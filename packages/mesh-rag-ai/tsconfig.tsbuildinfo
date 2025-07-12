@@ -1,1 +1,1 @@
-{"root":["./src/app.ts","./src/db/setupDB.ts","./src/services/githubService.ts"],"version":"5.8.3"}
+{"root":["./src/app.ts","./src/ingest/ingestDocs.ts","./src/services/githubService.ts","./src/services/openAIService.ts","./src/supabase/setupDB.ts","./src/supabase/supabaseClient.ts"],"version":"5.8.3"}

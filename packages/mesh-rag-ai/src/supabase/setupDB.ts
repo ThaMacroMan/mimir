@@ -94,4 +94,3 @@ export async function setupDatabase() {
     console.log("Disconnected from database");
   }
 }
-
