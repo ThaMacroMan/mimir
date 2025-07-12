@@ -5,7 +5,7 @@ export class GithubService {
     private baseUrl = "https://api.github.com"
     private owner = "MeshJS"
     private repo = "mesh"
-    private docPath = "apps/playground/src/pages"
+    private docPath = "packages"
     private token?: string
 
     constructor(token?: string) {
