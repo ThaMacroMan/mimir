@@ -4,6 +4,7 @@ import express from "express";
 import cors from "cors";
 import { setupDatabase } from "./supabase/setupDB";
 import { ingestDocs } from "./ingest/ingestDocs";
+import { askAI } from "./services/askAI";
 dotenv.config()
 
 const app = express();
@@ -30,6 +31,21 @@ app.post("/ingest", async (req, res) => {
     } catch(error: any) {
         console.error("Error ingesting the docs:", error.message || error);
         res.status(500).json({ message: "Failed to ingest the docs" })
+    }
+})
+
+app.post("/ask-mesh-ai", async (req, res) => {
+    const question = req.body.question;
+    if(typeof question !== "string" || !question.trim()) {
+        return res.status(400).json({ message: "Question must be non-empty string!" })
+    }
+
+    try {
+        const answer = await askAI(question);
+        return res.status(200).json({ answer })
+    } catch(error: any) {
+        console.error("Error processing API request:", error.message || error);
+        res.status(500).json({ message: "An internal server error occured while processing your question." })
     }
 })
 
