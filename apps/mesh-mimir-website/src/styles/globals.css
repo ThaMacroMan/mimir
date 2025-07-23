@@ -1,0 +1,32 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0d1117;
+  --surface: #161b22;
+  --primary: #0ea5e9;
+  --primary-hover: #0369a1;
+  --secondary: #38bdf8;
+  --text-primary: #ffffff;
+  --text-secondary: #cbd5e1;
+  --border: #2d333b;
+  --center-bg: #202632; /* Slightly lighter than surface for center content */
+}
+
+@layer base {
+  html {
+    background-color: var(--background);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--text-primary);
+  }
+
+  #__next {
+    background-color: var(--background);
+    min-height: 100vh;
+  }
+}
