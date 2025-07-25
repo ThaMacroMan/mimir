@@ -56,23 +56,15 @@
     min-height: 100vh;
   }
 
-  /* Custom scrollbar */
+  /* Hide scrollbars but keep functionality */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 0px;
+    height: 0px;
   }
 
-  ::-webkit-scrollbar-track {
-    background: var(--surface);
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: var(--border);
-    border-radius: 4px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--border-light);
+  /* Hide scrollbar for Firefox */
+  * {
+    scrollbar-width: none;
   }
 
   /* Selection */
@@ -160,5 +152,28 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+
+  /* Fluid layout utilities */
+  .fluid-container {
+    width: 100%;
+    max-width: none;
+    margin: 0 auto;
+  }
+
+  .fluid-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+
+  .fluid-text {
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
+    line-height: 1.4;
+  }
+
+  .fluid-heading {
+    font-size: clamp(2rem, 5vw, 4rem);
+    line-height: 1.1;
   }
 }

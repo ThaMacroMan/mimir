@@ -1,12 +1,13 @@
-import Header from "./Header";
-import Footer from "./Footer";
+import Header from "./src/components/Header";
+import Footer from "./src/components/Footer";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { motion, useScroll, useSpring, AnimatePresence } from "framer-motion";
 import { ReactNode, useEffect, useState, useRef } from "react";
-import Sidebar from "./Sidebar";
-import AIChatSidebar from "./AIChatSidebar";
-import { Terminal } from "./magicui/terminal";
+import Sidebar from "./src/components/Sidebar";
+import AIChatSidebar from "./src/components/AIChatSidebar";
+import ScrollNavigation from "./src/components/ScrollNavigation";
+import { Terminal } from "./src/components/magicui/terminal";
 
 interface BreadcrumbItem {
   label: string;
@@ -325,8 +326,13 @@ export default function Layout({ children }: { children: ReactNode }) {
   const [terminalDragging, setTerminalDragging] = useState(false);
   const [footerDragging, setFooterDragging] = useState(false);
   const [aiChatWidth, setAiChatWidth] = useState(320);
+  const [aiChatCenterOffset, setAiChatCenterOffset] = useState(0);
+  const [sidebarWidth, setSidebarWidth] = useState(260);
+  const [mainContentWidth, setMainContentWidth] = useState(0);
+  const [mainContentLeft, setMainContentLeft] = useState(260);
   const dragStartY = useRef<number | null>(null);
   const dragStartHeight = useRef<number | null>(null);
+  const mainContentRef = useRef<HTMLElement>(null);
   const minTerminalHeight = 120;
   const maxTerminalHeight = 600;
 
@@ -368,28 +374,55 @@ export default function Layout({ children }: { children: ReactNode }) {
     return parseInt(aiChatWidth) || 320;
   };
 
-  // Update CSS custom properties on the body for positioning
+  // Update sidebar positions and main content dimensions dynamically
   useEffect(() => {
     const updateSidebarPositions = () => {
-      const sidebarWidth =
-        document
-          .querySelector('nav[aria-label="Sidebar navigation"]')
-          ?.getBoundingClientRect().width || 260;
-      const aiChatWidth =
-        document
-          .querySelector('aside[aria-label="AI Chat sidebar"]')
-          ?.getBoundingClientRect().width || 320;
+      const sidebarElement = document.querySelector(
+        'nav[aria-label="Sidebar navigation"]'
+      );
+      const aiChatElement = document.querySelector(
+        'aside[aria-label="AI Chat sidebar"]'
+      );
+
+      const currentSidebarWidth =
+        sidebarElement?.getBoundingClientRect().width || 260;
+      const currentAiChatWidth =
+        aiChatElement?.getBoundingClientRect().width || 320;
+
+      // Update state variables
+      setSidebarWidth(currentSidebarWidth);
+      setAiChatWidth(currentAiChatWidth);
+
+      // Calculate main content dimensions
+      const viewportWidth = window.innerWidth;
+      const newMainContentWidth = Math.max(
+        300,
+        viewportWidth - currentSidebarWidth - currentAiChatWidth
+      ); // Minimum 300px width
+      const newMainContentLeft = currentSidebarWidth;
+
+      setMainContentWidth(newMainContentWidth);
+      setMainContentLeft(newMainContentLeft);
 
       // Set CSS custom properties for terminal
-      document.body.style.setProperty("--terminal-left", `${sidebarWidth}px`);
-      document.body.style.setProperty("--terminal-right", `${aiChatWidth}px`);
+      document.body.style.setProperty(
+        "--terminal-left",
+        `${currentSidebarWidth}px`
+      );
+      document.body.style.setProperty(
+        "--terminal-right",
+        `${currentAiChatWidth}px`
+      );
 
       // Set CSS custom properties for main content area
-      document.body.style.setProperty("--sidebar-width", `${sidebarWidth}px`);
-      document.body.style.setProperty("--ai-chat-width", `${aiChatWidth}px`);
-
-      // Update state for clip-path calculation
-      setAiChatWidth(aiChatWidth);
+      document.body.style.setProperty(
+        "--sidebar-width",
+        `${currentSidebarWidth}px`
+      );
+      document.body.style.setProperty(
+        "--ai-chat-width",
+        `${currentAiChatWidth}px`
+      );
     };
 
     updateSidebarPositions();
@@ -410,16 +443,26 @@ export default function Layout({ children }: { children: ReactNode }) {
       observer.observe(sidebar, {
         attributes: true,
         attributeFilter: ["style"],
+        childList: true,
+        subtree: true,
       });
     if (aiChat)
       observer.observe(aiChat, {
         attributes: true,
         attributeFilter: ["style"],
+        childList: true,
+        subtree: true,
       });
+
+    // Use ResizeObserver for more reliable width detection
+    const resizeObserver = new ResizeObserver(updateSidebarPositions);
+    if (sidebar) resizeObserver.observe(sidebar);
+    if (aiChat) resizeObserver.observe(aiChat);
 
     return () => {
       window.removeEventListener("resize", updateSidebarPositions);
       observer.disconnect();
+      resizeObserver.disconnect();
     };
   }, []);
 
@@ -430,6 +473,62 @@ export default function Layout({ children }: { children: ReactNode }) {
       terminalOpen ? `${terminalHeight}px` : "0px"
     );
   }, [terminalHeight, terminalOpen]);
+
+  // Add keyboard navigation for scrolling
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!mainContentRef.current) return;
+
+      // Only handle if not typing in an input
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.contentEditable === "true"
+      ) {
+        return;
+      }
+
+      const container = mainContentRef.current;
+      const scrollAmount = container.clientHeight * 0.8;
+
+      switch (e.key) {
+        case "ArrowUp":
+        case "PageUp":
+          e.preventDefault();
+          container.scrollTo({
+            top: Math.max(0, container.scrollTop - scrollAmount),
+            behavior: "smooth",
+          });
+          break;
+        case "ArrowDown":
+        case "PageDown":
+          e.preventDefault();
+          container.scrollTo({
+            top: Math.min(
+              container.scrollHeight - container.clientHeight,
+              container.scrollTop + scrollAmount
+            ),
+            behavior: "smooth",
+          });
+          break;
+        case "Home":
+          e.preventDefault();
+          container.scrollTo({ top: 0, behavior: "smooth" });
+          break;
+        case "End":
+          e.preventDefault();
+          container.scrollTo({
+            top: container.scrollHeight - container.clientHeight,
+            behavior: "smooth",
+          });
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   // Handle terminal dragging
   useEffect(() => {
@@ -499,19 +598,34 @@ export default function Layout({ children }: { children: ReactNode }) {
       <div className="flex flex-1 flex-row min-h-0">
         <Sidebar />
         <main
-          className="flex-1 min-h-0 overflow-auto px-0 max-w-none mx-0 bg-center-bg rounded-2xl shadow-xl"
+          ref={mainContentRef}
+          className="flex-1 min-h-0 overflow-auto px-0 max-w-none mx-0 bg-center-bg rounded-2xl shadow-xl transition-all duration-300"
           style={{
             maxHeight: `calc(100vh - 64px - 36px - var(--terminal-height, 0px))`,
             marginTop: "80px", // Account for fixed header + extra spacing
-            marginLeft: "var(--sidebar-width, 260px)",
-            marginRight: "0px", // No right margin - content flows into parabolic space
-            width: "calc(100vw - var(--sidebar-width, 260px))", // Full width minus sidebar
+            marginLeft: `${mainContentLeft}px`,
+            marginRight: `${aiChatWidth}px`, // Account for AI chat sidebar
+            width: `${mainContentWidth}px`, // Dynamic width based on sidebar states
+            minWidth: "300px", // Ensure minimum readable width
           }}
         >
           {children}
         </main>
-        <AIChatSidebar />
+        <AIChatSidebar
+          width={aiChatWidth}
+          centerOffset={aiChatCenterOffset}
+          onWidthChange={setAiChatWidth}
+          onCenterOffsetChange={setAiChatCenterOffset}
+        />
       </div>
+
+      {/* Custom Scroll Navigation - moved outside flex container */}
+      <ScrollNavigation
+        containerRef={mainContentRef}
+        className="hidden md:flex" // Only show on medium screens and up to avoid conflicts with mobile
+        aiChatWidth={aiChatWidth}
+        centerOffset={aiChatCenterOffset}
+      />
       <div className="fixed bottom-0 left-0 right-0 z-50">
         <Footer
           onTerminalClick={() => setTerminalOpen(v => !v)}
@@ -531,8 +645,8 @@ export default function Layout({ children }: { children: ReactNode }) {
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className="fixed z-[100] pointer-events-none"
             style={{
-              left: "var(--terminal-left, 260px)",
-              right: "var(--terminal-right, 320px)",
+              left: `${sidebarWidth}px`,
+              right: `${aiChatWidth}px`,
               height: terminalHeight,
               bottom: "36px", // footer height
             }}

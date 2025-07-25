@@ -1,14 +1,27 @@
 import { useState, useRef, useEffect } from "react";
 import { Bot, Send } from "lucide-react";
 
-export default function AIChatSidebar() {
+interface AIChatSidebarProps {
+  width?: number;
+  centerOffset?: number;
+  onWidthChange?: (width: number) => void;
+  onCenterOffsetChange?: (offset: number) => void;
+}
+
+export default function AIChatSidebar({
+  width: externalWidth,
+  centerOffset: externalCenterOffset,
+  onWidthChange,
+  onCenterOffsetChange,
+}: AIChatSidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
-  const [width, setWidth] = useState(320);
+  const [width, setWidth] = useState(externalWidth || 320);
   const [dragging, setDragging] = useState(false);
   const [maxWidth, setMaxWidth] = useState(
     typeof window !== "undefined" ? window.innerWidth / 2 : 600
   );
-  const [centerOffset, setCenterOffset] = useState(0); // Vertical offset for center point
+  const [centerOffset, setCenterOffset] = useState(externalCenterOffset || 0); // Vertical offset for center point
+  const [isClient, setIsClient] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const dragStartX = useRef<number | null>(null);
   const dragStartWidth = useRef<number | null>(null);
@@ -20,11 +33,50 @@ export default function AIChatSidebar() {
     { from: "ai", text: "Great question! Here's a quick guide..." },
   ]);
 
-  // Single unified parabolic function
-  const generateParabolicClipPath = (baseWidth: number, height: number) => {
+  // Update internal state when external props change
+  useEffect(() => {
+    if (externalWidth !== undefined) {
+      setWidth(externalWidth);
+    }
+  }, [externalWidth]);
+
+  useEffect(() => {
+    if (externalCenterOffset !== undefined) {
+      setCenterOffset(externalCenterOffset);
+    }
+  }, [externalCenterOffset]);
+
+  // Notify parent of changes
+  const updateWidth = (newWidth: number) => {
+    setWidth(newWidth);
+    onWidthChange?.(newWidth);
+  };
+
+  const updateCenterOffset = (newOffset: number) => {
+    setCenterOffset(newOffset);
+    onCenterOffsetChange?.(newOffset);
+  };
+
+  // Collapsed width constant
+  const COLLAPSED_WIDTH = 48;
+
+  // Create refs for all messages upfront to avoid conditional hooks
+  const messageRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const messageStyles = useRef<
+    Array<{
+      padding: number;
+      fontSize: string;
+      maxWidth: string;
+      opacity: number;
+      displayText: string;
+    }>
+  >([]);
+
+  // Single unified parabolic function - used for both clip-path and SVG border
+  const generateParabolicCurve = (baseWidth: number, height: number) => {
     const amplitudeFactor = Math.max(
-      0.03,
-      ((baseWidth - 120) / (maxWidth - 120)) * 0.15
+      0.12,
+      ((baseWidth - 120) / (maxWidth - 120)) * 0.5
     );
     const minContentWidth = Math.max(100, baseWidth * 0.4);
     const maxClipAmount = baseWidth - minContentWidth;
@@ -46,29 +98,38 @@ export default function AIChatSidebar() {
       const curveOutset = Math.min(rawCurveOutset, maxClipAmount);
       const x = curveOutset;
 
-      points.push(`${x}px ${y}px`);
+      points.push({ x, y });
     }
 
-    // Add the right edge points to close the shape
-    for (let i = numPoints; i >= 0; i--) {
-      const y = (i / numPoints) * height;
-      points.push(`${baseWidth}px ${y}px`);
-    }
+    return points;
+  };
 
-    return `polygon(${points.join(", ")})`;
+  // Generate clip-path from the unified curve
+  const generateParabolicClipPath = (baseWidth: number, height: number) => {
+    const points = generateParabolicCurve(baseWidth, height);
+
+    const clipPoints = [
+      ...points.map(p => `${p.x}px ${p.y}px`),
+      // Add the right edge points to close the shape
+      ...points
+        .slice()
+        .reverse()
+        .map(p => `${baseWidth}px ${p.y}px`),
+    ];
+
+    return `polygon(${clipPoints.join(", ")})`;
   };
 
   // Calculate available width at any vertical position using the main function
   const getAvailableWidthAtPosition = (yPosition: number) => {
-    const height =
-      typeof window !== "undefined" ? window.innerHeight - 100 : 600;
+    const height = isClient ? window.innerHeight - 100 : 600;
     const adjustedCenter = height / 2 + centerOffset;
     const distanceFromCenter = yPosition - adjustedCenter;
     const normalizedDistance = distanceFromCenter / (height / 2);
 
     const amplitudeFactor = Math.max(
-      0.03,
-      ((width - 120) / (maxWidth - 120)) * 0.15
+      0.12,
+      ((width - 120) / (maxWidth - 120)) * 0.5
     );
     const easedDistance = Math.pow(Math.abs(normalizedDistance), 1.2);
     const rawCurveOutset = width * amplitudeFactor * easedDistance;
@@ -99,12 +160,14 @@ export default function AIChatSidebar() {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const prevMessagesLength = useRef(messages.length);
 
-  // Update maxWidth on window resize
+  // Set client-side flag and update maxWidth on window resize
   useEffect(() => {
+    setIsClient(true);
     const handleResize = () => {
       setMaxWidth(window.innerWidth / 2);
       setWidth(w => Math.min(w, window.innerWidth / 2));
     };
+    handleResize(); // Call immediately
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -118,6 +181,18 @@ export default function AIChatSidebar() {
     }
     prevMessagesLength.current = messages.length;
   }, [messages]);
+
+  // Ensure proper scroll position on initial load
+  useEffect(() => {
+    if (messages.length > 0 && !collapsed) {
+      setTimeout(() => {
+        const chatContainer = document.querySelector(".chat-scroll");
+        if (chatContainer) {
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+      }, 200);
+    }
+  }, [collapsed]);
 
   // Ensure first message is always visible on load
   useEffect(() => {
@@ -142,11 +217,11 @@ export default function AIChatSidebar() {
         ) {
           const delta = dragStartX.current - e.clientX;
           const newWidth = Math.min(
-            Math.max(dragStartWidth.current + delta, 120),
+            Math.max(dragStartWidth.current + delta, COLLAPSED_WIDTH),
             maxWidth
           );
-          setWidth(newWidth);
-          setCollapsed(newWidth <= 120);
+          updateWidth(newWidth);
+          setCollapsed(newWidth <= COLLAPSED_WIDTH);
         }
 
         // Handle vertical dragging for parabola center point
@@ -158,12 +233,12 @@ export default function AIChatSidebar() {
           const deltaY = e.clientY - dragStartY.current;
           const newCenterOffset = dragStartCenterOffset.current + deltaY;
           const maxOffset =
-            (typeof window !== "undefined" ? window.innerHeight : 800) * 0.3;
+            (typeof window !== "undefined" ? window.innerHeight : 800) * 0.8;
           const clampedOffset = Math.max(
             -maxOffset,
             Math.min(maxOffset, newCenterOffset)
           );
-          setCenterOffset(clampedOffset);
+          updateCenterOffset(clampedOffset);
         }
       });
     };
@@ -185,15 +260,13 @@ export default function AIChatSidebar() {
   }, [dragging, maxWidth]);
 
   // Generate parabolic clip-path for visual container only
-  const clipPath = generateParabolicClipPath(
-    width,
-    typeof window !== "undefined" ? window.innerHeight - 100 : 600
-  );
+  const clipPath = isClient
+    ? generateParabolicClipPath(width, window.innerHeight - 100)
+    : "none";
 
   // Calculate optimal content positioning based on parabola
   const getOptimalContentLayout = () => {
-    const height =
-      typeof window !== "undefined" ? window.innerHeight - 100 : 600;
+    const height = isClient ? window.innerHeight - 100 : 600;
     const adjustedCenter = height / 2 + centerOffset;
 
     // Find the best areas for header, content, and input
@@ -240,34 +313,57 @@ export default function AIChatSidebar() {
         right: 0,
         top: 64,
         bottom: 36,
-        width: collapsed ? 120 : width,
+        width: collapsed ? COLLAPSED_WIDTH : width,
         height: "calc(100vh - 100px)",
         zIndex: 40,
       }}
     >
-      {/* Always visible blue border that follows the parabolic shape */}
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: width,
-          height: "calc(100vh - 100px)",
-          border: "1px solid hsl(var(--primary))",
-          borderRadius: collapsed ? "0" : "8px 0 0 8px",
-          clipPath: collapsed ? "none" : clipPath,
-          pointerEvents: "none",
-          zIndex: 42,
-        }}
-      />
+      {/* Parabolic border */}
+      {!collapsed && (
+        <svg
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: width,
+            height: "calc(100vh - 100px)",
+            pointerEvents: "none",
+            zIndex: 50, // Higher z-index to ensure visibility
+          }}
+          viewBox={`0 0 ${width} ${isClient ? window.innerHeight - 100 : 600}`}
+          preserveAspectRatio="none"
+        >
+          <path
+            d={(() => {
+              const height = isClient ? window.innerHeight - 100 : 600;
+              const points = generateParabolicCurve(width, height);
+
+              let pathData = "";
+              points.forEach((point, i) => {
+                if (i === 0) {
+                  pathData = `M ${point.x} ${point.y}`;
+                } else {
+                  pathData += ` L ${point.x} ${point.y}`;
+                }
+              });
+              return pathData;
+            })()}
+            fill="none"
+            stroke="#00d4ff"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      )}
 
       <aside
         ref={sidebarRef}
         style={
           {
-            width: collapsed ? 120 : width,
+            width: collapsed ? COLLAPSED_WIDTH : width,
             minWidth: collapsed ? 0 : 120,
-            maxWidth: collapsed ? 120 : maxWidth,
+            maxWidth: collapsed ? COLLAPSED_WIDTH : maxWidth,
             transition: dragging ? "none" : "width 0.2s",
             height: "calc(100vh - 100px)",
             top: 0,
@@ -275,11 +371,15 @@ export default function AIChatSidebar() {
             position: "absolute",
             right: 0,
             zIndex: 40,
-            "--ai-chat-width": collapsed ? "56px" : `${width}px`,
+            "--ai-chat-width": collapsed
+              ? `${COLLAPSED_WIDTH}px`
+              : `${width}px`,
             clipPath: collapsed ? "none" : clipPath,
           } as React.CSSProperties & { "--ai-chat-width": string }
         }
-        className={`bg-surface flex flex-col shadow-2xl ${collapsed ? "w-14 min-w-0" : "rounded-l-2xl"}`}
+        className={`bg-surface flex flex-col shadow-2xl ${
+          collapsed ? "min-w-0" : "rounded-l-2xl"
+        }`}
         aria-label="AI Chat sidebar"
       >
         {/* Combined Horizontal/Vertical Drag Handle */}
@@ -304,11 +404,18 @@ export default function AIChatSidebar() {
               <Bot className="w-5 h-5 text-primary" />
             </div>
           </div>
+        ) : !isClient ? (
+          // Loading state while client-side calculations are being set up
+          <div className="flex flex-col items-center justify-center flex-1">
+            <div className="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center">
+              <Bot className="w-5 h-5 text-primary" />
+            </div>
+          </div>
         ) : (
           <>
             {/* Dynamic Header - Adapts to available space */}
             <div
-              className="flex items-center gap-1 px-2 py-1 border-b border-border bg-surface-elevated min-w-0 flex-shrink-0 sticky top-0 z-50 rounded-t-lg"
+              className="flex items-center gap-1 px-2 py-1 bg-surface-elevated min-w-0 flex-shrink-0 sticky top-0 z-50 rounded-t-lg"
               style={{
                 height:
                   contentLayout.headerSpace.availableWidth < 150
@@ -326,7 +433,7 @@ export default function AIChatSidebar() {
                 maxWidth: `${contentLayout.headerSpace.availableWidth}px`,
                 position: "absolute",
                 top: "8px",
-                left: `${contentLayout.headerSpace.curveOutset}px`,
+                left: `${contentLayout.headerSpace.curveOutset + 2}px`,
               }}
             >
               <div
@@ -405,98 +512,103 @@ export default function AIChatSidebar() {
                 minHeight: 0,
                 width: `${contentLayout.contentArea.maxWidth}px`,
                 maxWidth: `${contentLayout.contentArea.maxWidth}px`,
-                marginLeft: `${getAvailableWidthAtPosition(contentLayout.contentArea.start).curveOutset}px`,
-                height: `${contentLayout.contentArea.end - contentLayout.contentArea.start}px`,
-                position: "relative",
-                top: `${contentLayout.contentArea.start}px`,
+                marginLeft: `${getAvailableWidthAtPosition(contentLayout.contentArea.start).curveOutset + 2}px`,
+                position: "absolute",
+                top: "40px", // Fixed top position below header
+                bottom: "60px", // Fixed bottom position above input
+                left: 0,
+                right: 0,
               }}
             >
               <div
-                className="w-full flex-1 overflow-y-auto flex flex-col gap-1 py-1 min-w-0 chat-scroll"
+                className="w-full h-full overflow-y-auto flex flex-col gap-1 py-1 min-w-0 chat-scroll"
                 style={{
-                  maxHeight: "100%",
-                  minHeight: "120px",
                   paddingTop: "8px",
                   paddingBottom: "24px",
                   marginTop: "0px",
                   width: "100%",
                   maxWidth: "100%",
+                  height: "100%",
                 }}
               >
                 {messages.map((msg, idx) => {
-                  const messageRef = useRef<HTMLDivElement>(null);
-                  const [messageStyle, setMessageStyle] = useState({
-                    padding: 12,
-                    fontSize: "12px",
-                    maxWidth: "90%",
-                    opacity: 1,
-                    displayText: msg.text,
-                  });
+                  // Calculate message style based on available width
+                  const availableWidth =
+                    contentLayout.contentArea.maxWidth - 32;
+                  let fontSize = "12px";
+                  let padding = 12;
+                  let maxWidth = "90%";
 
-                  useEffect(() => {
-                    if (messageRef.current) {
-                      const availableWidth =
-                        contentLayout.contentArea.maxWidth - 32;
+                  if (availableWidth < 150) {
+                    fontSize = "10px";
+                    padding = 8;
+                    maxWidth = "95%";
+                  } else if (availableWidth < 200) {
+                    fontSize = "11px";
+                    padding = 10;
+                    maxWidth = "92%";
+                  } else if (availableWidth > 300) {
+                    fontSize = "14px";
+                    padding = 16;
+                    maxWidth = "85%";
+                  }
 
-                      let fontSize = "12px";
-                      let padding = 12;
-                      let maxWidth = "90%";
+                  // Calculate the message's vertical position to determine parabolic offset
+                  const messageElement = messageRefs.current[idx];
+                  const messageTop = messageElement?.offsetTop || 0;
+                  const messageHeight = messageElement?.offsetHeight || 0;
+                  const messageCenterY = messageTop + messageHeight / 2;
 
-                      if (availableWidth < 150) {
-                        fontSize = "10px";
-                        padding = 8;
-                        maxWidth = "95%";
-                      } else if (availableWidth < 200) {
-                        fontSize = "11px";
-                        padding = 10;
-                        maxWidth = "92%";
-                      } else if (availableWidth > 300) {
-                        fontSize = "14px";
-                        padding = 16;
-                        maxWidth = "85%";
-                      }
+                  // Get the parabolic offset for this message's position
+                  const parabolicOffset =
+                    getAvailableWidthAtPosition(messageCenterY);
 
-                      setMessageStyle({
-                        padding,
-                        fontSize,
-                        maxWidth,
-                        opacity: 1,
-                        displayText: msg.text,
-                      });
-                    }
-                  }, [contentLayout.contentArea.maxWidth, idx]);
+                  // Calculate wider message width based on available space
+                  const messageWidth = Math.min(
+                    parabolicOffset.availableWidth - 16, // Use more of available width
+                    msg.from === "ai"
+                      ? parabolicOffset.availableWidth -
+                          parabolicOffset.curveOutset -
+                          16
+                      : parabolicOffset.availableWidth - 16
+                  );
 
                   return (
                     <div
-                      ref={messageRef}
+                      ref={el => {
+                        messageRefs.current[idx] = el;
+                      }}
                       key={idx}
                       className={`w-fit rounded-lg shadow-sm transition-all duration-300 ${
                         msg.from === "ai"
-                          ? "bg-surface-elevated text-text-primary self-start border border-border"
-                          : "bg-primary/20 text-primary self-end ml-auto border border-primary/30"
+                          ? "bg-surface-elevated text-text-primary self-start"
+                          : "bg-primary/20 text-primary self-end ml-auto"
                       }`}
                       style={{
                         wordBreak: "break-word",
-                        padding: `${messageStyle.padding}px`,
-                        fontSize: messageStyle.fontSize,
-                        maxWidth: messageStyle.maxWidth,
-                        opacity: messageStyle.opacity,
-                        marginLeft: msg.from === "user" ? "auto" : undefined,
+                        padding: `${padding}px`,
+                        fontSize: fontSize,
+                        opacity: 1,
+                        marginLeft:
+                          msg.from === "user"
+                            ? "auto"
+                            : `${parabolicOffset.curveOutset + 8}px`,
                         marginRight: msg.from === "ai" ? "auto" : undefined,
                         minWidth: "60px",
                         width: "fit-content",
+                        maxWidth: `${messageWidth}px`,
                       }}
                     >
                       <div
                         className="font-mono text-text-muted mb-1 truncate"
                         style={{
-                          fontSize: `${parseInt(messageStyle.fontSize) - 2}px`,
+                          fontSize: `${parseInt(fontSize) - 2}px`,
                         }}
                       >
                         {msg.from === "ai" ? "AI" : "You"}
                       </div>
                       <div className="break-words whitespace-pre-wrap">
-                        {messageStyle.displayText}
+                        {msg.text}
                       </div>
                     </div>
                   );
@@ -509,7 +621,7 @@ export default function AIChatSidebar() {
 
             {/* Dynamic Input Box - Adapts to available space with guaranteed send button */}
             <form
-              className="w-full flex items-center gap-2 p-1 bg-surface-elevated rounded-lg border border-border mt-1 min-w-0 flex-shrink-0 sticky bottom-0 z-10 rounded-b-lg"
+              className="w-full flex items-center gap-2 p-1 bg-surface-elevated rounded-lg mt-1 min-w-0 flex-shrink-0 sticky bottom-0 z-10 rounded-b-lg"
               onSubmit={e => {
                 e.preventDefault();
                 if (input.trim()) {
@@ -540,7 +652,8 @@ export default function AIChatSidebar() {
                 maxWidth: `${contentLayout.inputSpace.availableWidth}px`,
                 position: "absolute",
                 bottom: "8px",
-                left: `${contentLayout.inputSpace.curveOutset}px`,
+                left: `${contentLayout.inputSpace.curveOutset + 2}px`,
+                zIndex: 20,
               }}
             >
               <input

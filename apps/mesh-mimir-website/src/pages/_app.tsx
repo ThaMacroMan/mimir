@@ -6,7 +6,7 @@ import { MDXProvider } from "@mdx-js/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import Layout from "@/components/Layout";
+import Layout from "../../Layout";
 
 const components = {
   // Custom MDX components can be added here

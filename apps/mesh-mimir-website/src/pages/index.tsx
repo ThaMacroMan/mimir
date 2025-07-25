@@ -30,7 +30,7 @@ const staggerChildren = {
 
 export default function Home() {
   return (
-    <>
+    <div className="w-full min-h-screen">
       <Head>
         <title>Mimir | Anyone Can Build on Cardano</title>
         <meta
@@ -41,7 +41,7 @@ export default function Home() {
 
       {/* Hero Section */}
       <motion.section
-        className="text-center mb-16 mt-16 px-6"
+        className="text-center mb-16 mt-16 px-6 w-full"
         initial="initial"
         animate="animate"
         variants={staggerChildren}
@@ -55,14 +55,14 @@ export default function Home() {
         </motion.div>
 
         <motion.h1
-          className="text-5xl md:text-7xl font-black tracking-tight mb-6 gradient-text font-display"
+          className="fluid-heading font-black tracking-tight mb-6 gradient-text font-display"
           variants={fadeInUp}
         >
           BECOME A BUILDER
         </motion.h1>
 
         <motion.p
-          className="max-w-4xl mx-auto text-xl md:text-2xl text-text-secondary mb-8 leading-relaxed font-light"
+          className="fluid-text text-text-secondary mb-8 leading-relaxed font-light w-full"
           variants={fadeInUp}
         >
           <span className="text-primary font-semibold">Anyone</span> can build
@@ -76,20 +76,22 @@ export default function Home() {
           variants={fadeInUp}
         >
           <Sparkles className="w-5 h-5 text-primary" />
-          <span className="font-mono text-sm">No programming required</span>
+          <span className="font-mono text-sm">
+            No programming skills required
+          </span>
           <Sparkles className="w-5 h-5 text-primary" />
         </motion.div>
       </motion.section>
 
       {/* Persona Cards */}
       <motion.section
-        className="mb-12 px-6"
+        className="mb-12 px-6 w-full"
         initial="initial"
         whileInView="animate"
         viewport={{ once: true }}
         variants={staggerChildren}
       >
-        <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+        <div className="fluid-grid gap-4 sm:gap-6 w-full">
           {[
             {
               title: "Never Touched Code",
@@ -122,24 +124,24 @@ export default function Home() {
           ].map((persona, index) => (
             <motion.div
               key={persona.title}
-              className="wireframe-card wireframe-card-hover p-8 text-center group"
+              className="wireframe-card wireframe-card-hover p-4 sm:p-6 lg:p-8 text-center group h-full"
               variants={fadeInUp}
               whileHover={{ scale: 1.02, y: -4 }}
               transition={{ duration: 0.2 }}
             >
-              <div className="text-primary mb-6 group-hover:scale-110 transition-transform duration-200">
+              <div className="text-primary mb-4 sm:mb-6 group-hover:scale-110 transition-transform duration-200">
                 {persona.icon}
               </div>
-              <h3 className="text-xl font-bold mb-4 text-primary font-display">
+              <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-primary font-display">
                 {persona.title}
               </h3>
-              <p className="text-text-secondary leading-relaxed font-light">
+              <p className="text-text-secondary leading-relaxed font-light text-sm sm:text-base">
                 {persona.description}
               </p>
 
               {/* Wireframe-style accent line */}
               <div
-                className={`mt-6 h-px bg-gradient-to-r from-transparent via-${persona.color} to-transparent opacity-50`}
+                className={`mt-4 sm:mt-6 h-px bg-gradient-to-r from-transparent via-${persona.color} to-transparent opacity-50`}
               ></div>
             </motion.div>
           ))}
@@ -147,22 +149,25 @@ export default function Home() {
       </motion.section>
 
       {/* CTA Section */}
-      <motion.section className="text-center mb-16 px-6" variants={fadeInUp}>
+      <motion.section
+        className="text-center mb-16 px-6 w-full"
+        variants={fadeInUp}
+      >
         <motion.div
-          className="inline-flex flex-col items-center gap-6"
+          className="flex flex-col items-center gap-6 w-full"
           whileHover={{ scale: 1.02 }}
           transition={{ duration: 0.2 }}
         >
           <motion.a
             href="/docs/ai-tools"
-            className="wireframe-button-primary px-12 py-4 text-lg font-bold font-display"
+            className="wireframe-button-primary px-8 sm:px-12 py-4 text-base sm:text-lg font-bold font-display"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
             START BUILDING NOW
           </motion.a>
 
-          <div className="flex items-center gap-4 text-text-muted text-sm font-mono">
+          <div className="flex items-center gap-2 sm:gap-4 text-text-muted text-xs sm:text-sm font-mono">
             <span>→</span>
             <span>Press Enter to continue</span>
             <span>←</span>
@@ -172,21 +177,21 @@ export default function Home() {
 
       {/* Feature Grid */}
       <motion.section
-        className="mb-16 px-6"
+        className="mb-16 px-6 w-full"
         initial="initial"
         whileInView="animate"
         viewport={{ once: true }}
         variants={staggerChildren}
       >
-        <div className="max-w-6xl mx-auto">
+        <div className="w-full">
           <motion.h2
-            className="text-3xl font-bold text-center mb-12 text-primary font-display"
+            className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12 text-primary font-display"
             variants={fadeInUp}
           >
             Why Choose Mimir?
           </motion.h2>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="fluid-grid gap-4 sm:gap-6 w-full">
             {[
               {
                 title: "AI-Powered",
@@ -209,18 +214,18 @@ export default function Home() {
             ].map((feature, index) => (
               <motion.div
                 key={feature.title}
-                className="wireframe-card p-6 text-center"
+                className="wireframe-card p-4 sm:p-6 text-center h-full"
                 variants={fadeInUp}
                 whileHover={{ y: -2 }}
                 transition={{ duration: 0.2 }}
               >
-                <div className="text-primary mb-4 flex justify-center">
+                <div className="text-primary mb-3 sm:mb-4 flex justify-center">
                   {feature.icon}
                 </div>
-                <h3 className="text-lg font-semibold mb-3 text-primary font-display">
+                <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3 text-primary font-display">
                   {feature.title}
                 </h3>
-                <p className="text-text-secondary text-sm leading-relaxed">
+                <p className="text-text-secondary text-xs sm:text-sm leading-relaxed">
                   {feature.description}
                 </p>
               </motion.div>
@@ -228,6 +233,6 @@ export default function Home() {
           </div>
         </div>
       </motion.section>
-    </>
+    </div>
   );
 }
