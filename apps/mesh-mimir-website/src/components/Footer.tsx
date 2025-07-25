@@ -8,7 +8,7 @@ interface FooterProps {
 export default function Footer({ onTerminalClick, onFooterDrag }: FooterProps) {
   return (
     <footer
-      className="h-9 bg-surface/95 border-t border-border flex px-0 select-none relative"
+      className="h-9 bg-surface/95 border-t border-border flex px-4 select-none relative"
       style={{ fontSize: "0.85rem" }}
     >
       {/* Drag handle at top of footer */}
@@ -17,12 +17,14 @@ export default function Footer({ onTerminalClick, onFooterDrag }: FooterProps) {
         onMouseDown={onFooterDrag}
         style={{ marginTop: "-1px" }}
       />
+
       {/* Centered drag tip note */}
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-m text-text-secondary pointer-events-none select-none">
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-xs text-text-muted pointer-events-none select-none font-mono">
         Drag edge up or press Terminal for tips
       </div>
+
       {/* Far left: Small MeshBadge and AI Tools section */}
-      <div className="flex items-center pl-0" style={{ marginLeft: 0 }}>
+      <div className="flex items-center">
         <span
           className="inline-flex"
           style={{
@@ -34,24 +36,26 @@ export default function Footer({ onTerminalClick, onFooterDrag }: FooterProps) {
           <MeshBadge isDark={true} />
         </span>
         <span
-          className="text-text-secondary font-mono truncate"
+          className="text-text-secondary font-mono text-xs truncate"
           style={{ marginLeft: "-0.25rem" }}
         >
           Section: <span className="font-semibold text-primary">AI Tools</span>
         </span>
       </div>
+
       {/* Spacer */}
       <div className="flex-1" />
-      {/* Far right: Terminal button and MeshJS Mnemos */}
-      <div className="flex items-center justify-end text-m font-semibold min-w-[120px] mr-2 gap-2">
+
+      {/* Far right: Terminal button and MeshJS Mimir */}
+      <div className="flex items-center justify-end text-xs font-semibold min-w-[120px] gap-3">
         <button
           onClick={onTerminalClick}
-          className="flex items-center gap-1 px-3 py-1 rounded bg-background border border-border text-xs text-text-secondary hover:text-primary hover:bg-surface transition focus:outline-none focus:ring-2 focus:ring-primary/50"
+          className="flex items-center gap-2 px-3 py-1 rounded-lg bg-surface-elevated border border-border text-text-secondary hover:text-primary hover:bg-surface transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/50 font-mono"
           aria-label="Open terminal"
         >
           <svg
-            width="16"
-            height="16"
+            width="14"
+            height="14"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
@@ -63,7 +67,7 @@ export default function Footer({ onTerminalClick, onFooterDrag }: FooterProps) {
           </svg>
           Terminal
         </button>
-        MeshJS Mnemos
+        <span className="text-text-muted font-mono">MeshJS Mimir</span>
       </div>
     </footer>
   );

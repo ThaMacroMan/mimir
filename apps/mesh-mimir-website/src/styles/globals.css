@@ -1,32 +1,164 @@
-@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #0d1117;
-  --surface: #161b22;
-  --primary: #0ea5e9;
-  --primary-hover: #0369a1;
-  --secondary: #38bdf8;
+  /* Futuristic Color Palette */
+  --background: #0a0a0f;
+  --surface: #111118;
+  --surface-elevated: #1a1a24;
+  --primary: #00d4ff;
+  --primary-hover: #00b8e6;
+  --secondary: #6366f1;
+  --accent: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+
+  /* Text Colors */
   --text-primary: #ffffff;
-  --text-secondary: #cbd5e1;
-  --border: #2d333b;
-  --center-bg: #202632; /* Slightly lighter than surface for center content */
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+
+  /* Border Colors */
+  --border: #27272a;
+  --border-light: #3f3f46;
+  --border-accent: #00d4ff20;
+
+  /* Special Colors */
+  --glow: #00d4ff40;
+  --glow-strong: #00d4ff60;
+  --center-bg: #0f0f16;
 }
 
 @layer base {
   html {
     background-color: var(--background);
+    font-family:
+      "Inter",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      sans-serif;
   }
 
   body {
     background-color: var(--background);
     color: var(--text-primary);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    font-variation-settings: "wght" 400;
   }
 
   #__next {
     background-color: var(--background);
     min-height: 100vh;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--surface);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--border-light);
+  }
+
+  /* Selection */
+  ::selection {
+    background: var(--primary);
+    color: var(--background);
+  }
+
+  /* Focus styles */
+  *:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* Wireframe-style components */
+  .wireframe-card {
+    @apply bg-surface border border-border rounded-lg shadow-sm;
+    box-shadow:
+      0 1px 3px 0 rgba(0, 0, 0, 0.1),
+      0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  }
+
+  .wireframe-card-hover {
+    @apply hover:border-primary/30 hover:shadow-md transition-all duration-200;
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  .wireframe-button {
+    @apply bg-surface border border-border text-text-primary px-4 py-2 rounded-md font-medium;
+    @apply hover:border-primary/50 hover:bg-surface-elevated transition-all duration-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background;
+  }
+
+  .wireframe-button-primary {
+    @apply bg-primary text-background border-primary font-semibold;
+    @apply hover:bg-primary-hover hover:border-primary-hover;
+    box-shadow:
+      0 0 0 1px var(--primary),
+      0 4px 6px -1px rgba(0, 212, 255, 0.1);
+  }
+
+  .wireframe-input {
+    @apply bg-surface border border-border text-text-primary px-3 py-2 rounded-md;
+    @apply focus:border-primary focus:ring-1 focus:ring-primary/50 focus:outline-none;
+    @apply placeholder:text-text-muted;
+  }
+
+  /* Typography utilities */
+  .font-mono {
+    font-family:
+      "JetBrains Mono", "Fira Code", "Monaco", "Cascadia Code", monospace;
+  }
+
+  .font-display {
+    font-family:
+      "Inter",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Glow effects */
+  .glow {
+    box-shadow: 0 0 20px var(--glow);
+  }
+
+  .glow-strong {
+    box-shadow: 0 0 30px var(--glow-strong);
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    background: linear-gradient(
+      135deg,
+      var(--primary) 0%,
+      var(--secondary) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 }

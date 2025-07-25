@@ -324,10 +324,49 @@ export default function Layout({ children }: { children: ReactNode }) {
   const [terminalHeight, setTerminalHeight] = useState(420);
   const [terminalDragging, setTerminalDragging] = useState(false);
   const [footerDragging, setFooterDragging] = useState(false);
+  const [aiChatWidth, setAiChatWidth] = useState(320);
   const dragStartY = useRef<number | null>(null);
   const dragStartHeight = useRef<number | null>(null);
   const minTerminalHeight = 120;
   const maxTerminalHeight = 600;
+
+  // Calculate parabolic clip-path for main content to utilize sidebar curve space
+  const generateMainContentClipPath = (aiChatWidth: number, height: number) => {
+    // Amplitude factor - increases with width for more dramatic curve
+    const amplitudeFactor = Math.max(0.1, (aiChatWidth - 56) / (600 - 56));
+
+    // Generate points for the parabolic curve that mirrors the sidebar
+    const points = [];
+    const numPoints = 20;
+
+    for (let i = 0; i <= numPoints; i++) {
+      const y = (i / numPoints) * height;
+      // Mirror the sidebar's parabolic curve
+      const normalizedY = (y - height / 2) / (height / 2); // -1 to 1
+      const curveOutset =
+        aiChatWidth * amplitudeFactor * normalizedY * normalizedY;
+      const x = aiChatWidth - curveOutset; // Mirror the curve
+
+      points.push(`${x}px ${y}px`);
+    }
+
+    // Add the right edge points to close the shape
+    for (let i = numPoints; i >= 0; i--) {
+      const y = (i / numPoints) * height;
+      points.push(`100% ${y}px`);
+    }
+
+    return `polygon(0px 0px, ${points.join(", ")}, 100% 100%, 0px 100%)`;
+  };
+
+  // Get current AI chat width for clip-path calculation
+  const getCurrentAiChatWidth = () => {
+    if (typeof window === "undefined") return 320;
+    const aiChatWidth = getComputedStyle(document.body).getPropertyValue(
+      "--ai-chat-width"
+    );
+    return parseInt(aiChatWidth) || 320;
+  };
 
   // Update CSS custom properties on the body for positioning
   useEffect(() => {
@@ -348,6 +387,9 @@ export default function Layout({ children }: { children: ReactNode }) {
       // Set CSS custom properties for main content area
       document.body.style.setProperty("--sidebar-width", `${sidebarWidth}px`);
       document.body.style.setProperty("--ai-chat-width", `${aiChatWidth}px`);
+
+      // Update state for clip-path calculation
+      setAiChatWidth(aiChatWidth);
     };
 
     updateSidebarPositions();
@@ -462,9 +504,8 @@ export default function Layout({ children }: { children: ReactNode }) {
             maxHeight: `calc(100vh - 64px - 36px - var(--terminal-height, 0px))`,
             marginTop: "80px", // Account for fixed header + extra spacing
             marginLeft: "var(--sidebar-width, 260px)",
-            marginRight: "var(--ai-chat-width, 320px)",
-            width:
-              "calc(100vw - var(--sidebar-width, 260px) - var(--ai-chat-width, 320px))",
+            marginRight: "0px", // No right margin - content flows into parabolic space
+            width: "calc(100vw - var(--sidebar-width, 260px))", // Full width minus sidebar
           }}
         >
           {children}
@@ -509,7 +550,7 @@ export default function Layout({ children }: { children: ReactNode }) {
               />
               <Terminal>
                 {/* Example content, replace with real terminal logic later */}$
-                echo "Welcome to the MeshJS Terminal!"
+                echo "Welcome to the Mimir Terminal!"
               </Terminal>
               <button
                 onClick={() => setTerminalOpen(false)}

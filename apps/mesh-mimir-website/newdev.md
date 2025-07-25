@@ -1,4 +1,4 @@
-Steps to becoming a Cardano Developer using Mnemos and MeshJS
+Steps to becoming a Cardano Developer using Mimir and MeshJS
 
 1. Open Cursor, open terminal
 2. npx meshjs [appname]

@@ -10,7 +10,7 @@ export interface Tool {
   id: string;
   name: string;
   description: string;
-  icon: string;
+  icon: ReactNode;
   setupUrl: string;
   learnMoreUrl: string;
   features: string[];

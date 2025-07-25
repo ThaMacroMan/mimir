@@ -36,4 +36,4 @@ Follow us on [Twitter](https://meshjs.dev/go/twitter) for updates.
 
 Join our [Discord](https://meshjs.dev/go/discord) for any questions and suggestions.
 
-# Mnemos-Website
+# Mimir-Website

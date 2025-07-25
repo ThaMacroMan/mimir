@@ -2,10 +2,11 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { getSidebarSlides } from "./ai-tools/data/slides";
+import { BookOpen, Rocket, ChevronDown } from "lucide-react";
 
 interface SidebarSection {
   title: string;
-  icon: string;
+  icon: React.ReactNode;
   items: { label: string; href: string }[];
 }
 
@@ -18,24 +19,22 @@ const aiToolsItems = getSidebarSlides().map(slide => ({
 const sections: SidebarSection[] = [
   {
     title: "Learn",
-    icon: "📚",
+    icon: <BookOpen className="w-5 h-5" />,
     items: aiToolsItems,
   },
   {
     title: "Build",
-    icon: "🚀",
+    icon: <Rocket className="w-5 h-5" />,
     items: [{ label: "First Transaction", href: "/guides/first_transaction" }],
   },
 ];
-
-// NOTE: Ensure that the /docs/ai-tools page (AIToolsContainer) reads the 'slide' query param and displays the correct slide accordingly.
 
 export default function Sidebar() {
   const [openSections, setOpenSections] = useState(() =>
     sections.map(() => true)
   );
   const [collapsed, setCollapsed] = useState(false);
-  const [width, setWidth] = useState(260); // default width
+  const [width, setWidth] = useState(260);
   const [dragging, setDragging] = useState(false);
   const [maxWidth, setMaxWidth] = useState(
     typeof window !== "undefined" ? window.innerWidth / 2 : 600
@@ -102,8 +101,8 @@ export default function Sidebar() {
       style={
         {
           left: 0,
-          top: 64, // header height in px
-          bottom: 36, // footer height in px
+          top: 64,
+          bottom: 36,
           position: "fixed",
           zIndex: 30,
           height: "auto",
@@ -117,16 +116,19 @@ export default function Sidebar() {
     >
       {/* Sidebar Title */}
       {!collapsed && (
-        <div className="flex items-center justify-left gap-2 px-4 py-3 border-b border-border bg-surface text-lg font-bold text-primary select-none">
-          <span role="img" aria-label="Learning">
-            📚
-          </span>{" "}
-          Learning Sections
+        <div className="flex items-center gap-3 px-4 py-4 border-b border-border bg-surface-elevated">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-primary rounded-full"></div>
+            <span className="font-display font-semibold text-text-primary text-sm">
+              LEARNING SECTIONS
+            </span>
+          </div>
         </div>
       )}
+
       {/* Drag Handle */}
       <div
-        className={`absolute right-0 top-0 h-full w-2 cursor-ew-resize z-50 group ${dragging ? "bg-primary/30" : "bg-transparent"}`}
+        className={`absolute right-0 top-0 h-full w-1 cursor-ew-resize z-50 group ${dragging ? "bg-primary" : "bg-transparent hover:bg-primary/30"}`}
         onMouseDown={e => {
           setDragging(true);
           dragStartX.current = e.clientX;
@@ -134,34 +136,50 @@ export default function Sidebar() {
           e.preventDefault();
         }}
       ></div>
-      <ul className="space-y-4 flex-1 overflow-y-auto py-4 scrollbar-none">
+
+      <ul className="space-y-2 flex-1 overflow-y-auto py-4 scrollbar-none">
         {sections.map((section, idx) => {
-          // Determine if any item in this section matches the current route
           const isActiveSection = section.items.some(item =>
             router.pathname.startsWith(item.href)
           );
           return (
             <li key={section.title} className="relative group">
               <button
-                className={`flex items-center w-full text-left font-bold text-text-primary py-2 px-2 rounded hover:bg-background/60 focus:outline-none focus:ring-2 focus:ring-primary/30 transition ${collapsed ? "justify-center" : ""} ${isActiveSection ? "text-blue-500" : ""}`}
+                className={`flex items-center w-full text-left py-3 px-4 rounded-lg hover:bg-surface-elevated focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 ${collapsed ? "justify-center" : ""} ${isActiveSection ? "bg-primary/10 border border-primary/30" : ""}`}
                 aria-expanded={openSections[idx]}
                 aria-controls={`sidebar-section-${idx}`}
                 onClick={() => toggleSection(idx)}
                 tabIndex={collapsed ? -1 : 0}
               >
-                <span className="text-xl mr-0 md:mr-2">{section.icon}</span>
-                {!collapsed && <span className="flex-1">{section.title}</span>}
-                {/* Remove collapse/expand arrow */}
+                <span className="text-primary mr-3">{section.icon}</span>
+                {!collapsed && (
+                  <span className="flex-1 font-display font-medium text-text-primary">
+                    {section.title}
+                  </span>
+                )}
+                {!collapsed && (
+                  <ChevronDown
+                    className={`w-4 h-4 text-text-secondary transition-transform duration-200 ${
+                      openSections[idx] ? "rotate-180" : ""
+                    }`}
+                  />
+                )}
               </button>
+
               {/* Tooltip for collapsed state */}
               {collapsed && (
-                <span className="absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2 py-1 rounded bg-background border border-border text-xs text-text-secondary opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50 shadow-lg transition-opacity duration-200">
+                <span className="absolute left-full top-1/2 -translate-y-1/2 ml-2 px-3 py-2 rounded-lg bg-surface-elevated border border-border text-xs text-text-primary opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50 shadow-lg transition-opacity duration-200 font-display">
                   {section.title}
                 </span>
               )}
+
               <ul
                 id={`sidebar-section-${idx}`}
-                className={`pl-4 mt-2 space-y-2 transition-all ${openSections[idx] && !collapsed ? "max-h-96 opacity-100" : "max-h-0 opacity-0 overflow-hidden"}`}
+                className={`pl-4 mt-2 space-y-1 transition-all duration-200 ${
+                  openSections[idx] && !collapsed
+                    ? "max-h-96 opacity-100"
+                    : "max-h-0 opacity-0 overflow-hidden"
+                }`}
               >
                 {!collapsed &&
                   section.items.map(item => {
@@ -170,10 +188,11 @@ export default function Sidebar() {
                       <li key={item.href}>
                         <Link
                           href={item.href}
-                          className={`inline-block py-1 px-4 rounded-full text-text-secondary hover:text-primary hover:bg-background/40 transition font-bold ${isActiveItem ? "bg-blue-500 text-white" : ""}`}
-                          style={
-                            isActiveItem ? { minWidth: "fit-content" } : {}
-                          }
+                          className={`block py-2 px-4 rounded-lg text-sm font-mono transition-all duration-200 ${
+                            isActiveItem
+                              ? "bg-primary/20 text-primary border border-primary/30"
+                              : "text-text-secondary hover:text-primary hover:bg-surface-elevated"
+                          }`}
                         >
                           {item.label}
                         </Link>
@@ -185,6 +204,19 @@ export default function Sidebar() {
           );
         })}
       </ul>
+
+      {/* Status Bar */}
+      {!collapsed && (
+        <div className="border-t border-border px-4 py-3 bg-surface-elevated">
+          <div className="flex items-center justify-between text-xs text-text-muted font-mono">
+            <span>Section: AI Tools</span>
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 bg-primary rounded-full"></div>
+              <span>Mesh</span>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
