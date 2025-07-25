@@ -590,7 +590,7 @@ export default function Layout({ children }: { children: ReactNode }) {
   }, [terminalDragging, footerDragging, terminalHeight, terminalOpen]);
 
   return (
-    <div className="flex flex-col min-h-screen h-screen bg-background overflow-hidden">
+    <div className="flex flex-col min-h-screen h-screen overflow-hidden">
       <ReadingProgress />
       <div className="fixed top-0 left-0 right-0 z-50">
         <Header />
@@ -599,7 +599,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         <Sidebar />
         <main
           ref={mainContentRef}
-          className="flex-1 min-h-0 overflow-auto px-0 max-w-none mx-0 bg-center-bg rounded-2xl shadow-xl transition-all duration-300"
+          className="flex-1 min-h-0 overflow-auto px-0 max-w-none mx-0 transition-all duration-300"
           style={{
             maxHeight: `calc(100vh - 64px - 36px - var(--terminal-height, 0px))`,
             marginTop: "80px", // Account for fixed header + extra spacing
