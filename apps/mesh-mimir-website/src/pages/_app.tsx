@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Layout from "../../Layout";
+import ClickSpark from "../components/ClickSpark";
 
 const components = {
   // Custom MDX components can be added here
@@ -48,15 +49,25 @@ function LoadingBar() {
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <Layout>
-      <AnimatePresence
-        mode="wait"
-        initial={false}
-        onExitComplete={() => window.scrollTo(0, 0)}
-      >
-        <Component {...pageProps} />
-      </AnimatePresence>
-    </Layout>
+    <ClickSpark
+      sparkColor="#0ea5e9"
+      sparkSize={12}
+      sparkRadius={20}
+      sparkCount={12}
+      duration={618}
+      easing="ease-out"
+      extraScale={1.2}
+    >
+      <Layout>
+        <AnimatePresence
+          mode="wait"
+          initial={false}
+          onExitComplete={() => window.scrollTo(0, 0)}
+        >
+          <Component {...pageProps} />
+        </AnimatePresence>
+      </Layout>
+    </ClickSpark>
   );
 }
 

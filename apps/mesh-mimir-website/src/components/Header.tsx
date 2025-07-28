@@ -40,10 +40,7 @@ export default function Header() {
           aria-label="Discord"
           className="p-2 rounded-lg hover:bg-surface-elevated transition-colors duration-200"
         >
-          <MessageCircle
-            size={20}
-            className="text-text-secondary hover:text-primary transition-colors"
-          />
+          <MessageCircle size={20} className="text-primary transition-colors" />
         </Link>
         <Link
           href="https://twitter.com/mesh_js"
@@ -52,10 +49,7 @@ export default function Header() {
           aria-label="Twitter"
           className="p-2 rounded-lg hover:bg-surface-elevated transition-colors duration-200"
         >
-          <Twitter
-            size={20}
-            className="text-text-secondary hover:text-primary transition-colors"
-          />
+          <Twitter size={20} className="text-primary transition-colors" />
         </Link>
         <Link
           href="https://github.com/MeshJS/mesh"
@@ -64,10 +58,7 @@ export default function Header() {
           aria-label="GitHub"
           className="p-2 rounded-lg hover:bg-surface-elevated transition-colors duration-200"
         >
-          <Github
-            size={20}
-            className="text-text-secondary hover:text-primary transition-colors"
-          />
+          <Github size={20} className="text-primary transition-colors" />
         </Link>
       </div>
     </header>

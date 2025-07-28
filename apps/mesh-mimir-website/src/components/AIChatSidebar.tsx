@@ -400,16 +400,12 @@ export default function AIChatSidebar({
         {/* Collapsed state: show only icon */}
         {collapsed ? (
           <div className="flex flex-col items-center justify-center flex-1">
-            <div className="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center">
-              <Bot className="w-5 h-5 text-primary" />
-            </div>
+            <Bot className="w-5 h-5 text-primary" />
           </div>
         ) : !isClient ? (
           // Loading state while client-side calculations are being set up
           <div className="flex flex-col items-center justify-center flex-1">
-            <div className="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center">
-              <Bot className="w-5 h-5 text-primary" />
-            </div>
+            <Bot className="w-5 h-5 text-primary" />
           </div>
         ) : (
           <>
@@ -436,41 +432,23 @@ export default function AIChatSidebar({
                 left: `${contentLayout.headerSpace.curveOutset + 2}px`,
               }}
             >
-              <div
-                className="bg-primary/20 rounded flex items-center justify-center flex-shrink-0"
+              <Bot
+                className="text-primary"
                 style={{
                   width:
                     contentLayout.headerSpace.availableWidth < 150
-                      ? "12px"
+                      ? "8px"
                       : contentLayout.headerSpace.availableWidth < 200
-                        ? "14px"
-                        : "16px",
+                        ? "10px"
+                        : "12px",
                   height:
                     contentLayout.headerSpace.availableWidth < 150
-                      ? "12px"
+                      ? "8px"
                       : contentLayout.headerSpace.availableWidth < 200
-                        ? "14px"
-                        : "16px",
+                        ? "10px"
+                        : "12px",
                 }}
-              >
-                <Bot
-                  className="text-primary"
-                  style={{
-                    width:
-                      contentLayout.headerSpace.availableWidth < 150
-                        ? "8px"
-                        : contentLayout.headerSpace.availableWidth < 200
-                          ? "10px"
-                          : "12px",
-                    height:
-                      contentLayout.headerSpace.availableWidth < 150
-                        ? "8px"
-                        : contentLayout.headerSpace.availableWidth < 200
-                          ? "10px"
-                          : "12px",
-                  }}
-                />
-              </div>
+              />
               <div className="flex items-center gap-1 min-w-0 flex-1">
                 <span
                   className="font-display font-semibold text-text-primary truncate"
