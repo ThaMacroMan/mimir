@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion, useScroll, useSpring, AnimatePresence } from "framer-motion";
 import { ReactNode, useEffect, useState, useRef } from "react";
 import Sidebar from "./src/components/Sidebar";
-import AIChatSidebar from "./src/components/AIChatSidebar";
+import ResourceSidebar from "./src/components/AIChatSidebar";
 import ScrollNavigation from "./src/components/ScrollNavigation";
 import { Terminal } from "./src/components/magicui/terminal";
 
@@ -325,8 +325,7 @@ export default function Layout({ children }: { children: ReactNode }) {
   const [terminalHeight, setTerminalHeight] = useState(420);
   const [terminalDragging, setTerminalDragging] = useState(false);
   const [footerDragging, setFooterDragging] = useState(false);
-  const [aiChatWidth, setAiChatWidth] = useState(320);
-  const [aiChatCenterOffset, setAiChatCenterOffset] = useState(0);
+  const [aiChatWidth, setAiChatWidth] = useState(260);
   const [sidebarWidth, setSidebarWidth] = useState(260);
   const [mainContentWidth, setMainContentWidth] = useState(0);
   const [mainContentLeft, setMainContentLeft] = useState(260);
@@ -381,23 +380,25 @@ export default function Layout({ children }: { children: ReactNode }) {
         'nav[aria-label="Sidebar navigation"]'
       );
       const aiChatElement = document.querySelector(
-        'aside[aria-label="AI Chat sidebar"]'
+        'aside[aria-label="Resource sidebar"]'
       );
 
       const currentSidebarWidth =
         sidebarElement?.getBoundingClientRect().width || 260;
       const currentAiChatWidth =
-        aiChatElement?.getBoundingClientRect().width || 320;
+        aiChatElement?.getBoundingClientRect().width || 260;
 
       // Update state variables
       setSidebarWidth(currentSidebarWidth);
       setAiChatWidth(currentAiChatWidth);
 
       // Calculate main content dimensions
+      // Account for AI chat sidebar width + 16px right margin
+      const aiChatTotalSpace = currentAiChatWidth + 16; // 16px margin from right edge
       const viewportWidth = window.innerWidth;
       const newMainContentWidth = Math.max(
         300,
-        viewportWidth - currentSidebarWidth - currentAiChatWidth
+        viewportWidth - currentSidebarWidth - aiChatTotalSpace
       ); // Minimum 300px width
       const newMainContentLeft = currentSidebarWidth;
 
@@ -411,7 +412,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       );
       document.body.style.setProperty(
         "--terminal-right",
-        `${currentAiChatWidth}px`
+        `${aiChatTotalSpace}px`
       );
 
       // Set CSS custom properties for main content area
@@ -604,27 +605,21 @@ export default function Layout({ children }: { children: ReactNode }) {
             height: `calc(100vh - var(--terminal-height, 0px))`,
             marginTop: "0px", // Removed header spacing
             marginLeft: `${mainContentLeft}px`,
-            marginRight: `${aiChatWidth}px`, // Account for AI chat sidebar
+            marginRight: "0px", // Remove right margin since sidebar is absolutely positioned
             width: `${mainContentWidth}px`, // Dynamic width based on sidebar states
             minWidth: "300px", // Ensure minimum readable width
           }}
         >
           {children}
         </main>
-        <AIChatSidebar
-          width={aiChatWidth}
-          centerOffset={aiChatCenterOffset}
-          onWidthChange={setAiChatWidth}
-          onCenterOffsetChange={setAiChatCenterOffset}
-        />
+        <ResourceSidebar width={aiChatWidth} onWidthChange={setAiChatWidth} />
       </div>
 
       {/* Custom Scroll Navigation - moved outside flex container */}
       <ScrollNavigation
         containerRef={mainContentRef}
         className="hidden md:flex" // Only show on medium screens and up to avoid conflicts with mobile
-        aiChatWidth={aiChatWidth}
-        centerOffset={aiChatCenterOffset}
+        aiChatWidth={aiChatWidth + 16} // Account for AI chat sidebar + 16px margin
       />
       {/* <div className="fixed bottom-0 left-0 right-0 z-50">
         <Footer
@@ -646,7 +641,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             className="fixed z-[100] pointer-events-none"
             style={{
               left: `${sidebarWidth}px`,
-              right: `${aiChatWidth}px`,
+              right: `${aiChatWidth + 16}px`, // Account for AI chat sidebar + 16px margin
               height: terminalHeight,
               bottom: "0px", // No footer anymore
             }}

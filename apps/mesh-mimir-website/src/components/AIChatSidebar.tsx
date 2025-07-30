@@ -1,25 +1,23 @@
 import { useState, useRef, useEffect } from "react";
-import { Bot, Send } from "lucide-react";
+import { Bot, Send, BookOpen, MessageSquare } from "lucide-react";
 
-interface AIChatSidebarProps {
+interface ResourceSidebarProps {
   width?: number;
   height?: number;
-  centerOffset?: number;
   onWidthChange?: (width: number) => void;
   onHeightChange?: (height: number) => void;
-  onCenterOffsetChange?: (offset: number) => void;
 }
 
-export default function AIChatSidebar({
+type TabType = "resources" | "ai-chat";
+
+export default function ResourceSidebar({
   width: externalWidth,
   height: externalHeight,
-  centerOffset: externalCenterOffset,
   onWidthChange,
   onHeightChange,
-  onCenterOffsetChange,
-}: AIChatSidebarProps) {
+}: ResourceSidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
-  const [width, setWidth] = useState(externalWidth || 320);
+  const [width, setWidth] = useState(externalWidth || 260);
   const [height, setHeight] = useState(externalHeight || 800); // Start with fallback, will be updated on client
   const [top, setTop] = useState(16); // Vertical position of sidebar
   const [dragging, setDragging] = useState(false);
@@ -31,15 +29,14 @@ export default function AIChatSidebar({
   const [maxHeight, setMaxHeight] = useState(
     typeof window !== "undefined" ? window.innerHeight - 32 : 800
   );
-  const [centerOffset, setCenterOffset] = useState(externalCenterOffset || 0); // Vertical offset for center point
   const [isClient, setIsClient] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabType>("resources");
   const sidebarRef = useRef<HTMLDivElement>(null);
   const dragStartX = useRef<number | null>(null);
   const dragStartWidth = useRef<number | null>(null);
   const dragStartY = useRef<number | null>(null);
   const dragStartHeight = useRef<number | null>(null);
   const dragStartTop = useRef<number | null>(null);
-  const dragStartCenterOffset = useRef<number | null>(null);
 
   const [messages, setMessages] = useState([
     { from: "ai", text: "Hi! I'm your AI coding buddy. Ask me anything!" },
@@ -60,12 +57,6 @@ export default function AIChatSidebar({
     }
   }, [externalHeight]);
 
-  useEffect(() => {
-    if (externalCenterOffset !== undefined) {
-      setCenterOffset(externalCenterOffset);
-    }
-  }, [externalCenterOffset]);
-
   // Notify parent of changes
   const updateWidth = (newWidth: number) => {
     setWidth(newWidth);
@@ -77,108 +68,11 @@ export default function AIChatSidebar({
     onHeightChange?.(newHeight);
   };
 
-  const updateCenterOffset = (newOffset: number) => {
-    setCenterOffset(newOffset);
-    onCenterOffsetChange?.(newOffset);
-  };
-
   // Collapsed width constant
   const COLLAPSED_WIDTH = 48;
 
   // Create refs for all messages upfront to avoid conditional hooks
   const messageRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const messageStyles = useRef<
-    Array<{
-      padding: number;
-      fontSize: string;
-      maxWidth: string;
-      opacity: number;
-      displayText: string;
-    }>
-  >([]);
-
-  // Single unified parabolic function - used for both clip-path and SVG border
-  const generateParabolicCurve = (baseWidth: number, height: number) => {
-    const amplitudeFactor = Math.max(
-      0.12,
-      ((baseWidth - 120) / (maxWidth - 120)) * 0.5
-    );
-    const minContentWidth = Math.max(100, baseWidth * 0.4);
-    const maxClipAmount = baseWidth - minContentWidth;
-
-    const points = [];
-    const numPoints = 60; // Even more points for ultra-smooth curve
-
-    for (let i = 0; i <= numPoints; i++) {
-      const y = (i / numPoints) * height;
-      const adjustedCenter = height / 2 + centerOffset;
-      const distanceFromCenter = y - adjustedCenter;
-      const normalizedDistance = distanceFromCenter / (height / 2);
-
-      // Ultra-smooth parabolic function with cubic easing
-      const easedDistance = Math.pow(Math.abs(normalizedDistance), 1.2); // Even gentler power
-      const rawCurveOutset = baseWidth * amplitudeFactor * easedDistance;
-
-      // Simple classic parabola - no bottom transition needed
-      const curveOutset = Math.min(rawCurveOutset, maxClipAmount);
-      const x = curveOutset;
-
-      points.push({ x, y });
-    }
-
-    return points;
-  };
-
-  // Generate clip-path from the unified curve
-  const generateParabolicClipPath = (baseWidth: number, height: number) => {
-    const points = generateParabolicCurve(baseWidth, height);
-
-    const clipPoints = [
-      ...points.map(p => `${p.x}px ${p.y}px`),
-      // Add the right edge points to close the shape
-      ...points
-        .slice()
-        .reverse()
-        .map(p => `${baseWidth}px ${p.y}px`),
-    ];
-
-    return `polygon(${clipPoints.join(", ")})`;
-  };
-
-  // Calculate available width at any vertical position using the main function
-  const getAvailableWidthAtPosition = (yPosition: number) => {
-    const adjustedCenter = height / 2 + centerOffset;
-    const distanceFromCenter = yPosition - adjustedCenter;
-    const normalizedDistance = distanceFromCenter / (height / 2);
-
-    const amplitudeFactor = Math.max(
-      0.12,
-      ((width - 120) / (maxWidth - 120)) * 0.5
-    );
-    const easedDistance = Math.pow(Math.abs(normalizedDistance), 1.2);
-    const rawCurveOutset = width * amplitudeFactor * easedDistance;
-
-    const minContentWidth = Math.max(100, width * 0.4);
-    const maxClipAmount = width - minContentWidth;
-    const curveOutset = Math.min(rawCurveOutset, maxClipAmount);
-
-    const availableWidth = Math.max(minContentWidth, width - curveOutset);
-
-    return {
-      availableWidth,
-      curveOutset,
-      isNearApex: Math.abs(normalizedDistance) < 0.3,
-      normalizedDistance,
-      position: Math.max(0, Math.min(1, yPosition / height)),
-    };
-  };
-
-  // Calculate responsive text sizes based on width
-  const getResponsiveTextSize = () => {
-    if (width < 200) return "text-xs";
-    if (width < 300) return "text-sm";
-    return "text-sm";
-  };
 
   const [input, setInput] = useState("");
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -215,7 +109,7 @@ export default function AIChatSidebar({
 
   // Ensure proper scroll position on initial load
   useEffect(() => {
-    if (messages.length > 0 && !collapsed) {
+    if (messages.length > 0 && !collapsed && activeTab === "ai-chat") {
       setTimeout(() => {
         const chatContainer = document.querySelector(".chat-scroll");
         if (chatContainer) {
@@ -223,17 +117,17 @@ export default function AIChatSidebar({
         }
       }, 200);
     }
-  }, [collapsed]);
+  }, [collapsed, activeTab]);
 
   // Ensure first message is always visible on load
   useEffect(() => {
-    if (messages.length > 0 && !collapsed) {
+    if (messages.length > 0 && !collapsed && activeTab === "ai-chat") {
       const chatContainer = document.querySelector(".chat-scroll");
       if (chatContainer) {
         chatContainer.scrollTop = 0;
       }
     }
-  }, [collapsed]);
+  }, [collapsed, activeTab]);
 
   useEffect(() => {
     if (!dragging && !draggingVertical && !draggingPosition) return;
@@ -298,22 +192,6 @@ export default function AIChatSidebar({
           );
           setTop(newTop);
         }
-
-        // Handle vertical dragging for parabola center point (when dragging horizontally)
-        if (
-          dragging &&
-          dragStartY.current !== null &&
-          dragStartCenterOffset.current !== null
-        ) {
-          const deltaY = e.clientY - dragStartY.current;
-          const newCenterOffset = dragStartCenterOffset.current + deltaY;
-          const maxOffset = height * 0.8;
-          const clampedOffset = Math.max(
-            -maxOffset,
-            Math.min(maxOffset, newCenterOffset)
-          );
-          updateCenterOffset(clampedOffset);
-        }
       });
     };
     const handleMouseUp = () => {
@@ -325,7 +203,6 @@ export default function AIChatSidebar({
       dragStartY.current = null;
       dragStartHeight.current = null;
       dragStartTop.current = null;
-      dragStartCenterOffset.current = null;
 
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
     };
@@ -345,49 +222,39 @@ export default function AIChatSidebar({
     height,
   ]);
 
-  // Generate parabolic clip-path for visual container only
-  const clipPath = isClient ? generateParabolicClipPath(width, height) : "none";
-
-  // Calculate optimal content positioning based on parabola
-  const getOptimalContentLayout = () => {
-    const adjustedCenter = height / 2 + centerOffset;
-
-    // Find the best areas for header, content, and input
-    const headerPosition = 0;
-    const inputPosition = height;
-
-    // Calculate available space at header and input positions
-    const headerSpace = getAvailableWidthAtPosition(headerPosition);
-    const inputSpace = getAvailableWidthAtPosition(inputPosition);
-
-    // Find the area with maximum available width for content
-    let maxContentWidth = 0;
-    let optimalContentStart = 0;
-    let optimalContentEnd = height;
-
-    // Sample points to find the best content area
-    for (let y = 0; y <= height; y += 20) {
-      const space = getAvailableWidthAtPosition(y);
-      if (space.availableWidth > maxContentWidth) {
-        maxContentWidth = space.availableWidth;
-        optimalContentStart = Math.max(0, y - 50);
-        optimalContentEnd = Math.min(height, y + 50);
-      }
-    }
-
-    return {
-      headerSpace,
-      inputSpace,
-      contentArea: {
-        start: optimalContentStart,
-        end: optimalContentEnd,
-        maxWidth: maxContentWidth,
-      },
-      adjustedCenter,
-    };
-  };
-
-  const contentLayout = getOptimalContentLayout();
+  // Mock resources data - in a real app, this would be dynamic based on the current page
+  const resources = [
+    {
+      title: "MeshJS Documentation",
+      description: "Official MeshJS documentation and API reference",
+      url: "https://meshjs.dev/",
+      type: "docs",
+    },
+    {
+      title: "Cardano Developer Portal",
+      description: "Learn about Cardano development and tools",
+      url: "https://developers.cardano.org/",
+      type: "portal",
+    },
+    {
+      title: "Blockfrost API",
+      description: "Cardano blockchain data and analytics",
+      url: "https://blockfrost.io/",
+      type: "api",
+    },
+    {
+      title: "DexHunter",
+      description: "Cardano DEX aggregator and analytics",
+      url: "https://dexhunter.io/",
+      type: "tool",
+    },
+    {
+      title: "Taptools",
+      description: "Cardano portfolio tracking and analytics",
+      url: "https://taptools.io/",
+      type: "tool",
+    },
+  ];
 
   return (
     <div
@@ -400,44 +267,6 @@ export default function AIChatSidebar({
         zIndex: 40,
       }}
     >
-      {/* Parabolic border */}
-      {!collapsed && (
-        <svg
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: width,
-            height: height,
-            pointerEvents: "none",
-            zIndex: 50, // Higher z-index to ensure visibility
-          }}
-          viewBox={`0 0 ${width} ${height}`}
-          preserveAspectRatio="none"
-        >
-          <path
-            d={(() => {
-              const points = generateParabolicCurve(width, height);
-
-              let pathData = "";
-              points.forEach((point, i) => {
-                if (i === 0) {
-                  pathData = `M ${point.x} ${point.y}`;
-                } else {
-                  pathData += ` L ${point.x} ${point.y}`;
-                }
-              });
-              return pathData;
-            })()}
-            fill="none"
-            stroke="#00d4ff"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      )}
-
       <aside
         ref={sidebarRef}
         style={
@@ -453,14 +282,13 @@ export default function AIChatSidebar({
             position: "absolute",
             right: 0,
             zIndex: 40,
-            "--ai-chat-width": collapsed
+            "--resource-sidebar-width": collapsed
               ? `${COLLAPSED_WIDTH}px`
               : `${width}px`,
-            clipPath: collapsed ? "none" : clipPath,
-          } as React.CSSProperties & { "--ai-chat-width": string }
+          } as React.CSSProperties & { "--resource-sidebar-width": string }
         }
         className={`bg-surface/30 backdrop-blur-md flex flex-col shadow-2xl rounded-3xl overflow-hidden isolate`}
-        aria-label="AI Chat sidebar"
+        aria-label="Resource sidebar"
       >
         {/* Horizontal Drag Handle */}
         <div
@@ -470,8 +298,6 @@ export default function AIChatSidebar({
               setDragging(true);
               dragStartX.current = e.clientX;
               dragStartWidth.current = width;
-              dragStartY.current = e.clientY;
-              dragStartCenterOffset.current = centerOffset;
               e.preventDefault();
             }
           }}
@@ -493,12 +319,12 @@ export default function AIChatSidebar({
         {/* Collapsed state: show only icon */}
         {collapsed ? (
           <div className="flex flex-col items-center justify-center flex-1">
-            <Bot className="w-5 h-5 text-primary" />
+            <BookOpen className="w-5 h-5 text-primary" />
           </div>
         ) : !isClient ? (
           // Loading state while client-side calculations are being set up
           <div className="flex flex-col items-center justify-center flex-1">
-            <Bot className="w-5 h-5 text-primary" />
+            <BookOpen className="w-5 h-5 text-primary" />
           </div>
         ) : (
           <>
@@ -517,216 +343,220 @@ export default function AIChatSidebar({
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-primary rounded-full"></div>
                 <span className="font-display font-semibold text-text-primary text-sm">
-                  AI CHAT
+                  RESOURCES
                 </span>
               </div>
             </div>
 
-            {/* Chat Area - Dynamically positioned and sized */}
-            <div
-              className="flex-1 flex flex-col bg-surface/20 backdrop-blur-sm min-w-0 overflow-hidden"
-              style={{
-                minHeight: 0,
-                width: `${contentLayout.contentArea.maxWidth}px`,
-                maxWidth: `${contentLayout.contentArea.maxWidth}px`,
-                marginLeft: `${getAvailableWidthAtPosition(contentLayout.contentArea.start).curveOutset + 2}px`,
-                position: "absolute",
-                top: "72px", // Account for header height (16px padding + ~56px content)
-                bottom: "80px", // Account for input height and padding
-                left: 0,
-                right: 0,
-              }}
-            >
-              <div
-                className="w-full h-full overflow-y-auto flex flex-col gap-1 py-1 min-w-0 chat-scroll"
-                style={{
-                  paddingTop: "8px",
-                  paddingBottom: "24px",
-                  marginTop: "0px",
-                  width: "100%",
-                  maxWidth: "100%",
-                  height: "100%",
-                }}
+            {/* Tab Navigation */}
+            <div className="flex border-b border-border/30 bg-surface-elevated/20">
+              <button
+                onClick={() => setActiveTab("resources")}
+                className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium transition-all duration-200 ${
+                  activeTab === "resources"
+                    ? "text-primary bg-primary/10 border-b-2 border-primary"
+                    : "text-text-secondary hover:text-primary hover:bg-surface-elevated/50"
+                }`}
               >
-                {messages.map((msg, idx) => {
-                  // Calculate message style based on available width
-                  const availableWidth =
-                    contentLayout.contentArea.maxWidth - 32;
-                  let fontSize = "12px";
-                  let padding = 12;
-                  let maxWidth = "90%";
-
-                  if (availableWidth < 150) {
-                    fontSize = "10px";
-                    padding = 8;
-                    maxWidth = "95%";
-                  } else if (availableWidth < 200) {
-                    fontSize = "11px";
-                    padding = 10;
-                    maxWidth = "92%";
-                  } else if (availableWidth > 300) {
-                    fontSize = "14px";
-                    padding = 16;
-                    maxWidth = "85%";
-                  }
-
-                  // Calculate the message's vertical position to determine parabolic offset
-                  const messageElement = messageRefs.current[idx];
-                  const messageTop = messageElement?.offsetTop || 0;
-                  const messageHeight = messageElement?.offsetHeight || 0;
-                  const messageCenterY = messageTop + messageHeight / 2;
-
-                  // Get the parabolic offset for this message's position
-                  const parabolicOffset =
-                    getAvailableWidthAtPosition(messageCenterY);
-
-                  // Calculate wider message width based on available space
-                  const messageWidth = Math.min(
-                    parabolicOffset.availableWidth - 16, // Use more of available width
-                    msg.from === "ai"
-                      ? parabolicOffset.availableWidth -
-                          parabolicOffset.curveOutset -
-                          16
-                      : parabolicOffset.availableWidth - 16
-                  );
-
-                  return (
-                    <div
-                      ref={el => {
-                        messageRefs.current[idx] = el;
-                      }}
-                      key={idx}
-                      className={`w-fit rounded-lg shadow-sm transition-all duration-300 ${
-                        msg.from === "ai"
-                          ? "bg-surface-elevated text-text-primary self-start"
-                          : "bg-primary/20 text-primary self-end ml-auto"
-                      }`}
-                      style={{
-                        wordBreak: "break-word",
-                        padding: `${padding}px`,
-                        fontSize: fontSize,
-                        opacity: 1,
-                        marginLeft:
-                          msg.from === "user"
-                            ? "auto"
-                            : `${parabolicOffset.curveOutset + 8}px`,
-                        marginRight: msg.from === "ai" ? "auto" : undefined,
-                        minWidth: "60px",
-                        width: "fit-content",
-                        maxWidth: `${messageWidth}px`,
-                      }}
-                    >
-                      <div
-                        className="font-mono text-text-muted mb-1 truncate"
-                        style={{
-                          fontSize: `${parseInt(fontSize) - 2}px`,
-                        }}
-                      >
-                        {msg.from === "ai" ? "AI" : "You"}
-                      </div>
-                      <div className="break-words whitespace-pre-wrap">
-                        {msg.text}
-                      </div>
-                    </div>
-                  );
-                })}
-                <div ref={chatEndRef} />
-                <div className="h-12" />
-                <div className="h-12" />
-              </div>
+                <BookOpen className="w-4 h-4" />
+                <span>Resources</span>
+              </button>
+              <button
+                onClick={() => setActiveTab("ai-chat")}
+                className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium transition-all duration-200 ${
+                  activeTab === "ai-chat"
+                    ? "text-primary bg-primary/10 border-b-2 border-primary"
+                    : "text-text-secondary hover:text-primary hover:bg-surface-elevated/50"
+                }`}
+              >
+                <MessageSquare className="w-4 h-4" />
+                <span>AI Chat</span>
+              </button>
             </div>
 
-            {/* Dynamic Input Box - Adapts to available space with guaranteed send button */}
-            <form
-              className="w-full flex items-center gap-2 p-1 bg-surface-elevated rounded-lg mt-1 min-w-0 flex-shrink-0 sticky bottom-0 z-10 rounded-b-lg"
-              onSubmit={e => {
-                e.preventDefault();
-                if (input.trim()) {
-                  setMessages([...messages, { from: "user", text: input }]);
-                  setInput("");
-                }
-              }}
-              style={{
-                fontSize:
-                  contentLayout.inputSpace.availableWidth < 150
-                    ? "10px"
-                    : contentLayout.inputSpace.availableWidth < 200
-                      ? "11px"
-                      : "12px",
-                padding:
-                  contentLayout.inputSpace.availableWidth < 150
-                    ? "2px"
-                    : contentLayout.inputSpace.availableWidth < 200
-                      ? "3px"
-                      : "4px",
-                height:
-                  contentLayout.inputSpace.availableWidth < 150
-                    ? "24px"
-                    : contentLayout.inputSpace.availableWidth < 200
-                      ? "28px"
-                      : "32px",
-                width: `${contentLayout.inputSpace.availableWidth}px`,
-                maxWidth: `${contentLayout.inputSpace.availableWidth}px`,
-                position: "absolute",
-                bottom: "8px",
-                left: `${contentLayout.inputSpace.curveOutset + 2}px`,
-                zIndex: 20,
-              }}
-            >
-              <input
-                type="text"
-                className="flex-1 bg-transparent text-text-primary border-none focus:outline-none focus:ring-0 font-mono placeholder:text-text-muted min-w-0"
-                placeholder={
-                  contentLayout.inputSpace.availableWidth < 150
-                    ? "..."
-                    : contentLayout.inputSpace.availableWidth < 200
-                      ? "Ask..."
-                      : "Ask me anything..."
-                }
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                disabled={collapsed}
-                style={{
-                  minWidth:
-                    contentLayout.inputSpace.availableWidth < 150
-                      ? "15px"
-                      : contentLayout.inputSpace.availableWidth < 200
-                        ? "20px"
-                        : "30px",
-                  fontSize: "inherit",
-                  flex: 1,
-                  maxWidth: "calc(100% - 50px)", // Reserve space for send button
+            {/* Tab Content */}
+            <div className="flex-1 overflow-hidden">
+              {activeTab === "resources" ? (
+                /* Resources Tab */
+                <div className="h-full overflow-y-auto p-4 space-y-3">
+                  {resources.map((resource, idx) => (
+                    <a
+                      key={idx}
+                      href={resource.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block p-3 rounded-lg bg-surface-elevated/50 hover:bg-surface-elevated border border-border/30 hover:border-primary/30 transition-all duration-200 group"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-text-primary text-sm mb-1 group-hover:text-primary transition-colors">
+                            {resource.title}
+                          </h4>
+                          <p className="text-text-secondary text-xs leading-relaxed">
+                            {resource.description}
+                          </p>
+                        </div>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              ) : (
+                /* AI Chat Tab */
+                <div className="h-full flex flex-col bg-surface/20 backdrop-blur-sm min-w-0 overflow-hidden">
+                  <div
+                    className="w-full h-full overflow-y-auto flex flex-col gap-1 py-1 min-w-0 chat-scroll"
+                    style={{
+                      paddingTop: "8px",
+                      paddingBottom: "24px",
+                      marginTop: "0px",
+                      width: "100%",
+                      maxWidth: "100%",
+                      height: "100%",
+                    }}
+                  >
+                    {messages.map((msg, idx) => {
+                      // Calculate message style based on available width
+                      const availableWidth = width - 32;
+                      let fontSize = "12px";
+                      let padding = 12;
+                      let maxWidth = "90%";
+
+                      if (availableWidth < 150) {
+                        fontSize = "10px";
+                        padding = 8;
+                        maxWidth = "95%";
+                      } else if (availableWidth < 200) {
+                        fontSize = "11px";
+                        padding = 10;
+                        maxWidth = "92%";
+                      } else if (availableWidth > 300) {
+                        fontSize = "14px";
+                        padding = 16;
+                        maxWidth = "85%";
+                      }
+
+                      return (
+                        <div
+                          ref={el => {
+                            messageRefs.current[idx] = el;
+                          }}
+                          key={idx}
+                          className={`w-fit rounded-lg shadow-sm transition-all duration-300 ${
+                            msg.from === "ai"
+                              ? "bg-surface-elevated text-text-primary self-start"
+                              : "bg-primary/20 text-primary self-end ml-auto"
+                          }`}
+                          style={{
+                            wordBreak: "break-word",
+                            padding: `${padding}px`,
+                            fontSize: fontSize,
+                            opacity: 1,
+                            marginLeft: msg.from === "user" ? "auto" : "8px",
+                            marginRight: msg.from === "ai" ? "auto" : "8px",
+                            minWidth: "60px",
+                            width: "fit-content",
+                            maxWidth: `${Math.min(availableWidth - 16, 400)}px`,
+                          }}
+                        >
+                          <div
+                            className="font-mono text-text-muted mb-1 truncate"
+                            style={{
+                              fontSize: `${parseInt(fontSize) - 2}px`,
+                            }}
+                          >
+                            {msg.from === "ai" ? "AI" : "You"}
+                          </div>
+                          <div className="break-words whitespace-pre-wrap">
+                            {msg.text}
+                          </div>
+                        </div>
+                      );
+                    })}
+                    <div ref={chatEndRef} />
+                    <div className="h-12" />
+                    <div className="h-12" />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Input Box - Only show for AI Chat tab */}
+            {activeTab === "ai-chat" && (
+              <form
+                className="w-full flex items-center gap-2 p-1 bg-surface-elevated rounded-lg mt-1 min-w-0 flex-shrink-0 sticky bottom-0 z-10 rounded-b-lg"
+                onSubmit={e => {
+                  e.preventDefault();
+                  if (input.trim()) {
+                    setMessages([...messages, { from: "user", text: input }]);
+                    setInput("");
+                  }
                 }}
-              />
-              <button
-                type="submit"
-                className="rounded bg-primary text-background font-semibold hover:bg-primary-hover transition-all duration-200 font-mono disabled:opacity-50 flex items-center gap-1 flex-shrink-0"
-                disabled={!input.trim()}
                 style={{
-                  padding:
-                    contentLayout.inputSpace.availableWidth < 150
-                      ? "2px 3px"
-                      : contentLayout.inputSpace.availableWidth < 200
-                        ? "3px 4px"
-                        : "4px 6px",
-                  fontSize: "inherit",
-                  minWidth: "40px", // Guarantee minimum send button width
-                  flexShrink: 0,
-                  width: "40px", // Fixed width for send button
+                  fontSize:
+                    width < 150 ? "10px" : width < 200 ? "11px" : "12px",
+                  padding: width < 150 ? "2px" : width < 200 ? "3px" : "4px",
+                  height: width < 150 ? "24px" : width < 200 ? "28px" : "32px",
+                  width: "100%",
+                  maxWidth: "100%",
+                  position: "absolute",
+                  bottom: "8px",
+                  left: "8px",
+                  right: "8px",
+                  zIndex: 20,
                 }}
               >
-                <Send
-                  className={
-                    contentLayout.inputSpace.availableWidth < 150
-                      ? "w-2 h-2"
-                      : contentLayout.inputSpace.availableWidth < 200
-                        ? "w-2.5 h-2.5"
-                        : "w-3 h-3"
+                <input
+                  type="text"
+                  className="flex-1 bg-transparent text-text-primary border-none focus:outline-none focus:ring-0 font-mono placeholder:text-text-muted min-w-0"
+                  placeholder={
+                    width < 150
+                      ? "..."
+                      : width < 200
+                        ? "Ask..."
+                        : "Ask me anything..."
                   }
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  disabled={collapsed}
+                  style={{
+                    minWidth:
+                      width < 150 ? "15px" : width < 200 ? "20px" : "30px",
+                    fontSize: "inherit",
+                    flex: 1,
+                    maxWidth: "calc(100% - 50px)", // Reserve space for send button
+                  }}
                 />
-                <span className="hidden sm:inline">Send</span>
-              </button>
-            </form>
+                <button
+                  type="submit"
+                  className="rounded bg-primary text-background font-semibold hover:bg-primary-hover transition-all duration-200 font-mono disabled:opacity-50 flex items-center gap-1 flex-shrink-0"
+                  disabled={!input.trim()}
+                  style={{
+                    padding:
+                      width < 150
+                        ? "2px 3px"
+                        : width < 200
+                          ? "3px 4px"
+                          : "4px 6px",
+                    fontSize: "inherit",
+                    minWidth: "40px", // Guarantee minimum send button width
+                    flexShrink: 0,
+                    width: "40px", // Fixed width for send button
+                  }}
+                >
+                  <Send
+                    className={
+                      width < 150
+                        ? "w-2 h-2"
+                        : width < 200
+                          ? "w-2.5 h-2.5"
+                          : "w-3 h-3"
+                    }
+                  />
+                  <span className="hidden sm:inline">Send</span>
+                </button>
+              </form>
+            )}
           </>
         )}
       </aside>

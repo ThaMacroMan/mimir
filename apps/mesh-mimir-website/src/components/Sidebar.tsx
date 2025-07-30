@@ -49,7 +49,6 @@ export default function Sidebar() {
   const [maxHeight, setMaxHeight] = useState(
     typeof window !== "undefined" ? window.innerHeight - 32 : 800
   );
-  const [centerOffset, setCenterOffset] = useState(0); // Vertical offset for center point
   const [isClient, setIsClient] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const dragStartX = useRef<number | null>(null);
@@ -57,90 +56,8 @@ export default function Sidebar() {
   const dragStartY = useRef<number | null>(null);
   const dragStartHeight = useRef<number | null>(null);
   const dragStartTop = useRef<number | null>(null);
-  const dragStartCenterOffset = useRef<number | null>(null);
 
   const router = useRouter();
-
-  // Single unified parabolic function - used for both clip-path and SVG border
-  const generateParabolicCurve = (baseWidth: number, height: number) => {
-    const amplitudeFactor = Math.max(
-      0.12,
-      ((baseWidth - 120) / (maxWidth - 120)) * 0.5
-    );
-    const minContentWidth = Math.max(100, baseWidth * 0.4);
-    const maxClipAmount = baseWidth - minContentWidth;
-
-    const points = [];
-    const numPoints = 60; // Even more points for ultra-smooth curve
-
-    for (let i = 0; i <= numPoints; i++) {
-      const y = (i / numPoints) * height;
-      const adjustedCenter = height / 2 + centerOffset;
-      const distanceFromCenter = y - adjustedCenter;
-      const normalizedDistance = distanceFromCenter / (height / 2);
-
-      // Ultra-smooth parabolic function with cubic easing
-      const easedDistance = Math.pow(Math.abs(normalizedDistance), 1.2); // Even gentler power
-      const rawCurveOutset = baseWidth * amplitudeFactor * easedDistance;
-
-      // Simple classic parabola - no bottom transition needed
-      const curveOutset = Math.min(rawCurveOutset, maxClipAmount);
-      const x = baseWidth - curveOutset; // Curve inward from the right edge
-
-      points.push({ x, y });
-    }
-
-    return points;
-  };
-
-  // Generate clip-path from the unified curve - curve on the right side (inside of site)
-  const generateParabolicClipPath = (
-    baseWidth: number,
-    curveHeight: number
-  ) => {
-    const points = generateParabolicCurve(baseWidth, curveHeight);
-
-    const clipPoints = [
-      // Start from top-left corner
-      "0px 0px",
-      // Add the right edge points (curved inward)
-      ...points.map(p => `${p.x}px ${p.y}px`),
-      // Add the bottom-left corner
-      "0px 100%",
-      // Close the polygon by returning to the start
-      "0px 0px",
-    ];
-
-    return `polygon(${clipPoints.join(", ")})`;
-  };
-
-  // Calculate available width at any vertical position using the main function
-  const getAvailableWidthAtPosition = (yPosition: number) => {
-    const adjustedCenter = height / 2 + centerOffset;
-    const distanceFromCenter = yPosition - adjustedCenter;
-    const normalizedDistance = distanceFromCenter / (height / 2);
-
-    const amplitudeFactor = Math.max(
-      0.12,
-      ((width - 120) / (maxWidth - 120)) * 0.5
-    );
-    const easedDistance = Math.pow(Math.abs(normalizedDistance), 1.2);
-    const rawCurveOutset = width * amplitudeFactor * easedDistance;
-
-    const minContentWidth = Math.max(100, width * 0.4);
-    const maxClipAmount = width - minContentWidth;
-    const curveOutset = Math.min(rawCurveOutset, maxClipAmount);
-
-    const availableWidth = Math.max(minContentWidth, width - curveOutset);
-
-    return {
-      availableWidth,
-      curveOutset,
-      isNearApex: Math.abs(normalizedDistance) < 0.3,
-      normalizedDistance,
-      position: Math.max(0, Math.min(1, yPosition / height)),
-    };
-  };
 
   // Set client-side flag and update maxWidth/maxHeight on window resize
   useEffect(() => {
@@ -222,22 +139,6 @@ export default function Sidebar() {
           );
           setTop(newTop);
         }
-
-        // Handle vertical dragging for parabola center point (when dragging horizontally)
-        if (
-          dragging &&
-          dragStartY.current !== null &&
-          dragStartCenterOffset.current !== null
-        ) {
-          const deltaY = e.clientY - dragStartY.current;
-          const newCenterOffset = dragStartCenterOffset.current + deltaY;
-          const maxOffset = height * 0.8;
-          const clampedOffset = Math.max(
-            -maxOffset,
-            Math.min(maxOffset, newCenterOffset)
-          );
-          setCenterOffset(clampedOffset);
-        }
       });
     };
     const handleMouseUp = () => {
@@ -249,7 +150,6 @@ export default function Sidebar() {
       dragStartY.current = null;
       dragStartHeight.current = null;
       dragStartTop.current = null;
-      dragStartCenterOffset.current = null;
 
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
     };
@@ -273,9 +173,6 @@ export default function Sidebar() {
     setOpenSections(prev => prev.map((open, i) => (i === idx ? !open : open)));
   };
 
-  // Generate parabolic clip-path for visual container only
-  const clipPath = isClient ? generateParabolicClipPath(width, height) : "none";
-
   return (
     <div
       className="rounded-3xl overflow-hidden"
@@ -288,44 +185,6 @@ export default function Sidebar() {
         zIndex: 30,
       }}
     >
-      {/* Parabolic border */}
-      {!collapsed && (
-        <svg
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: width,
-            height: height,
-            pointerEvents: "none",
-            zIndex: 50, // Higher z-index to ensure visibility
-          }}
-          viewBox={`0 0 ${width} ${height}`}
-          preserveAspectRatio="none"
-        >
-          <path
-            d={(() => {
-              const points = generateParabolicCurve(width, height);
-
-              let pathData = "";
-              points.forEach((point, i) => {
-                if (i === 0) {
-                  pathData = `M ${point.x} ${point.y}`;
-                } else {
-                  pathData += ` L ${point.x} ${point.y}`;
-                }
-              });
-              return pathData;
-            })()}
-            fill="none"
-            stroke="#00d4ff"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      )}
-
       <nav
         ref={sidebarRef}
         className={`bg-surface/30 backdrop-blur-md transition-all duration-300 flex flex-col overflow-hidden isolate ${collapsed ? "min-w-0 rounded-3xl" : "rounded-3xl"}`}
@@ -346,8 +205,6 @@ export default function Sidebar() {
             "--sidebar-width": collapsed
               ? `${COLLAPSED_WIDTH}px`
               : `${width}px`,
-            clipPath: collapsed ? "none" : clipPath,
-            WebkitClipPath: collapsed ? "none" : clipPath,
           } as React.CSSProperties & { "--sidebar-width": string }
         }
       >
@@ -381,8 +238,6 @@ export default function Sidebar() {
               setDragging(true);
               dragStartX.current = e.clientX;
               dragStartWidth.current = width;
-              dragStartY.current = e.clientY;
-              dragStartCenterOffset.current = centerOffset;
               e.preventDefault();
             }
           }}
@@ -401,7 +256,7 @@ export default function Sidebar() {
           }}
         />
 
-        <ul className="space-y-2 flex-1 overflow-y-auto py-4 scrollbar-none">
+        <ul className="space-y-2 flex-1 overflow-y-auto py-4 px-2 scrollbar-none">
           {sections.map((section, idx) => {
             const isActiveSection = section.items.some(item =>
               router.pathname.startsWith(item.href)
@@ -409,7 +264,7 @@ export default function Sidebar() {
             return (
               <li key={section.title} className="relative group">
                 <button
-                  className={`flex items-center w-full text-left py-3 px-4 rounded-lg hover:bg-surface-elevated focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 ${collapsed ? "justify-center" : ""} ${isActiveSection ? "bg-primary/10 border border-primary/30" : ""}`}
+                  className={`flex items-center w-full text-left py-3 px-3 rounded-lg hover:bg-surface-elevated focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 ${collapsed ? "justify-center" : ""} ${isActiveSection ? "bg-primary/10 border border-primary/30" : ""}`}
                   aria-expanded={openSections[idx]}
                   aria-controls={`sidebar-section-${idx}`}
                   onClick={() => toggleSection(idx)}
@@ -454,7 +309,7 @@ export default function Sidebar() {
                         <li key={item.href}>
                           <Link
                             href={item.href}
-                            className={`block py-2 px-4 rounded-lg text-sm font-mono transition-all duration-200 ${
+                            className={`block py-2 px-3 rounded-lg text-sm font-mono transition-all duration-200 ${
                               isActiveItem
                                 ? "bg-primary/20 text-primary border border-primary/30"
                                 : "text-text-secondary hover:text-primary hover:bg-surface-elevated"
