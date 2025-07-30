@@ -38,9 +38,16 @@ export default function Sidebar() {
   );
   const [collapsed, setCollapsed] = useState(false);
   const [width, setWidth] = useState(260);
+  const [height, setHeight] = useState(800); // Start with fallback, will be updated on client
+  const [top, setTop] = useState(16); // Vertical position of sidebar
   const [dragging, setDragging] = useState(false);
+  const [draggingVertical, setDraggingVertical] = useState(false);
+  const [draggingPosition, setDraggingPosition] = useState(false);
   const [maxWidth, setMaxWidth] = useState(
     typeof window !== "undefined" ? window.innerWidth / 2 : 600
+  );
+  const [maxHeight, setMaxHeight] = useState(
+    typeof window !== "undefined" ? window.innerHeight - 32 : 800
   );
   const [centerOffset, setCenterOffset] = useState(0); // Vertical offset for center point
   const [isClient, setIsClient] = useState(false);
@@ -48,7 +55,10 @@ export default function Sidebar() {
   const dragStartX = useRef<number | null>(null);
   const dragStartWidth = useRef<number | null>(null);
   const dragStartY = useRef<number | null>(null);
+  const dragStartHeight = useRef<number | null>(null);
+  const dragStartTop = useRef<number | null>(null);
   const dragStartCenterOffset = useRef<number | null>(null);
+
   const router = useRouter();
 
   // Single unified parabolic function - used for both clip-path and SVG border
@@ -83,17 +93,22 @@ export default function Sidebar() {
     return points;
   };
 
-  // Generate clip-path from the unified curve
-  const generateParabolicClipPath = (baseWidth: number, height: number) => {
-    const points = generateParabolicCurve(baseWidth, height);
+  // Generate clip-path from the unified curve - curve on the right side (inside of site)
+  const generateParabolicClipPath = (
+    baseWidth: number,
+    curveHeight: number
+  ) => {
+    const points = generateParabolicCurve(baseWidth, curveHeight);
 
     const clipPoints = [
+      // Start from top-left corner
+      "0px 0px",
+      // Add the right edge points (curved inward)
       ...points.map(p => `${p.x}px ${p.y}px`),
-      // Add the left edge points to close the shape
-      ...points
-        .slice()
-        .reverse()
-        .map(p => `0px ${p.y}px`),
+      // Add the bottom-left corner
+      "0px 100%",
+      // Close the polygon by returning to the start
+      "0px 0px",
     ];
 
     return `polygon(${clipPoints.join(", ")})`;
@@ -101,7 +116,6 @@ export default function Sidebar() {
 
   // Calculate available width at any vertical position using the main function
   const getAvailableWidthAtPosition = (yPosition: number) => {
-    const height = isClient ? window.innerHeight - 100 : 600;
     const adjustedCenter = height / 2 + centerOffset;
     const distanceFromCenter = yPosition - adjustedCenter;
     const normalizedDistance = distanceFromCenter / (height / 2);
@@ -128,12 +142,17 @@ export default function Sidebar() {
     };
   };
 
-  // Set client-side flag and update maxWidth on window resize
+  // Set client-side flag and update maxWidth/maxHeight on window resize
   useEffect(() => {
     setIsClient(true);
     const handleResize = () => {
-      setMaxWidth(window.innerWidth / 2);
-      setWidth(w => Math.min(w, window.innerWidth / 2));
+      const newMaxWidth = window.innerWidth / 2;
+      const newMaxHeight = window.innerHeight - 32;
+      setMaxWidth(newMaxWidth);
+      setMaxHeight(newMaxHeight);
+      setWidth(w => Math.min(w, newMaxWidth));
+      // Always set to full height on initial load and resize
+      setHeight(newMaxHeight);
     };
     handleResize(); // Call immediately
     window.addEventListener("resize", handleResize);
@@ -141,10 +160,11 @@ export default function Sidebar() {
   }, []);
 
   useEffect(() => {
-    if (!dragging) return;
+    if (!dragging && !draggingVertical && !draggingPosition) return;
     let animationFrameId: number;
     const handleMouseMove = (e: MouseEvent) => {
       animationFrameId = requestAnimationFrame(() => {
+        // Handle horizontal dragging for width
         if (
           dragging &&
           dragStartX.current !== null &&
@@ -160,7 +180,50 @@ export default function Sidebar() {
           setCollapsed(newWidth <= COLLAPSED_WIDTH);
         }
 
-        // Handle vertical dragging for parabola center point
+        // Handle vertical dragging for height (bottom handle only)
+        if (
+          draggingVertical &&
+          dragStartY.current !== null &&
+          dragStartHeight.current !== null
+        ) {
+          const deltaY = e.clientY - dragStartY.current;
+
+          // Bottom handle: height increases as we drag down, decreases as we drag up
+          const newHeight = Math.min(
+            Math.max(dragStartHeight.current + deltaY, 200), // Minimum height of 200px
+            maxHeight
+          );
+
+          // Prevent expanding off-screen by adjusting top position if needed
+          const maxAllowedHeight = window.innerHeight - top - 16; // 16px margin from bottom
+          if (newHeight > maxAllowedHeight) {
+            const adjustedHeight = maxAllowedHeight;
+            const adjustedTop = Math.max(
+              16,
+              window.innerHeight - adjustedHeight - 16
+            );
+            setTop(adjustedTop);
+            setHeight(adjustedHeight);
+          } else {
+            setHeight(newHeight);
+          }
+        }
+
+        // Handle position dragging (moving the entire sidebar up/down)
+        if (
+          draggingPosition &&
+          dragStartY.current !== null &&
+          dragStartTop.current !== null
+        ) {
+          const deltaY = e.clientY - dragStartY.current;
+          const newTop = Math.min(
+            Math.max(dragStartTop.current + deltaY, 16), // Minimum top position
+            window.innerHeight - height - 16 // Maximum top position (keep sidebar in view)
+          );
+          setTop(newTop);
+        }
+
+        // Handle vertical dragging for parabola center point (when dragging horizontally)
         if (
           dragging &&
           dragStartY.current !== null &&
@@ -168,8 +231,7 @@ export default function Sidebar() {
         ) {
           const deltaY = e.clientY - dragStartY.current;
           const newCenterOffset = dragStartCenterOffset.current + deltaY;
-          const maxOffset =
-            (typeof window !== "undefined" ? window.innerHeight : 800) * 0.8;
+          const maxOffset = height * 0.8;
           const clampedOffset = Math.max(
             -maxOffset,
             Math.min(maxOffset, newCenterOffset)
@@ -180,10 +242,15 @@ export default function Sidebar() {
     };
     const handleMouseUp = () => {
       setDragging(false);
+      setDraggingVertical(false);
+      setDraggingPosition(false);
       dragStartX.current = null;
       dragStartWidth.current = null;
       dragStartY.current = null;
+      dragStartHeight.current = null;
+      dragStartTop.current = null;
       dragStartCenterOffset.current = null;
+
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
     };
     window.addEventListener("mousemove", handleMouseMove);
@@ -193,26 +260,31 @@ export default function Sidebar() {
       window.removeEventListener("mouseup", handleMouseUp);
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
     };
-  }, [dragging, maxWidth]);
+  }, [
+    dragging,
+    draggingVertical,
+    draggingPosition,
+    maxWidth,
+    maxHeight,
+    height,
+  ]);
 
   const toggleSection = (idx: number) => {
     setOpenSections(prev => prev.map((open, i) => (i === idx ? !open : open)));
   };
 
   // Generate parabolic clip-path for visual container only
-  const clipPath = isClient
-    ? generateParabolicClipPath(width, window.innerHeight - 100)
-    : "none";
+  const clipPath = isClient ? generateParabolicClipPath(width, height) : "none";
 
   return (
     <div
+      className="rounded-3xl overflow-hidden"
       style={{
         position: "fixed",
-        left: 0,
-        top: 64,
-        bottom: 36,
+        left: "16px",
+        top: `${top}px`,
         width: collapsed ? COLLAPSED_WIDTH : width,
-        height: "calc(100vh - 100px)",
+        height: height,
         zIndex: 30,
       }}
     >
@@ -224,16 +296,15 @@ export default function Sidebar() {
             top: 0,
             left: 0,
             width: width,
-            height: "calc(100vh - 100px)",
+            height: height,
             pointerEvents: "none",
             zIndex: 50, // Higher z-index to ensure visibility
           }}
-          viewBox={`0 0 ${width} ${isClient ? window.innerHeight - 100 : 600}`}
+          viewBox={`0 0 ${width} ${height}`}
           preserveAspectRatio="none"
         >
           <path
             d={(() => {
-              const height = isClient ? window.innerHeight - 100 : 600;
               const points = generateParabolicCurve(width, height);
 
               let pathData = "";
@@ -257,15 +328,16 @@ export default function Sidebar() {
 
       <nav
         ref={sidebarRef}
-        className={`bg-surface border-l border-border transition-all duration-300 flex flex-col ${collapsed ? "min-w-0" : ""}`}
+        className={`bg-surface/30 backdrop-blur-md transition-all duration-300 flex flex-col overflow-hidden isolate ${collapsed ? "min-w-0 rounded-3xl" : "rounded-3xl"}`}
         aria-label="Sidebar navigation"
         style={
           {
             width: collapsed ? COLLAPSED_WIDTH : width,
             minWidth: collapsed ? 0 : COLLAPSED_WIDTH,
             maxWidth: collapsed ? COLLAPSED_WIDTH : maxWidth,
-            transition: dragging ? "none" : "width 0.2s",
-            height: "calc(100vh - 100px)",
+            transition:
+              dragging || draggingVertical ? "none" : "width 0.2s, height 0.2s",
+            height: height,
             top: 0,
             bottom: 0,
             position: "absolute",
@@ -275,12 +347,23 @@ export default function Sidebar() {
               ? `${COLLAPSED_WIDTH}px`
               : `${width}px`,
             clipPath: collapsed ? "none" : clipPath,
+            WebkitClipPath: collapsed ? "none" : clipPath,
           } as React.CSSProperties & { "--sidebar-width": string }
         }
       >
         {/* Sidebar Title */}
         {!collapsed && (
-          <div className="flex items-center gap-3 px-4 py-4 border-b border-border bg-surface-elevated">
+          <div
+            className="flex items-center gap-3 px-4 py-4 border-b border-border/30 bg-surface-elevated/40 backdrop-blur-sm rounded-t-3xl cursor-move"
+            onMouseDown={e => {
+              if (e.button === 0) {
+                setDraggingPosition(true);
+                dragStartY.current = e.clientY;
+                dragStartTop.current = top;
+                e.preventDefault();
+              }
+            }}
+          >
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-primary rounded-full"></div>
               <span className="font-display font-semibold text-text-primary text-sm">
@@ -290,7 +373,7 @@ export default function Sidebar() {
           </div>
         )}
 
-        {/* Combined Horizontal/Vertical Drag Handle */}
+        {/* Horizontal Drag Handle */}
         <div
           className={`absolute right-0 top-0 h-full w-1 cursor-ew-resize z-50 group ${dragging ? "bg-primary" : "bg-transparent hover:bg-primary/30"}`}
           onMouseDown={e => {
@@ -300,6 +383,19 @@ export default function Sidebar() {
               dragStartWidth.current = width;
               dragStartY.current = e.clientY;
               dragStartCenterOffset.current = centerOffset;
+              e.preventDefault();
+            }
+          }}
+        />
+
+        {/* Vertical Drag Handle (bottom only) */}
+        <div
+          className={`absolute left-0 bottom-0 w-full h-1 cursor-ns-resize z-50 group ${draggingVertical ? "bg-primary" : "bg-transparent hover:bg-primary/30"}`}
+          onMouseDown={e => {
+            if (e.button === 0) {
+              setDraggingVertical(true);
+              dragStartY.current = e.clientY;
+              dragStartHeight.current = height;
               e.preventDefault();
             }
           }}
@@ -319,7 +415,9 @@ export default function Sidebar() {
                   onClick={() => toggleSection(idx)}
                   tabIndex={collapsed ? -1 : 0}
                 >
-                  <span className="text-primary mr-3">{section.icon}</span>
+                  <span className={`text-primary ${collapsed ? "" : "mr-3"}`}>
+                    {section.icon}
+                  </span>
                   {!collapsed && (
                     <span className="flex-1 font-display font-medium text-text-primary">
                       {section.title}
@@ -375,7 +473,7 @@ export default function Sidebar() {
 
         {/* Status Bar */}
         {!collapsed && (
-          <div className="border-t border-border px-4 py-3 bg-surface-elevated">
+          <div className="border-t border-border px-4 py-3 bg-surface-elevated rounded-b-3xl">
             <div className="flex items-center justify-between text-xs text-text-muted font-mono">
               <span>Section: AI Tools</span>
               <div className="flex items-center gap-1">

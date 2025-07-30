@@ -3,22 +3,33 @@ import { Bot, Send } from "lucide-react";
 
 interface AIChatSidebarProps {
   width?: number;
+  height?: number;
   centerOffset?: number;
   onWidthChange?: (width: number) => void;
+  onHeightChange?: (height: number) => void;
   onCenterOffsetChange?: (offset: number) => void;
 }
 
 export default function AIChatSidebar({
   width: externalWidth,
+  height: externalHeight,
   centerOffset: externalCenterOffset,
   onWidthChange,
+  onHeightChange,
   onCenterOffsetChange,
 }: AIChatSidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [width, setWidth] = useState(externalWidth || 320);
+  const [height, setHeight] = useState(externalHeight || 800); // Start with fallback, will be updated on client
+  const [top, setTop] = useState(16); // Vertical position of sidebar
   const [dragging, setDragging] = useState(false);
+  const [draggingVertical, setDraggingVertical] = useState(false);
+  const [draggingPosition, setDraggingPosition] = useState(false);
   const [maxWidth, setMaxWidth] = useState(
     typeof window !== "undefined" ? window.innerWidth / 2 : 600
+  );
+  const [maxHeight, setMaxHeight] = useState(
+    typeof window !== "undefined" ? window.innerHeight - 32 : 800
   );
   const [centerOffset, setCenterOffset] = useState(externalCenterOffset || 0); // Vertical offset for center point
   const [isClient, setIsClient] = useState(false);
@@ -26,7 +37,10 @@ export default function AIChatSidebar({
   const dragStartX = useRef<number | null>(null);
   const dragStartWidth = useRef<number | null>(null);
   const dragStartY = useRef<number | null>(null);
+  const dragStartHeight = useRef<number | null>(null);
+  const dragStartTop = useRef<number | null>(null);
   const dragStartCenterOffset = useRef<number | null>(null);
+
   const [messages, setMessages] = useState([
     { from: "ai", text: "Hi! I'm your AI coding buddy. Ask me anything!" },
     { from: "user", text: "How do I send a Cardano transaction?" },
@@ -41,6 +55,12 @@ export default function AIChatSidebar({
   }, [externalWidth]);
 
   useEffect(() => {
+    if (externalHeight !== undefined) {
+      setHeight(externalHeight);
+    }
+  }, [externalHeight]);
+
+  useEffect(() => {
     if (externalCenterOffset !== undefined) {
       setCenterOffset(externalCenterOffset);
     }
@@ -50,6 +70,11 @@ export default function AIChatSidebar({
   const updateWidth = (newWidth: number) => {
     setWidth(newWidth);
     onWidthChange?.(newWidth);
+  };
+
+  const updateHeight = (newHeight: number) => {
+    setHeight(newHeight);
+    onHeightChange?.(newHeight);
   };
 
   const updateCenterOffset = (newOffset: number) => {
@@ -122,7 +147,6 @@ export default function AIChatSidebar({
 
   // Calculate available width at any vertical position using the main function
   const getAvailableWidthAtPosition = (yPosition: number) => {
-    const height = isClient ? window.innerHeight - 100 : 600;
     const adjustedCenter = height / 2 + centerOffset;
     const distanceFromCenter = yPosition - adjustedCenter;
     const normalizedDistance = distanceFromCenter / (height / 2);
@@ -164,8 +188,15 @@ export default function AIChatSidebar({
   useEffect(() => {
     setIsClient(true);
     const handleResize = () => {
-      setMaxWidth(window.innerWidth / 2);
-      setWidth(w => Math.min(w, window.innerWidth / 2));
+      const newMaxWidth = window.innerWidth / 2;
+      const newMaxHeight = window.innerHeight - 32;
+      setMaxWidth(newMaxWidth);
+      setMaxHeight(newMaxHeight);
+      setWidth(w => Math.min(w, newMaxWidth));
+      // Always set to full height on initial load and resize (unless external height is provided)
+      if (!externalHeight) {
+        setHeight(newMaxHeight);
+      }
     };
     handleResize(); // Call immediately
     window.addEventListener("resize", handleResize);
@@ -205,10 +236,11 @@ export default function AIChatSidebar({
   }, [collapsed]);
 
   useEffect(() => {
-    if (!dragging) return;
+    if (!dragging && !draggingVertical && !draggingPosition) return;
     let animationFrameId: number;
     const handleMouseMove = (e: MouseEvent) => {
       animationFrameId = requestAnimationFrame(() => {
+        // Handle horizontal dragging for width
         if (
           dragging &&
           dragStartX.current !== null &&
@@ -224,7 +256,50 @@ export default function AIChatSidebar({
           setCollapsed(newWidth <= COLLAPSED_WIDTH);
         }
 
-        // Handle vertical dragging for parabola center point
+        // Handle vertical dragging for height (bottom handle only)
+        if (
+          draggingVertical &&
+          dragStartY.current !== null &&
+          dragStartHeight.current !== null
+        ) {
+          const deltaY = e.clientY - dragStartY.current;
+
+          // Bottom handle: height increases as we drag down, decreases as we drag up
+          const newHeight = Math.min(
+            Math.max(dragStartHeight.current + deltaY, 200), // Minimum height of 200px
+            maxHeight
+          );
+
+          // Prevent expanding off-screen by adjusting top position if needed
+          const maxAllowedHeight = window.innerHeight - top - 16; // 16px margin from bottom
+          if (newHeight > maxAllowedHeight) {
+            const adjustedHeight = maxAllowedHeight;
+            const adjustedTop = Math.max(
+              16,
+              window.innerHeight - adjustedHeight - 16
+            );
+            setTop(adjustedTop);
+            updateHeight(adjustedHeight);
+          } else {
+            updateHeight(newHeight);
+          }
+        }
+
+        // Handle position dragging (moving the entire sidebar up/down)
+        if (
+          draggingPosition &&
+          dragStartY.current !== null &&
+          dragStartTop.current !== null
+        ) {
+          const deltaY = e.clientY - dragStartY.current;
+          const newTop = Math.min(
+            Math.max(dragStartTop.current + deltaY, 16), // Minimum top position
+            window.innerHeight - height - 16 // Maximum top position (keep sidebar in view)
+          );
+          setTop(newTop);
+        }
+
+        // Handle vertical dragging for parabola center point (when dragging horizontally)
         if (
           dragging &&
           dragStartY.current !== null &&
@@ -232,8 +307,7 @@ export default function AIChatSidebar({
         ) {
           const deltaY = e.clientY - dragStartY.current;
           const newCenterOffset = dragStartCenterOffset.current + deltaY;
-          const maxOffset =
-            (typeof window !== "undefined" ? window.innerHeight : 800) * 0.8;
+          const maxOffset = height * 0.8;
           const clampedOffset = Math.max(
             -maxOffset,
             Math.min(maxOffset, newCenterOffset)
@@ -244,10 +318,15 @@ export default function AIChatSidebar({
     };
     const handleMouseUp = () => {
       setDragging(false);
+      setDraggingVertical(false);
+      setDraggingPosition(false);
       dragStartX.current = null;
       dragStartWidth.current = null;
       dragStartY.current = null;
+      dragStartHeight.current = null;
+      dragStartTop.current = null;
       dragStartCenterOffset.current = null;
+
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
     };
     window.addEventListener("mousemove", handleMouseMove);
@@ -257,16 +336,20 @@ export default function AIChatSidebar({
       window.removeEventListener("mouseup", handleMouseUp);
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
     };
-  }, [dragging, maxWidth]);
+  }, [
+    dragging,
+    draggingVertical,
+    draggingPosition,
+    maxWidth,
+    maxHeight,
+    height,
+  ]);
 
   // Generate parabolic clip-path for visual container only
-  const clipPath = isClient
-    ? generateParabolicClipPath(width, window.innerHeight - 100)
-    : "none";
+  const clipPath = isClient ? generateParabolicClipPath(width, height) : "none";
 
   // Calculate optimal content positioning based on parabola
   const getOptimalContentLayout = () => {
-    const height = isClient ? window.innerHeight - 100 : 600;
     const adjustedCenter = height / 2 + centerOffset;
 
     // Find the best areas for header, content, and input
@@ -310,11 +393,10 @@ export default function AIChatSidebar({
     <div
       style={{
         position: "fixed",
-        right: 0,
-        top: 64,
-        bottom: 36,
+        right: "16px",
+        top: `${top}px`,
         width: collapsed ? COLLAPSED_WIDTH : width,
-        height: "calc(100vh - 100px)",
+        height: height,
         zIndex: 40,
       }}
     >
@@ -326,16 +408,15 @@ export default function AIChatSidebar({
             top: 0,
             left: 0,
             width: width,
-            height: "calc(100vh - 100px)",
+            height: height,
             pointerEvents: "none",
             zIndex: 50, // Higher z-index to ensure visibility
           }}
-          viewBox={`0 0 ${width} ${isClient ? window.innerHeight - 100 : 600}`}
+          viewBox={`0 0 ${width} ${height}`}
           preserveAspectRatio="none"
         >
           <path
             d={(() => {
-              const height = isClient ? window.innerHeight - 100 : 600;
               const points = generateParabolicCurve(width, height);
 
               let pathData = "";
@@ -364,8 +445,9 @@ export default function AIChatSidebar({
             width: collapsed ? COLLAPSED_WIDTH : width,
             minWidth: collapsed ? 0 : 120,
             maxWidth: collapsed ? COLLAPSED_WIDTH : maxWidth,
-            transition: dragging ? "none" : "width 0.2s",
-            height: "calc(100vh - 100px)",
+            transition:
+              dragging || draggingVertical ? "none" : "width 0.2s, height 0.2s",
+            height: height,
             top: 0,
             bottom: 0,
             position: "absolute",
@@ -377,12 +459,10 @@ export default function AIChatSidebar({
             clipPath: collapsed ? "none" : clipPath,
           } as React.CSSProperties & { "--ai-chat-width": string }
         }
-        className={`bg-surface flex flex-col shadow-2xl ${
-          collapsed ? "min-w-0" : "rounded-l-2xl"
-        }`}
+        className={`bg-surface/30 backdrop-blur-md flex flex-col shadow-2xl rounded-3xl overflow-hidden isolate`}
         aria-label="AI Chat sidebar"
       >
-        {/* Combined Horizontal/Vertical Drag Handle */}
+        {/* Horizontal Drag Handle */}
         <div
           className={`absolute left-0 top-0 h-full w-1 cursor-ew-resize z-50 group ${dragging ? "bg-primary" : "bg-transparent hover:bg-primary/30"}`}
           onMouseDown={e => {
@@ -392,6 +472,19 @@ export default function AIChatSidebar({
               dragStartWidth.current = width;
               dragStartY.current = e.clientY;
               dragStartCenterOffset.current = centerOffset;
+              e.preventDefault();
+            }
+          }}
+        />
+
+        {/* Vertical Drag Handle (bottom only) */}
+        <div
+          className={`absolute left-0 bottom-0 w-full h-1 cursor-ns-resize z-50 group ${draggingVertical ? "bg-primary" : "bg-transparent hover:bg-primary/30"}`}
+          onMouseDown={e => {
+            if (e.button === 0) {
+              setDraggingVertical(true);
+              dragStartY.current = e.clientY;
+              dragStartHeight.current = height;
               e.preventDefault();
             }
           }}
@@ -409,91 +502,37 @@ export default function AIChatSidebar({
           </div>
         ) : (
           <>
-            {/* Dynamic Header - Adapts to available space */}
+            {/* Sidebar Title */}
             <div
-              className="flex items-center gap-1 px-2 py-1 bg-surface-elevated min-w-0 flex-shrink-0 sticky top-0 z-50 rounded-t-lg"
-              style={{
-                height:
-                  contentLayout.headerSpace.availableWidth < 150
-                    ? "20px"
-                    : contentLayout.headerSpace.availableWidth < 200
-                      ? "24px"
-                      : "28px",
-                minHeight:
-                  contentLayout.headerSpace.availableWidth < 150
-                    ? "20px"
-                    : contentLayout.headerSpace.availableWidth < 200
-                      ? "24px"
-                      : "28px",
-                width: `${contentLayout.headerSpace.availableWidth}px`,
-                maxWidth: `${contentLayout.headerSpace.availableWidth}px`,
-                position: "absolute",
-                top: "8px",
-                left: `${contentLayout.headerSpace.curveOutset + 2}px`,
+              className="flex items-center gap-3 px-4 py-4 border-b border-border/30 bg-surface-elevated/40 backdrop-blur-sm rounded-t-3xl cursor-move"
+              onMouseDown={e => {
+                if (e.button === 0) {
+                  setDraggingPosition(true);
+                  dragStartY.current = e.clientY;
+                  dragStartTop.current = top;
+                  e.preventDefault();
+                }
               }}
             >
-              <Bot
-                className="text-primary"
-                style={{
-                  width:
-                    contentLayout.headerSpace.availableWidth < 150
-                      ? "8px"
-                      : contentLayout.headerSpace.availableWidth < 200
-                        ? "10px"
-                        : "12px",
-                  height:
-                    contentLayout.headerSpace.availableWidth < 150
-                      ? "8px"
-                      : contentLayout.headerSpace.availableWidth < 200
-                        ? "10px"
-                        : "12px",
-                }}
-              />
-              <div className="flex items-center gap-1 min-w-0 flex-1">
-                <span
-                  className="font-display font-semibold text-text-primary truncate"
-                  style={{
-                    fontSize:
-                      contentLayout.headerSpace.availableWidth < 150
-                        ? "8px"
-                        : contentLayout.headerSpace.availableWidth < 200
-                          ? "10px"
-                          : "12px",
-                  }}
-                >
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-primary rounded-full"></div>
+                <span className="font-display font-semibold text-text-primary text-sm">
                   AI CHAT
                 </span>
-                <div
-                  className="bg-primary rounded-full animate-pulse flex-shrink-0"
-                  style={{
-                    width:
-                      contentLayout.headerSpace.availableWidth < 150
-                        ? "2px"
-                        : contentLayout.headerSpace.availableWidth < 200
-                          ? "3px"
-                          : "4px",
-                    height:
-                      contentLayout.headerSpace.availableWidth < 150
-                        ? "2px"
-                        : contentLayout.headerSpace.availableWidth < 200
-                          ? "3px"
-                          : "4px",
-                  }}
-                />
               </div>
             </div>
 
             {/* Chat Area - Dynamically positioned and sized */}
             <div
-              className="flex-1 flex flex-col bg-surface min-w-0 overflow-hidden"
+              className="flex-1 flex flex-col bg-surface/20 backdrop-blur-sm min-w-0 overflow-hidden"
               style={{
                 minHeight: 0,
                 width: `${contentLayout.contentArea.maxWidth}px`,
                 maxWidth: `${contentLayout.contentArea.maxWidth}px`,
                 marginLeft: `${getAvailableWidthAtPosition(contentLayout.contentArea.start).curveOutset + 2}px`,
                 position: "absolute",
-                top: "40px", // Fixed top position below header
-                bottom: "60px", // Fixed bottom position above input
+                top: "72px", // Account for header height (16px padding + ~56px content)
+                bottom: "80px", // Account for input height and padding
                 left: 0,
                 right: 0,
               }}

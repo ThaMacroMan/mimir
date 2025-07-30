@@ -590,19 +590,19 @@ export default function Layout({ children }: { children: ReactNode }) {
   }, [terminalDragging, footerDragging, terminalHeight, terminalOpen]);
 
   return (
-    <div className="flex flex-col min-h-screen h-screen overflow-hidden">
-      <ReadingProgress />
-      <div className="fixed top-0 left-0 right-0 z-50">
+    <div className="flex flex-col h-screen overflow-hidden">
+      {/* <ReadingProgress /> */}
+      {/* <div className="fixed top-0 left-0 right-0 z-50">
         <Header />
-      </div>
-      <div className="flex flex-1 flex-row min-h-0">
+      </div> */}
+      <div className="flex flex-1 flex-row h-full">
         <Sidebar />
         <main
           ref={mainContentRef}
-          className="flex-1 min-h-0 overflow-auto px-0 max-w-none mx-0 transition-all duration-300"
+          className="flex-1 overflow-auto px-0 max-w-none mx-0 transition-all duration-300"
           style={{
-            maxHeight: `calc(100vh - 64px - 36px - var(--terminal-height, 0px))`,
-            marginTop: "80px", // Account for fixed header + extra spacing
+            height: `calc(100vh - var(--terminal-height, 0px))`,
+            marginTop: "0px", // Removed header spacing
             marginLeft: `${mainContentLeft}px`,
             marginRight: `${aiChatWidth}px`, // Account for AI chat sidebar
             width: `${mainContentWidth}px`, // Dynamic width based on sidebar states
@@ -626,7 +626,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         aiChatWidth={aiChatWidth}
         centerOffset={aiChatCenterOffset}
       />
-      <div className="fixed bottom-0 left-0 right-0 z-50">
+      {/* <div className="fixed bottom-0 left-0 right-0 z-50">
         <Footer
           onTerminalClick={() => setTerminalOpen(v => !v)}
           onFooterDrag={e => {
@@ -635,7 +635,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             dragStartHeight.current = terminalHeight;
           }}
         />
-      </div>
+      </div> */}
       <AnimatePresence>
         {terminalOpen && (
           <motion.div
@@ -648,7 +648,7 @@ export default function Layout({ children }: { children: ReactNode }) {
               left: `${sidebarWidth}px`,
               right: `${aiChatWidth}px`,
               height: terminalHeight,
-              bottom: "36px", // footer height
+              bottom: "0px", // No footer anymore
             }}
           >
             <div className="pointer-events-auto w-full h-full relative">
