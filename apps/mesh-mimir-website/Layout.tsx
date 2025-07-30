@@ -335,42 +335,13 @@ export default function Layout({ children }: { children: ReactNode }) {
   const minTerminalHeight = 120;
   const maxTerminalHeight = 600;
 
-  // Calculate parabolic clip-path for main content to utilize sidebar curve space
-  const generateMainContentClipPath = (aiChatWidth: number, height: number) => {
-    // Amplitude factor - increases with width for more dramatic curve
-    const amplitudeFactor = Math.max(0.1, (aiChatWidth - 56) / (600 - 56));
-
-    // Generate points for the parabolic curve that mirrors the sidebar
-    const points = [];
-    const numPoints = 20;
-
-    for (let i = 0; i <= numPoints; i++) {
-      const y = (i / numPoints) * height;
-      // Mirror the sidebar's parabolic curve
-      const normalizedY = (y - height / 2) / (height / 2); // -1 to 1
-      const curveOutset =
-        aiChatWidth * amplitudeFactor * normalizedY * normalizedY;
-      const x = aiChatWidth - curveOutset; // Mirror the curve
-
-      points.push(`${x}px ${y}px`);
-    }
-
-    // Add the right edge points to close the shape
-    for (let i = numPoints; i >= 0; i--) {
-      const y = (i / numPoints) * height;
-      points.push(`100% ${y}px`);
-    }
-
-    return `polygon(0px 0px, ${points.join(", ")}, 100% 100%, 0px 100%)`;
-  };
-
-  // Get current AI chat width for clip-path calculation
-  const getCurrentAiChatWidth = () => {
-    if (typeof window === "undefined") return 320;
-    const aiChatWidth = getComputedStyle(document.body).getPropertyValue(
-      "--ai-chat-width"
+  // Get current AI chat height for bottom spacing calculation
+  const getCurrentAiChatHeight = () => {
+    if (typeof window === "undefined") return 300;
+    const aiChatHeight = getComputedStyle(document.body).getPropertyValue(
+      "--ai-chat-height"
     );
-    return parseInt(aiChatWidth) || 320;
+    return parseInt(aiChatHeight) || 300;
   };
 
   // Update sidebar positions and main content dimensions dynamically
@@ -385,21 +356,22 @@ export default function Layout({ children }: { children: ReactNode }) {
 
       const currentSidebarWidth =
         sidebarElement?.getBoundingClientRect().width || 260;
-      const currentAiChatWidth =
-        aiChatElement?.getBoundingClientRect().width || 260;
+      const currentAiChatHeight =
+        aiChatElement?.getBoundingClientRect().height || 300;
 
       // Update state variables
       setSidebarWidth(currentSidebarWidth);
-      setAiChatWidth(currentAiChatWidth);
+      setAiChatWidth(currentAiChatHeight); // Reuse aiChatWidth for height
 
       // Calculate main content dimensions
-      // Account for AI chat sidebar width + 16px right margin
-      const aiChatTotalSpace = currentAiChatWidth + 16; // 16px margin from right edge
-      const viewportWidth = window.innerWidth;
+      // Account for AI chat sidebar height + 16px bottom margin
+      const aiChatTotalSpace = currentAiChatHeight + 16; // 16px margin from bottom edge
+      const viewportWidth =
+        typeof window !== "undefined" ? window.innerWidth : 1200;
       const newMainContentWidth = Math.max(
         300,
-        viewportWidth - currentSidebarWidth - aiChatTotalSpace
-      ); // Minimum 300px width
+        viewportWidth - currentSidebarWidth - 48 // Account for left and right margins (32px + 16px extra)
+      );
       const newMainContentLeft = currentSidebarWidth;
 
       setMainContentWidth(newMainContentWidth);
@@ -412,7 +384,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       );
       document.body.style.setProperty(
         "--terminal-right",
-        `${aiChatTotalSpace}px`
+        `16px` // Fixed right margin for horizontal layout
       );
 
       // Set CSS custom properties for main content area
@@ -421,8 +393,8 @@ export default function Layout({ children }: { children: ReactNode }) {
         `${currentSidebarWidth}px`
       );
       document.body.style.setProperty(
-        "--ai-chat-width",
-        `${currentAiChatWidth}px`
+        "--ai-chat-height",
+        `${currentAiChatHeight}px`
       );
     };
 
@@ -437,7 +409,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       'nav[aria-label="Sidebar navigation"]'
     );
     const aiChat = document.querySelector(
-      'aside[aria-label="AI Chat sidebar"]'
+      'aside[aria-label="Resource sidebar"]'
     );
 
     if (sidebar)
@@ -539,7 +511,8 @@ export default function Layout({ children }: { children: ReactNode }) {
       if (dragStartY.current !== null && dragStartHeight.current !== null) {
         const deltaY = dragStartY.current - e.clientY;
         // Calculate max height to prevent terminal from going below footer
-        const viewportHeight = window.innerHeight;
+        const viewportHeight =
+          typeof window !== "undefined" ? window.innerHeight : 800;
         const headerHeight = 64; // header height
         const footerHeight = 36; // footer height
         const maxAllowedHeight =
@@ -567,7 +540,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         }
       }
     };
- 
+
     const handleMouseUp = () => {
       // Close terminal if dragged below minimum height
       if (terminalHeight < minTerminalHeight + 20) {
@@ -602,24 +575,30 @@ export default function Layout({ children }: { children: ReactNode }) {
           ref={mainContentRef}
           className="flex-1 overflow-auto px-0 max-w-none mx-0 transition-all duration-300"
           style={{
-            height: `calc(100vh - var(--terminal-height, 0px))`,
-            marginTop: "0px", // Removed header spacing
-            marginLeft: `${mainContentLeft}px`,
-            marginRight: "0px", // Remove right margin since sidebar is absolutely positioned
-            width: `${mainContentWidth}px`, // Dynamic width based on sidebar states
+            height: `calc(100vh - var(--terminal-height, 0px) - var(--ai-chat-height, 0px) - 48px)`,
+            marginTop: "16px", // Add top margin to push content down
+            marginLeft: `${mainContentLeft + 16}px`, // Add extra left margin
+            marginRight: "16px", // Add right margin for spacing
+            width: `${mainContentWidth - 16}px`, // Reduce width to account for extra margin
             minWidth: "300px", // Ensure minimum readable width
+            paddingTop: "16px", // Add top padding to push content down
+            paddingLeft: "16px", // Add left padding to push content right
           }}
         >
           {children}
         </main>
-        <ResourceSidebar width={aiChatWidth} onWidthChange={setAiChatWidth} />
+        <ResourceSidebar
+          height={aiChatWidth}
+          onHeightChange={setAiChatWidth}
+          sidebarWidth={sidebarWidth}
+        />
       </div>
 
       {/* Custom Scroll Navigation - moved outside flex container */}
       <ScrollNavigation
         containerRef={mainContentRef}
         className="hidden md:flex" // Only show on medium screens and up to avoid conflicts with mobile
-        aiChatWidth={aiChatWidth + 16} // Account for AI chat sidebar + 16px margin
+        aiChatWidth={16} // Fixed right margin for horizontal layout
       />
       {/* <div className="fixed bottom-0 left-0 right-0 z-50">
         <Footer
@@ -641,9 +620,9 @@ export default function Layout({ children }: { children: ReactNode }) {
             className="fixed z-[100] pointer-events-none"
             style={{
               left: `${sidebarWidth}px`,
-              right: `${aiChatWidth + 16}px`, // Account for AI chat sidebar + 16px margin
+              right: `16px`, // Fixed right margin for horizontal layout
               height: terminalHeight,
-              bottom: "0px", // No footer anymore
+              bottom: `calc(var(--ai-chat-height, 0px) + 16px)`, // Position above AI chat sidebar
             }}
           >
             <div className="pointer-events-auto w-full h-full relative">

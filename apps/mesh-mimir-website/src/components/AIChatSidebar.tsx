@@ -1,11 +1,19 @@
 import { useState, useRef, useEffect } from "react";
-import { Bot, Send, BookOpen, MessageSquare } from "lucide-react";
+import {
+  Bot,
+  Send,
+  BookOpen,
+  MessageSquare,
+  Minimize2,
+  Maximize2,
+} from "lucide-react";
 
 interface ResourceSidebarProps {
   width?: number;
   height?: number;
   onWidthChange?: (width: number) => void;
   onHeightChange?: (height: number) => void;
+  sidebarWidth?: number;
 }
 
 type TabType = "resources" | "ai-chat";
@@ -15,19 +23,19 @@ export default function ResourceSidebar({
   height: externalHeight,
   onWidthChange,
   onHeightChange,
+  sidebarWidth = 260,
 }: ResourceSidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
-  const [width, setWidth] = useState(externalWidth || 260);
-  const [height, setHeight] = useState(externalHeight || 800); // Start with fallback, will be updated on client
-  const [top, setTop] = useState(16); // Vertical position of sidebar
+  const [minimized, setMinimized] = useState(false);
+  const [width, setWidth] = useState(externalWidth || 1200 - sidebarWidth); // Default fallback for SSR
+  const [height, setHeight] = useState(externalHeight || 300);
   const [dragging, setDragging] = useState(false);
   const [draggingVertical, setDraggingVertical] = useState(false);
-  const [draggingPosition, setDraggingPosition] = useState(false);
   const [maxWidth, setMaxWidth] = useState(
-    typeof window !== "undefined" ? window.innerWidth / 2 : 600
+    typeof window !== "undefined" ? window.innerWidth - 32 : 600
   );
   const [maxHeight, setMaxHeight] = useState(
-    typeof window !== "undefined" ? window.innerHeight - 32 : 800
+    typeof window !== "undefined" ? window.innerHeight / 2 : 400
   );
   const [isClient, setIsClient] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>("resources");
@@ -36,7 +44,6 @@ export default function ResourceSidebar({
   const dragStartWidth = useRef<number | null>(null);
   const dragStartY = useRef<number | null>(null);
   const dragStartHeight = useRef<number | null>(null);
-  const dragStartTop = useRef<number | null>(null);
 
   const [messages, setMessages] = useState([
     { from: "ai", text: "Hi! I'm your AI coding buddy. Ask me anything!" },
@@ -68,8 +75,9 @@ export default function ResourceSidebar({
     onHeightChange?.(newHeight);
   };
 
-  // Collapsed width constant
-  const COLLAPSED_WIDTH = 48;
+  // Collapsed height constant (for horizontal layout)
+  const COLLAPSED_HEIGHT = 48;
+  const MINIMIZED_HEIGHT = 48;
 
   // Create refs for all messages upfront to avoid conditional hooks
   const messageRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -82,20 +90,25 @@ export default function ResourceSidebar({
   useEffect(() => {
     setIsClient(true);
     const handleResize = () => {
-      const newMaxWidth = window.innerWidth / 2;
-      const newMaxHeight = window.innerHeight - 32;
+      const newMaxWidth = window.innerWidth - sidebarWidth - 48; // Account for sidebar and margins (32px left + 16px right)
+      const newMaxHeight = window.innerHeight / 2; // Half screen height max
       setMaxWidth(newMaxWidth);
       setMaxHeight(newMaxHeight);
-      setWidth(w => Math.min(w, newMaxWidth));
-      // Always set to full height on initial load and resize (unless external height is provided)
+
+      // If not minimized, update to full width
+      if (!minimized) {
+        setWidth(newMaxWidth);
+      }
+
+      // Always set to reasonable height on initial load and resize (unless external height is provided)
       if (!externalHeight) {
-        setHeight(newMaxHeight);
+        setHeight(Math.min(300, newMaxHeight)); // Default to 300px or max height
       }
     };
     handleResize(); // Call immediately
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [minimized, externalHeight, sidebarWidth]);
 
   // Only scroll to bottom when a new message is added
   useEffect(() => {
@@ -130,79 +143,52 @@ export default function ResourceSidebar({
   }, [collapsed, activeTab]);
 
   useEffect(() => {
-    if (!dragging && !draggingVertical && !draggingPosition) return;
+    if (!dragging && !draggingVertical) return;
     let animationFrameId: number;
     const handleMouseMove = (e: MouseEvent) => {
       animationFrameId = requestAnimationFrame(() => {
-        // Handle horizontal dragging for width
+        // Handle horizontal dragging for width (only when not minimized)
         if (
           dragging &&
+          !minimized &&
           dragStartX.current !== null &&
           dragStartWidth.current !== null &&
           sidebarRef.current
         ) {
-          const delta = dragStartX.current - e.clientX;
+          const delta = e.clientX - dragStartX.current;
           const newWidth = Math.min(
-            Math.max(dragStartWidth.current + delta, COLLAPSED_WIDTH),
+            Math.max(dragStartWidth.current + delta, COLLAPSED_HEIGHT),
             maxWidth
           );
           updateWidth(newWidth);
-          setCollapsed(newWidth <= COLLAPSED_WIDTH);
+          setCollapsed(newWidth <= COLLAPSED_HEIGHT);
         }
 
-        // Handle vertical dragging for height (bottom handle only)
+        // Handle vertical dragging for height (top handle only for horizontal layout)
         if (
           draggingVertical &&
           dragStartY.current !== null &&
           dragStartHeight.current !== null
         ) {
-          const deltaY = e.clientY - dragStartY.current;
+          const deltaY = dragStartY.current - e.clientY; // Inverted for top handle
 
-          // Bottom handle: height increases as we drag down, decreases as we drag up
+          // Top handle: height increases as we drag up, decreases as we drag down
           const newHeight = Math.min(
             Math.max(dragStartHeight.current + deltaY, 200), // Minimum height of 200px
             maxHeight
           );
 
-          // Prevent expanding off-screen by adjusting top position if needed
-          const maxAllowedHeight = window.innerHeight - top - 16; // 16px margin from bottom
-          if (newHeight > maxAllowedHeight) {
-            const adjustedHeight = maxAllowedHeight;
-            const adjustedTop = Math.max(
-              16,
-              window.innerHeight - adjustedHeight - 16
-            );
-            setTop(adjustedTop);
-            updateHeight(adjustedHeight);
-          } else {
-            updateHeight(newHeight);
-          }
-        }
-
-        // Handle position dragging (moving the entire sidebar up/down)
-        if (
-          draggingPosition &&
-          dragStartY.current !== null &&
-          dragStartTop.current !== null
-        ) {
-          const deltaY = e.clientY - dragStartY.current;
-          const newTop = Math.min(
-            Math.max(dragStartTop.current + deltaY, 16), // Minimum top position
-            window.innerHeight - height - 16 // Maximum top position (keep sidebar in view)
-          );
-          setTop(newTop);
+          updateHeight(newHeight);
         }
       });
     };
     const handleMouseUp = () => {
       setDragging(false);
       setDraggingVertical(false);
-      setDraggingPosition(false);
       dragStartX.current = null;
       dragStartWidth.current = null;
       dragStartY.current = null;
       dragStartHeight.current = null;
-      dragStartTop.current = null;
 
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
     };
@@ -213,14 +199,7 @@ export default function ResourceSidebar({
       window.removeEventListener("mouseup", handleMouseUp);
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
     };
-  }, [
-    dragging,
-    draggingVertical,
-    draggingPosition,
-    maxWidth,
-    maxHeight,
-    height,
-  ]);
+  }, [dragging, draggingVertical, maxWidth, maxHeight, width, minimized]);
 
   // Mock resources data - in a real app, this would be dynamic based on the current page
   const resources = [
@@ -256,14 +235,24 @@ export default function ResourceSidebar({
     },
   ];
 
+  const toggleMinimize = () => {
+    if (minimized) {
+      setMinimized(false);
+      setWidth(maxWidth); // Expand to full width
+    } else {
+      setMinimized(true);
+      setWidth(300); // Minimize to 300px width
+    }
+  };
+
   return (
     <div
       style={{
         position: "fixed",
-        right: "16px",
-        top: `${top}px`,
-        width: collapsed ? COLLAPSED_WIDTH : width,
-        height: height,
+        left: `${sidebarWidth + 32}px`, // Connect with sidebar + 16px margin
+        bottom: "16px",
+        width: minimized ? 300 : collapsed ? COLLAPSED_HEIGHT : width,
+        height: collapsed ? COLLAPSED_HEIGHT : height,
         zIndex: 40,
       }}
     >
@@ -271,41 +260,43 @@ export default function ResourceSidebar({
         ref={sidebarRef}
         style={
           {
-            width: collapsed ? COLLAPSED_WIDTH : width,
+            width: minimized ? 300 : collapsed ? COLLAPSED_HEIGHT : width,
             minWidth: collapsed ? 0 : 120,
-            maxWidth: collapsed ? COLLAPSED_WIDTH : maxWidth,
+            maxWidth: collapsed ? COLLAPSED_HEIGHT : maxWidth,
             transition:
               dragging || draggingVertical ? "none" : "width 0.2s, height 0.2s",
-            height: height,
+            height: collapsed ? COLLAPSED_HEIGHT : height,
             top: 0,
             bottom: 0,
             position: "absolute",
-            right: 0,
+            left: 0,
             zIndex: 40,
             "--resource-sidebar-width": collapsed
-              ? `${COLLAPSED_WIDTH}px`
+              ? `${COLLAPSED_HEIGHT}px`
               : `${width}px`,
           } as React.CSSProperties & { "--resource-sidebar-width": string }
         }
         className={`bg-surface/30 backdrop-blur-md flex flex-col shadow-2xl rounded-3xl overflow-hidden isolate`}
         aria-label="Resource sidebar"
       >
-        {/* Horizontal Drag Handle */}
-        <div
-          className={`absolute left-0 top-0 h-full w-1 cursor-ew-resize z-50 group ${dragging ? "bg-primary" : "bg-transparent hover:bg-primary/30"}`}
-          onMouseDown={e => {
-            if (e.button === 0) {
-              setDragging(true);
-              dragStartX.current = e.clientX;
-              dragStartWidth.current = width;
-              e.preventDefault();
-            }
-          }}
-        />
+        {/* Vertical Drag Handle (left side for horizontal layout) - only when not minimized */}
+        {!minimized && (
+          <div
+            className={`absolute left-0 top-0 w-1 h-full cursor-ew-resize z-50 group ${dragging ? "bg-primary" : "bg-transparent hover:bg-primary/30"}`}
+            onMouseDown={e => {
+              if (e.button === 0) {
+                setDragging(true);
+                dragStartX.current = e.clientX;
+                dragStartWidth.current = width;
+                e.preventDefault();
+              }
+            }}
+          />
+        )}
 
-        {/* Vertical Drag Handle (bottom only) */}
+        {/* Horizontal Drag Handle (top only for horizontal layout) */}
         <div
-          className={`absolute left-0 bottom-0 w-full h-1 cursor-ns-resize z-50 group ${draggingVertical ? "bg-primary" : "bg-transparent hover:bg-primary/30"}`}
+          className={`absolute left-0 top-0 w-full h-1 cursor-ns-resize z-50 group ${draggingVertical ? "bg-primary" : "bg-transparent hover:bg-primary/30"}`}
           onMouseDown={e => {
             if (e.button === 0) {
               setDraggingVertical(true);
@@ -329,23 +320,26 @@ export default function ResourceSidebar({
         ) : (
           <>
             {/* Sidebar Title */}
-            <div
-              className="flex items-center gap-3 px-4 py-4 border-b border-border/30 bg-surface-elevated/40 backdrop-blur-sm rounded-t-3xl cursor-move"
-              onMouseDown={e => {
-                if (e.button === 0) {
-                  setDraggingPosition(true);
-                  dragStartY.current = e.clientY;
-                  dragStartTop.current = top;
-                  e.preventDefault();
-                }
-              }}
-            >
+            <div className="flex items-center justify-between gap-3 px-4 py-4 border-b border-border/30 bg-surface-elevated/40 backdrop-blur-sm rounded-t-3xl">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-primary rounded-full"></div>
                 <span className="font-display font-semibold text-text-primary text-sm">
                   RESOURCES
                 </span>
               </div>
+
+              {/* Minimize/Maximize button */}
+              <button
+                onClick={toggleMinimize}
+                className="p-1 rounded hover:bg-surface-elevated/50 transition-colors"
+                title={minimized ? "Expand" : "Minimize"}
+              >
+                {minimized ? (
+                  <Maximize2 className="w-4 h-4 text-text-secondary hover:text-primary" />
+                ) : (
+                  <Minimize2 className="w-4 h-4 text-text-secondary hover:text-primary" />
+                )}
+              </button>
             </div>
 
             {/* Tab Navigation */}
