@@ -567,7 +567,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         }
       }
     };
-
+ 
     const handleMouseUp = () => {
       // Close terminal if dragged below minimum height
       if (terminalHeight < minTerminalHeight + 20) {
