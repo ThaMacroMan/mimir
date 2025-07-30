@@ -389,7 +389,7 @@ export default function ResourceSidebar({
 
         {/* Collapsed state: show both icons at top */}
         {collapsed ? (
-          <div className="flex flex-col items-center justify-center gap-4 py-4 px-2">
+          <div className="flex flex-col items-center justify-center gap-8 h-full px-2">
             <button
               onClick={() => {
                 setIsAnimating(true);
@@ -433,7 +433,7 @@ export default function ResourceSidebar({
           <>
             {/* Sidebar Title */}
             <div
-              className={`flex items-center justify-between px-4 py-4 border-b border-border/30 bg-surface-elevated/40 backdrop-blur-sm rounded-t-3xl transition-all duration-300 ease-out ${collapsed ? "opacity-0 pointer-events-none" : "opacity-100"}`}
+              className={`flex items-center justify-between px-4 py-4 border-b border-border/30 bg-surface-elevated/40 backdrop-blur-sm rounded-t-3xl transition-all duration-300 ease-out ${collapsed ? "opacity-0 pointer-events-none h-0 overflow-hidden" : "opacity-100"}`}
             >
               <div
                 className="flex items-center gap-2 cursor-move"

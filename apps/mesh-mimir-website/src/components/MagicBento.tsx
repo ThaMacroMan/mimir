@@ -419,8 +419,8 @@ export default function MagicBento() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
       >
-        <div className="inline-flex flex-col items-center gap-2 px-8 py-4 bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 rounded-full text-5xl text-primary backdrop-blur-sm shadow-2xl">
-          <span className="font-mono font-extrabold tracking-widest text-5xl md:text-6xl lg:text-7xl drop-shadow-lg">
+        <div className="inline-flex flex-col items-center justify-center gap-1 px-8 py-6 bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 rounded-full backdrop-blur-sm shadow-2xl">
+          <span className="font-mono font-extrabold tracking-widest text-5xl md:text-6xl lg:text-7xl text-primary drop-shadow-lg">
             Mimir
           </span>
           <span className="text-xs text-text-secondary font-mono opacity-70 mt-2 flex items-center gap-2">
