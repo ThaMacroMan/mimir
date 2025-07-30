@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Bot, Send, BookOpen, MessageSquare } from "lucide-react";
+import { Bot, Send, BookOpen, MessageSquare, Link } from "lucide-react";
 
 interface ResourceSidebarProps {
   width?: number;
@@ -10,14 +10,20 @@ interface ResourceSidebarProps {
 
 type TabType = "resources" | "ai-chat";
 
+// Collapsed width constant
+const COLLAPSED_WIDTH = 48;
+
 export default function ResourceSidebar({
   width: externalWidth,
   height: externalHeight,
   onWidthChange,
   onHeightChange,
 }: ResourceSidebarProps) {
-  const [collapsed, setCollapsed] = useState(false);
-  const [width, setWidth] = useState(externalWidth || 260);
+  const [collapsed, setCollapsed] = useState(true);
+  const [width, setWidth] = useState(externalWidth || COLLAPSED_WIDTH);
+  const [animatingWidth, setAnimatingWidth] = useState(
+    externalWidth || COLLAPSED_WIDTH
+  ); // For smooth transitions
   const [height, setHeight] = useState(externalHeight || 800); // Start with fallback, will be updated on client
   const [top, setTop] = useState(16); // Vertical position of sidebar
   const [dragging, setDragging] = useState(false);
@@ -37,6 +43,15 @@ export default function ResourceSidebar({
   const dragStartY = useRef<number | null>(null);
   const dragStartHeight = useRef<number | null>(null);
   const dragStartTop = useRef<number | null>(null);
+
+  // Click and hold functionality
+  const [isHolding, setIsHolding] = useState(false);
+  const holdTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const expandDuration = 500; // 0.5 seconds to expand
+  const collapseDuration = 1000; // 1 second to collapse
+
+  // Animation states
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const [messages, setMessages] = useState([
     { from: "ai", text: "Hi! I'm your AI coding buddy. Ask me anything!" },
@@ -60,6 +75,7 @@ export default function ResourceSidebar({
   // Notify parent of changes
   const updateWidth = (newWidth: number) => {
     setWidth(newWidth);
+    setAnimatingWidth(newWidth);
     onWidthChange?.(newWidth);
   };
 
@@ -67,9 +83,6 @@ export default function ResourceSidebar({
     setHeight(newHeight);
     onHeightChange?.(newHeight);
   };
-
-  // Collapsed width constant
-  const COLLAPSED_WIDTH = 48;
 
   // Create refs for all messages upfront to avoid conditional hooks
   const messageRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -106,6 +119,52 @@ export default function ResourceSidebar({
     }
     prevMessagesLength.current = messages.length;
   }, [messages]);
+
+  // Handle click and hold functionality
+  const handleMouseDown = () => {
+    if (collapsed) {
+      setIsHolding(true);
+      holdTimeoutRef.current = setTimeout(() => {
+        setIsAnimating(true);
+        setCollapsed(false);
+        setWidth(260); // Expand to default width
+        setAnimatingWidth(260);
+        setIsHolding(false);
+        // Reset animation state after transition
+        setTimeout(() => setIsAnimating(false), 600);
+      }, expandDuration);
+    } else {
+      // Hold to collapse when expanded
+      setIsHolding(true);
+      holdTimeoutRef.current = setTimeout(() => {
+        setIsAnimating(true);
+        setAnimatingWidth(COLLAPSED_WIDTH);
+        // Delay the collapsed state change to allow the transition to animate
+        setTimeout(() => {
+          setCollapsed(true);
+          setWidth(COLLAPSED_WIDTH);
+          setIsHolding(false);
+          setIsAnimating(false);
+        }, 600);
+      }, collapseDuration);
+    }
+  };
+
+  const handleMouseUp = () => {
+    if (holdTimeoutRef.current) {
+      clearTimeout(holdTimeoutRef.current);
+      holdTimeoutRef.current = null;
+    }
+    setIsHolding(false);
+  };
+
+  const handleMouseLeave = () => {
+    if (holdTimeoutRef.current) {
+      clearTimeout(holdTimeoutRef.current);
+      holdTimeoutRef.current = null;
+    }
+    setIsHolding(false);
+  };
 
   // Ensure proper scroll position on initial load
   useEffect(() => {
@@ -271,24 +330,34 @@ export default function ResourceSidebar({
         ref={sidebarRef}
         style={
           {
-            width: collapsed ? COLLAPSED_WIDTH : width,
+            width: animatingWidth,
             minWidth: collapsed ? 0 : 120,
             maxWidth: collapsed ? COLLAPSED_WIDTH : maxWidth,
             transition:
-              dragging || draggingVertical ? "none" : "width 0.2s, height 0.2s",
+              dragging || draggingVertical
+                ? "none"
+                : "width 0.6s cubic-bezier(0.4, 0, 0.2, 1), height 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
             height: height,
             top: 0,
             bottom: 0,
             position: "absolute",
             right: 0,
             zIndex: 40,
-            "--resource-sidebar-width": collapsed
-              ? `${COLLAPSED_WIDTH}px`
-              : `${width}px`,
+            "--resource-sidebar-width": `${animatingWidth}px`,
           } as React.CSSProperties & { "--resource-sidebar-width": string }
         }
-        className={`bg-surface/30 backdrop-blur-md flex flex-col shadow-2xl rounded-3xl overflow-hidden isolate`}
+        className={`bg-surface/30 backdrop-blur-md flex flex-col shadow-2xl rounded-3xl overflow-hidden isolate transition-all duration-500 ease-out ${
+          collapsed ? "cursor-pointer" : "cursor-pointer"
+        } ${collapsed && isHolding ? "scale-105 opacity-90" : ""} ${!collapsed && isHolding ? "scale-95 opacity-90" : ""} ${isAnimating ? "animate-pulse" : ""}`}
         aria-label="Resource sidebar"
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
+        title={
+          collapsed
+            ? "Click and hold for 0.5s to expand"
+            : "Click and hold for 1s to collapse"
+        }
       >
         {/* Horizontal Drag Handle */}
         <div
@@ -299,6 +368,7 @@ export default function ResourceSidebar({
               dragStartX.current = e.clientX;
               dragStartWidth.current = width;
               e.preventDefault();
+              e.stopPropagation();
             }
           }}
         />
@@ -312,14 +382,47 @@ export default function ResourceSidebar({
               dragStartY.current = e.clientY;
               dragStartHeight.current = height;
               e.preventDefault();
+              e.stopPropagation();
             }
           }}
         />
 
-        {/* Collapsed state: show only icon */}
+        {/* Collapsed state: show both icons at top */}
         {collapsed ? (
-          <div className="flex flex-col items-center justify-center flex-1">
-            <BookOpen className="w-5 h-5 text-primary" />
+          <div className="flex flex-col items-center justify-center gap-4 py-4 px-2">
+            <button
+              onClick={() => {
+                setIsAnimating(true);
+                setCollapsed(false);
+                setWidth(260);
+                setAnimatingWidth(260);
+                setActiveTab("resources");
+                setTimeout(() => setIsAnimating(false), 600);
+              }}
+              onMouseDown={e => e.stopPropagation()}
+              className="text-primary hover:text-primary-hover transition-all duration-300 ease-out cursor-pointer hover:scale-105"
+            >
+              <Link className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => {
+                setIsAnimating(true);
+                setCollapsed(false);
+                setWidth(260);
+                setAnimatingWidth(260);
+                setActiveTab("ai-chat");
+                setTimeout(() => setIsAnimating(false), 600);
+              }}
+              onMouseDown={e => e.stopPropagation()}
+              className="text-primary hover:text-primary-hover transition-all duration-300 ease-out cursor-pointer hover:scale-105"
+            >
+              <MessageSquare className="w-5 h-5" />
+            </button>
+            {isHolding && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            )}
           </div>
         ) : !isClient ? (
           // Loading state while client-side calculations are being set up
@@ -330,28 +433,57 @@ export default function ResourceSidebar({
           <>
             {/* Sidebar Title */}
             <div
-              className="flex items-center gap-3 px-4 py-4 border-b border-border/30 bg-surface-elevated/40 backdrop-blur-sm rounded-t-3xl cursor-move"
-              onMouseDown={e => {
-                if (e.button === 0) {
-                  setDraggingPosition(true);
-                  dragStartY.current = e.clientY;
-                  dragStartTop.current = top;
-                  e.preventDefault();
-                }
-              }}
+              className={`flex items-center justify-between px-4 py-4 border-b border-border/30 bg-surface-elevated/40 backdrop-blur-sm rounded-t-3xl transition-all duration-300 ease-out ${collapsed ? "opacity-0 pointer-events-none" : "opacity-100"}`}
             >
-              <div className="flex items-center gap-2">
+              <div
+                className="flex items-center gap-2 cursor-move"
+                onMouseDown={e => {
+                  if (e.button === 0) {
+                    setDraggingPosition(true);
+                    dragStartY.current = e.clientY;
+                    dragStartTop.current = top;
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }
+                }}
+              >
                 <div className="w-2 h-2 bg-primary rounded-full"></div>
                 <span className="font-display font-semibold text-text-primary text-sm">
                   RESOURCES
                 </span>
               </div>
+              <button
+                onClick={() => {
+                  setIsAnimating(true);
+                  setAnimatingWidth(COLLAPSED_WIDTH);
+                  setCollapsed(true);
+                  setWidth(COLLAPSED_WIDTH);
+                  setTimeout(() => setIsAnimating(false), 600);
+                }}
+                className="text-text-secondary hover:text-primary transition-all duration-300 ease-out cursor-pointer p-2 rounded-lg hover:bg-surface-elevated hover:scale-105"
+                title="Collapse sidebar"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
             </div>
 
             {/* Tab Navigation */}
             <div className="flex border-b border-border/30 bg-surface-elevated/20">
               <button
                 onClick={() => setActiveTab("resources")}
+                onMouseDown={e => e.stopPropagation()}
                 className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium transition-all duration-200 ${
                   activeTab === "resources"
                     ? "text-primary bg-primary/10 border-b-2 border-primary"
@@ -363,6 +495,7 @@ export default function ResourceSidebar({
               </button>
               <button
                 onClick={() => setActiveTab("ai-chat")}
+                onMouseDown={e => e.stopPropagation()}
                 className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium transition-all duration-200 ${
                   activeTab === "ai-chat"
                     ? "text-primary bg-primary/10 border-b-2 border-primary"
@@ -386,6 +519,7 @@ export default function ResourceSidebar({
                       target="_blank"
                       rel="noopener noreferrer"
                       className="block p-3 rounded-lg bg-surface-elevated/50 hover:bg-surface-elevated border border-border/30 hover:border-primary/30 transition-all duration-200 group"
+                      onMouseDown={e => e.stopPropagation()}
                     >
                       <div className="flex items-start gap-3">
                         <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
@@ -518,6 +652,7 @@ export default function ResourceSidebar({
                   }
                   value={input}
                   onChange={e => setInput(e.target.value)}
+                  onMouseDown={e => e.stopPropagation()}
                   disabled={collapsed}
                   style={{
                     minWidth:
@@ -531,6 +666,7 @@ export default function ResourceSidebar({
                   type="submit"
                   className="rounded bg-primary text-background font-semibold hover:bg-primary-hover transition-all duration-200 font-mono disabled:opacity-50 flex items-center gap-1 flex-shrink-0"
                   disabled={!input.trim()}
+                  onMouseDown={e => e.stopPropagation()}
                   style={{
                     padding:
                       width < 150

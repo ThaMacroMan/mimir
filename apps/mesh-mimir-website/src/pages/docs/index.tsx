@@ -18,12 +18,14 @@ const staggerChildren = {
 
 export default function LearnIndex() {
   return (
-    <div>
-      <h1>Learn Section</h1>
-      <p>
-        Welcome to the learning section. Here you will find guides and tutorials
-        to help you get started with Cardano development.
-      </p>
+    <div className="space-y-16">
+      <section>
+        <h1 className="text-4xl font-bold mb-8">Learn Section</h1>
+        <p className="text-lg text-text-secondary leading-relaxed">
+          Welcome to the learning section. Here you will find guides and
+          tutorials to help you get started with Cardano development.
+        </p>
+      </section>
     </div>
   );
 }

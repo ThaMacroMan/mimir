@@ -56,12 +56,14 @@ const guides = [
 
 export default function GuidesIndex() {
   return (
-    <div>
-      <h1>Guides Section</h1>
-      <p>
-        Welcome to the guides section. Here you will find step-by-step
-        walkthroughs of different projects.
-      </p>
+    <div className="space-y-16">
+      <section>
+        <h1 className="text-4xl font-bold mb-8">Guides Section</h1>
+        <p className="text-lg text-text-secondary leading-relaxed">
+          Welcome to the guides section. Here you will find step-by-step
+          walkthroughs of different projects.
+        </p>
+      </section>
     </div>
   );
 }

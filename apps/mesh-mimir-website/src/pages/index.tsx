@@ -16,6 +16,7 @@ import {
 import FluidBackground from "../components/FluidBackground";
 import { MetallicCardanoLogo } from "../components/MetallicCardanoLogo";
 import MagicBento from "../components/MagicBento";
+import ClickCounter from "../components/ClickCounter";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 60 },
@@ -64,6 +65,27 @@ export default function Home() {
           variants={staggerChildren}
         >
           <MagicBento />
+        </motion.section>
+
+        {/* Click Counter Section */}
+        <motion.section
+          className="mb-16 w-full relative z-10"
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true }}
+          variants={staggerChildren}
+        >
+          <div className="container mx-auto px-6">
+            <motion.div className="flex justify-center" variants={fadeInUp}>
+              <ClickCounter
+                initialCount={0}
+                showMilestones={true}
+                milestoneValues={[10, 25, 50, 100, 250, 500, 1000]}
+                persistData={true}
+                storageKey="mimir-v1-click-counter"
+              />
+            </motion.div>
+          </div>
         </motion.section>
       </div>
     </div>

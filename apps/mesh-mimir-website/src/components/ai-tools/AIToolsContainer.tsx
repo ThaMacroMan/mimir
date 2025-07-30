@@ -24,20 +24,18 @@ export default function AIToolsContainer() {
   };
 
   return (
-    <div className="w-full text-xl">
-      <div className="max-w-7xl mx-auto mb-12">
-        <AnimatePresence mode="wait">
-          {showIntro ? (
-            <AIToolsIntro onGetStarted={handleGetStarted} />
-          ) : !selectedTool ? (
-            <AIToolsSelection onSelectTool={handleSelectTool} />
-          ) : selectedTool === "cursor" ? (
-            <CursorSetupQuest onBack={handleBackToSelection} />
-          ) : (
-            <WindsurfSetup onBack={handleBackToSelection} />
-          )}
-        </AnimatePresence>
-      </div>
+    <div className="w-full text-xl space-y-16">
+      <AnimatePresence mode="wait">
+        {showIntro ? (
+          <AIToolsIntro onGetStarted={handleGetStarted} />
+        ) : !selectedTool ? (
+          <AIToolsSelection onSelectTool={handleSelectTool} />
+        ) : selectedTool === "cursor" ? (
+          <CursorSetupQuest onBack={handleBackToSelection} />
+        ) : (
+          <WindsurfSetup onBack={handleBackToSelection} />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

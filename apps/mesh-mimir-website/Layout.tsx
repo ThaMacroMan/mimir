@@ -325,10 +325,10 @@ export default function Layout({ children }: { children: ReactNode }) {
   const [terminalHeight, setTerminalHeight] = useState(420);
   const [terminalDragging, setTerminalDragging] = useState(false);
   const [footerDragging, setFooterDragging] = useState(false);
-  const [aiChatWidth, setAiChatWidth] = useState(260);
-  const [sidebarWidth, setSidebarWidth] = useState(260);
+  const [aiChatWidth, setAiChatWidth] = useState(48);
+  const [sidebarWidth, setSidebarWidth] = useState(48);
   const [mainContentWidth, setMainContentWidth] = useState(0);
-  const [mainContentLeft, setMainContentLeft] = useState(260);
+  const [mainContentLeft, setMainContentLeft] = useState(48);
   const dragStartY = useRef<number | null>(null);
   const dragStartHeight = useRef<number | null>(null);
   const mainContentRef = useRef<HTMLElement>(null);
@@ -567,7 +567,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         }
       }
     };
- 
+
     const handleMouseUp = () => {
       // Close terminal if dragged below minimum height
       if (terminalHeight < minTerminalHeight + 20) {
@@ -600,7 +600,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         <Sidebar />
         <main
           ref={mainContentRef}
-          className="flex-1 overflow-auto px-0 max-w-none mx-0 transition-all duration-300"
+          className="flex-1 overflow-auto px-8 max-w-none mx-0 transition-all duration-300"
           style={{
             height: `calc(100vh - var(--terminal-height, 0px))`,
             marginTop: "0px", // Removed header spacing
@@ -610,7 +610,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             minWidth: "300px", // Ensure minimum readable width
           }}
         >
-          {children}
+          <div className="max-w-6xl mx-auto">{children}</div>
         </main>
         <ResourceSidebar width={aiChatWidth} onWidthChange={setAiChatWidth} />
       </div>
