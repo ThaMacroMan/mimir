@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 
 interface LogoPosition {
   x: number;
@@ -155,10 +156,12 @@ export default function FluidBackground() {
         const finalOpacity = baseOpacity + opacityVariation;
 
         return (
-          <img
+          <Image
             key={index}
             src={`/cardano_we_logos/PNG/Cardano-RGB_Logo-Icon-${index % 2 === 0 ? "White" : "Black"}.png`}
             alt="Cardano"
+            width={finalSize}
+            height={finalSize}
             className="cardano-logo"
             style={{
               position: "absolute",

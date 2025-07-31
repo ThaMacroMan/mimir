@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react-refresh/only-export-components */
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -466,10 +465,13 @@ export default function MetallicPaint({
       }
 
       function getUniforms(program: WebGLProgram, gl: WebGL2RenderingContext) {
-        let uniforms: Record<string, WebGLUniformLocation | null> = {};
-        let uniformCount = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+        const uniforms: Record<string, WebGLUniformLocation | null> = {};
+        const uniformCount = gl.getProgramParameter(
+          program,
+          gl.ACTIVE_UNIFORMS
+        );
         for (let i = 0; i < uniformCount; i++) {
-          let uniformName = gl.getActiveUniform(program, i)?.name;
+          const uniformName = gl.getActiveUniform(program, i)?.name;
           if (!uniformName) continue;
           uniforms[uniformName] = gl.getUniformLocation(program, uniformName);
         }
@@ -611,11 +613,9 @@ export default function MetallicPaint({
 export function MetallicCardanoLogo({
   className = "",
   size = 200,
-  responsive = false,
 }: {
   className?: string;
   size?: number;
-  responsive?: boolean;
 }) {
   const [imageData, setImageData] = useState<ImageData | null>(null);
   const [isLoading, setIsLoading] = useState(true);

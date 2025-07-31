@@ -7,15 +7,11 @@ interface ScrollNavigationProps {
   className?: string;
   style?: React.CSSProperties;
   aiChatWidth?: number;
-  centerOffset?: number; // Add centerOffset prop
 }
 
 export default function ScrollNavigation({
   containerRef,
-  className = "",
-  style,
-  aiChatWidth = 320,
-  centerOffset = 0, // Default to 0
+  aiChatWidth = 260,
 }: ScrollNavigationProps) {
   const [showUpArrow, setShowUpArrow] = useState(false);
   const [showDownArrow, setShowDownArrow] = useState(false);
@@ -82,43 +78,20 @@ export default function ScrollNavigation({
     return () => window.removeEventListener("resize", handleResize);
   }, [checkScrollPosition]);
 
-  // Calculate parabolic curve positions dynamically using the same logic as AI chat sidebar
-  const calculateCurvePosition = useCallback(
-    (yPosition: number) => {
-      const maxWidth =
-        typeof window !== "undefined" ? window.innerWidth / 2 : 600;
-      const height =
-        typeof window !== "undefined" ? window.innerHeight - 100 : 600;
-
-      const amplitudeFactor = Math.max(
-        0.12,
-        ((aiChatWidth - 120) / (maxWidth - 120)) * 0.5
-      );
-      const minContentWidth = Math.max(100, aiChatWidth * 0.4);
-      const maxClipAmount = aiChatWidth - minContentWidth;
-
-      // Use the same centerOffset as the AI chat sidebar
-      const adjustedCenter = height / 2 + centerOffset;
-      const distanceFromCenter = yPosition - adjustedCenter;
-      const normalizedDistance = distanceFromCenter / (height / 2);
-      const easedDistance = Math.pow(Math.abs(normalizedDistance), 1.2);
-      const rawCurveOutset = aiChatWidth * amplitudeFactor * easedDistance;
-      const curveOutset = Math.min(rawCurveOutset, maxClipAmount);
-
-      return aiChatWidth - curveOutset;
-    },
-    [aiChatWidth, centerOffset]
-  );
+  // Calculate position for navigation buttons
+  const calculateButtonPosition = useCallback(() => {
+    return aiChatWidth + 16; // 16px margin from the sidebar
+  }, [aiChatWidth]);
 
   return (
     <>
       <AnimatePresence>
-        {/* Top button - dynamically positioned on the curve */}
+        {/* Top button */}
         {showUpArrow && (
           <motion.div
             className="fixed top-20 w-14 h-14 bg-surface/80 border border-primary/30 rounded-full flex items-center justify-center text-primary z-50 shadow-xl backdrop-blur-md cursor-pointer"
             style={{
-              right: `${calculateCurvePosition(100) + 4}px`, // 100px from top
+              right: `${calculateButtonPosition()}px`,
               opacity: isScrolling ? 0.5 : 1,
               pointerEvents: isScrolling ? "none" : "auto",
             }}
@@ -137,12 +110,12 @@ export default function ScrollNavigation({
           </motion.div>
         )}
 
-        {/* Bottom button - dynamically positioned on the curve */}
+        {/* Bottom button */}
         {showDownArrow && (
           <motion.div
             className="fixed bottom-20 w-14 h-14 bg-surface/80 border border-primary/30 rounded-full flex items-center justify-center text-primary z-50 shadow-xl backdrop-blur-md cursor-pointer"
             style={{
-              right: `${calculateCurvePosition(window.innerHeight - 100) + 4}px`, // 100px from bottom
+              right: `${calculateButtonPosition()}px`,
               opacity: isScrolling ? 0.5 : 1,
               pointerEvents: isScrolling ? "none" : "auto",
             }}

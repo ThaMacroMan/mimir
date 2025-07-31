@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { Search, MessageCircle, Twitter, Github } from "lucide-react";
+import { MessageCircle, Twitter, Github } from "lucide-react";
 
 export default function Header() {
   return (

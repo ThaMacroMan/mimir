@@ -1,32 +1,76 @@
-import { useState, useRef, useEffect } from "react";
-import { Bot, Send } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { Send, BookOpen, MessageSquare, Link, X } from "lucide-react";
+import { MetallicCardanoLogo } from "./MetallicCardanoLogo";
+import { useSidebarPersistence } from "../hooks/useSidebarPersistence";
 
-interface AIChatSidebarProps {
+interface ResourceSidebarProps {
   width?: number;
-  centerOffset?: number;
+  height?: number;
   onWidthChange?: (width: number) => void;
-  onCenterOffsetChange?: (offset: number) => void;
+  onHeightChange?: (height: number) => void;
 }
 
-export default function AIChatSidebar({
+type TabType = "resources" | "ai-chat";
+
+// Collapsed width constant
+const COLLAPSED_WIDTH = 48;
+
+export default function ResourceSidebar({
   width: externalWidth,
-  centerOffset: externalCenterOffset,
+  height: externalHeight,
   onWidthChange,
-  onCenterOffsetChange,
-}: AIChatSidebarProps) {
-  const [collapsed, setCollapsed] = useState(false);
-  const [width, setWidth] = useState(externalWidth || 320);
+  onHeightChange,
+}: ResourceSidebarProps) {
+  // Initialize persistence hook
+  const {
+    state: persistedState,
+    updateState: updatePersistedState,
+    isLoaded: isPersistedStateLoaded,
+  } = useSidebarPersistence({
+    sidebarId: "ai-chat-sidebar",
+    defaultState: {
+      collapsed: true,
+      width: externalWidth || COLLAPSED_WIDTH,
+      height: externalHeight || 800,
+      top: 16,
+      activeTab: "resources",
+    },
+  });
+
+  const [collapsed, setCollapsed] = useState(persistedState.collapsed);
+  const [width, setWidth] = useState(persistedState.width);
+  const [animatingWidth, setAnimatingWidth] = useState(persistedState.width); // For smooth transitions
+  const [height, setHeight] = useState(persistedState.height); // Start with fallback, will be updated on client
+  const [top, setTop] = useState(persistedState.top); // Vertical position of sidebar
   const [dragging, setDragging] = useState(false);
+  const [draggingVertical, setDraggingVertical] = useState(false);
+  const [draggingPosition, setDraggingPosition] = useState(false);
   const [maxWidth, setMaxWidth] = useState(
     typeof window !== "undefined" ? window.innerWidth / 2 : 600
   );
-  const [centerOffset, setCenterOffset] = useState(externalCenterOffset || 0); // Vertical offset for center point
+  const [maxHeight, setMaxHeight] = useState(
+    typeof window !== "undefined" ? window.innerHeight - 32 : 800
+  );
   const [isClient, setIsClient] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabType>(
+    (persistedState.activeTab as TabType) || "resources"
+  );
   const sidebarRef = useRef<HTMLDivElement>(null);
   const dragStartX = useRef<number | null>(null);
   const dragStartWidth = useRef<number | null>(null);
   const dragStartY = useRef<number | null>(null);
-  const dragStartCenterOffset = useRef<number | null>(null);
+  const dragStartHeight = useRef<number | null>(null);
+  const dragStartTop = useRef<number | null>(null);
+
+  // Click and hold functionality
+  const [isHolding, setIsHolding] = useState(false);
+  const holdTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const expandDuration = 500; // 0.5 seconds to expand
+  const collapseDuration = 1000; // 1 second to collapse
+
+  // Animation states
+  const [isAnimating, setIsAnimating] = useState(false);
+
   const [messages, setMessages] = useState([
     { from: "ai", text: "Hi! I'm your AI coding buddy. Ask me anything!" },
     { from: "user", text: "How do I send a Cardano transaction?" },
@@ -41,136 +85,68 @@ export default function AIChatSidebar({
   }, [externalWidth]);
 
   useEffect(() => {
-    if (externalCenterOffset !== undefined) {
-      setCenterOffset(externalCenterOffset);
+    if (externalHeight !== undefined) {
+      setHeight(externalHeight);
     }
-  }, [externalCenterOffset]);
+  }, [externalHeight]);
 
   // Notify parent of changes
-  const updateWidth = (newWidth: number) => {
-    setWidth(newWidth);
-    onWidthChange?.(newWidth);
-  };
+  const updateWidth = useCallback(
+    (newWidth: number) => {
+      setWidth(newWidth);
+      setAnimatingWidth(newWidth);
+      onWidthChange?.(newWidth);
+    },
+    [onWidthChange]
+  );
 
-  const updateCenterOffset = (newOffset: number) => {
-    setCenterOffset(newOffset);
-    onCenterOffsetChange?.(newOffset);
-  };
-
-  // Collapsed width constant
-  const COLLAPSED_WIDTH = 48;
+  const updateHeight = useCallback(
+    (newHeight: number) => {
+      setHeight(newHeight);
+      onHeightChange?.(newHeight);
+    },
+    [onHeightChange]
+  );
 
   // Create refs for all messages upfront to avoid conditional hooks
   const messageRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const messageStyles = useRef<
-    Array<{
-      padding: number;
-      fontSize: string;
-      maxWidth: string;
-      opacity: number;
-      displayText: string;
-    }>
-  >([]);
-
-  // Single unified parabolic function - used for both clip-path and SVG border
-  const generateParabolicCurve = (baseWidth: number, height: number) => {
-    const amplitudeFactor = Math.max(
-      0.12,
-      ((baseWidth - 120) / (maxWidth - 120)) * 0.5
-    );
-    const minContentWidth = Math.max(100, baseWidth * 0.4);
-    const maxClipAmount = baseWidth - minContentWidth;
-
-    const points = [];
-    const numPoints = 60; // Even more points for ultra-smooth curve
-
-    for (let i = 0; i <= numPoints; i++) {
-      const y = (i / numPoints) * height;
-      const adjustedCenter = height / 2 + centerOffset;
-      const distanceFromCenter = y - adjustedCenter;
-      const normalizedDistance = distanceFromCenter / (height / 2);
-
-      // Ultra-smooth parabolic function with cubic easing
-      const easedDistance = Math.pow(Math.abs(normalizedDistance), 1.2); // Even gentler power
-      const rawCurveOutset = baseWidth * amplitudeFactor * easedDistance;
-
-      // Simple classic parabola - no bottom transition needed
-      const curveOutset = Math.min(rawCurveOutset, maxClipAmount);
-      const x = curveOutset;
-
-      points.push({ x, y });
-    }
-
-    return points;
-  };
-
-  // Generate clip-path from the unified curve
-  const generateParabolicClipPath = (baseWidth: number, height: number) => {
-    const points = generateParabolicCurve(baseWidth, height);
-
-    const clipPoints = [
-      ...points.map(p => `${p.x}px ${p.y}px`),
-      // Add the right edge points to close the shape
-      ...points
-        .slice()
-        .reverse()
-        .map(p => `${baseWidth}px ${p.y}px`),
-    ];
-
-    return `polygon(${clipPoints.join(", ")})`;
-  };
-
-  // Calculate available width at any vertical position using the main function
-  const getAvailableWidthAtPosition = (yPosition: number) => {
-    const height = isClient ? window.innerHeight - 100 : 600;
-    const adjustedCenter = height / 2 + centerOffset;
-    const distanceFromCenter = yPosition - adjustedCenter;
-    const normalizedDistance = distanceFromCenter / (height / 2);
-
-    const amplitudeFactor = Math.max(
-      0.12,
-      ((width - 120) / (maxWidth - 120)) * 0.5
-    );
-    const easedDistance = Math.pow(Math.abs(normalizedDistance), 1.2);
-    const rawCurveOutset = width * amplitudeFactor * easedDistance;
-
-    const minContentWidth = Math.max(100, width * 0.4);
-    const maxClipAmount = width - minContentWidth;
-    const curveOutset = Math.min(rawCurveOutset, maxClipAmount);
-
-    const availableWidth = Math.max(minContentWidth, width - curveOutset);
-
-    return {
-      availableWidth,
-      curveOutset,
-      isNearApex: Math.abs(normalizedDistance) < 0.3,
-      normalizedDistance,
-      position: Math.max(0, Math.min(1, yPosition / height)),
-    };
-  };
-
-  // Calculate responsive text sizes based on width
-  const getResponsiveTextSize = () => {
-    if (width < 200) return "text-xs";
-    if (width < 300) return "text-sm";
-    return "text-sm";
-  };
 
   const [input, setInput] = useState("");
   const chatEndRef = useRef<HTMLDivElement>(null);
   const prevMessagesLength = useRef(messages.length);
 
+  // Sync with persisted state when it loads
+  useEffect(() => {
+    if (isPersistedStateLoaded) {
+      setCollapsed(persistedState.collapsed);
+      setWidth(persistedState.width);
+      setAnimatingWidth(persistedState.width);
+      setHeight(persistedState.height);
+      setTop(persistedState.top);
+      if (persistedState.activeTab) {
+        setActiveTab(persistedState.activeTab as TabType);
+      }
+    }
+  }, [isPersistedStateLoaded, persistedState]);
+
   // Set client-side flag and update maxWidth on window resize
   useEffect(() => {
     setIsClient(true);
     const handleResize = () => {
-      setMaxWidth(window.innerWidth / 2);
-      setWidth(w => Math.min(w, window.innerWidth / 2));
+      const newMaxWidth = window.innerWidth / 2;
+      const newMaxHeight = window.innerHeight - 32;
+      setMaxWidth(newMaxWidth);
+      setMaxHeight(newMaxHeight);
+      setWidth(w => Math.min(w, newMaxWidth));
+      // Always set to full height on initial load and resize (unless external height is provided)
+      if (!externalHeight) {
+        setHeight(newMaxHeight);
+      }
     };
     handleResize(); // Call immediately
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [externalHeight]);
 
   // Only scroll to bottom when a new message is added
   useEffect(() => {
@@ -180,11 +156,59 @@ export default function AIChatSidebar({
       }, 100);
     }
     prevMessagesLength.current = messages.length;
-  }, [messages]);
+  }, [messages.length]);
+
+  // Handle click and hold functionality
+  const handleMouseDown = () => {
+    if (collapsed) {
+      setIsHolding(true);
+      holdTimeoutRef.current = setTimeout(() => {
+        setIsAnimating(true);
+        setCollapsed(false);
+        setWidth(260); // Expand to default width
+        setAnimatingWidth(260);
+        updatePersistedState({ collapsed: false, width: 260 });
+        setIsHolding(false);
+        // Reset animation state after transition
+        setTimeout(() => setIsAnimating(false), 600);
+      }, expandDuration);
+    } else {
+      // Hold to collapse when expanded
+      setIsHolding(true);
+      holdTimeoutRef.current = setTimeout(() => {
+        setIsAnimating(true);
+        setAnimatingWidth(COLLAPSED_WIDTH);
+        // Delay the collapsed state change to allow the transition to animate
+        setTimeout(() => {
+          setCollapsed(true);
+          setWidth(COLLAPSED_WIDTH);
+          updatePersistedState({ collapsed: true, width: COLLAPSED_WIDTH });
+          setIsHolding(false);
+          setIsAnimating(false);
+        }, 600);
+      }, collapseDuration);
+    }
+  };
+
+  const handleMouseUp = () => {
+    if (holdTimeoutRef.current) {
+      clearTimeout(holdTimeoutRef.current);
+      holdTimeoutRef.current = null;
+    }
+    setIsHolding(false);
+  };
+
+  const handleMouseLeave = () => {
+    if (holdTimeoutRef.current) {
+      clearTimeout(holdTimeoutRef.current);
+      holdTimeoutRef.current = null;
+    }
+    setIsHolding(false);
+  };
 
   // Ensure proper scroll position on initial load
   useEffect(() => {
-    if (messages.length > 0 && !collapsed) {
+    if (messages.length > 0 && !collapsed && activeTab === "ai-chat") {
       setTimeout(() => {
         const chatContainer = document.querySelector(".chat-scroll");
         if (chatContainer) {
@@ -192,23 +216,24 @@ export default function AIChatSidebar({
         }
       }, 200);
     }
-  }, [collapsed]);
+  }, [collapsed, activeTab, messages.length]);
 
   // Ensure first message is always visible on load
   useEffect(() => {
-    if (messages.length > 0 && !collapsed) {
+    if (messages.length > 0 && !collapsed && activeTab === "ai-chat") {
       const chatContainer = document.querySelector(".chat-scroll");
       if (chatContainer) {
         chatContainer.scrollTop = 0;
       }
     }
-  }, [collapsed]);
+  }, [collapsed, activeTab, messages.length]);
 
   useEffect(() => {
-    if (!dragging) return;
+    if (!dragging && !draggingVertical && !draggingPosition) return;
     let animationFrameId: number;
     const handleMouseMove = (e: MouseEvent) => {
       animationFrameId = requestAnimationFrame(() => {
+        // Handle horizontal dragging for width
         if (
           dragging &&
           dragStartX.current !== null &&
@@ -221,33 +246,67 @@ export default function AIChatSidebar({
             maxWidth
           );
           updateWidth(newWidth);
-          setCollapsed(newWidth <= COLLAPSED_WIDTH);
+          const newCollapsed = newWidth <= COLLAPSED_WIDTH;
+          setCollapsed(newCollapsed);
+          updatePersistedState({ width: newWidth, collapsed: newCollapsed });
         }
 
-        // Handle vertical dragging for parabola center point
+        // Handle vertical dragging for height (bottom handle only)
         if (
-          dragging &&
+          draggingVertical &&
           dragStartY.current !== null &&
-          dragStartCenterOffset.current !== null
+          dragStartHeight.current !== null
         ) {
           const deltaY = e.clientY - dragStartY.current;
-          const newCenterOffset = dragStartCenterOffset.current + deltaY;
-          const maxOffset =
-            (typeof window !== "undefined" ? window.innerHeight : 800) * 0.8;
-          const clampedOffset = Math.max(
-            -maxOffset,
-            Math.min(maxOffset, newCenterOffset)
+
+          // Bottom handle: height increases as we drag down, decreases as we drag up
+          const newHeight = Math.min(
+            Math.max(dragStartHeight.current + deltaY, 200), // Minimum height of 200px
+            maxHeight
           );
-          updateCenterOffset(clampedOffset);
+
+          // Prevent expanding off-screen by adjusting top position if needed
+          const maxAllowedHeight = window.innerHeight - top - 16; // 16px margin from bottom
+          if (newHeight > maxAllowedHeight) {
+            const adjustedHeight = maxAllowedHeight;
+            const adjustedTop = Math.max(
+              16,
+              window.innerHeight - adjustedHeight - 16
+            );
+            setTop(adjustedTop);
+            updateHeight(adjustedHeight);
+          } else {
+            updateHeight(newHeight);
+            updatePersistedState({ height: newHeight });
+          }
+        }
+
+        // Handle position dragging (moving the entire sidebar up/down)
+        if (
+          draggingPosition &&
+          dragStartY.current !== null &&
+          dragStartTop.current !== null
+        ) {
+          const deltaY = e.clientY - dragStartY.current;
+          const newTop = Math.min(
+            Math.max(dragStartTop.current + deltaY, 16), // Minimum top position
+            window.innerHeight - height - 16 // Maximum top position (keep sidebar in view)
+          );
+          setTop(newTop);
+          updatePersistedState({ top: newTop });
         }
       });
     };
     const handleMouseUp = () => {
       setDragging(false);
+      setDraggingVertical(false);
+      setDraggingPosition(false);
       dragStartX.current = null;
       dragStartWidth.current = null;
       dragStartY.current = null;
-      dragStartCenterOffset.current = null;
+      dragStartHeight.current = null;
+      dragStartTop.current = null;
+
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
     };
     window.addEventListener("mousemove", handleMouseMove);
@@ -257,132 +316,98 @@ export default function AIChatSidebar({
       window.removeEventListener("mouseup", handleMouseUp);
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
     };
-  }, [dragging, maxWidth]);
+  }, [
+    dragging,
+    draggingVertical,
+    draggingPosition,
+    maxWidth,
+    maxHeight,
+    height,
+    top,
+    updateHeight,
+    updatePersistedState,
+    updateWidth,
+  ]);
 
-  // Generate parabolic clip-path for visual container only
-  const clipPath = isClient
-    ? generateParabolicClipPath(width, window.innerHeight - 100)
-    : "none";
-
-  // Calculate optimal content positioning based on parabola
-  const getOptimalContentLayout = () => {
-    const height = isClient ? window.innerHeight - 100 : 600;
-    const adjustedCenter = height / 2 + centerOffset;
-
-    // Find the best areas for header, content, and input
-    const headerPosition = 0;
-    const inputPosition = height;
-
-    // Calculate available space at header and input positions
-    const headerSpace = getAvailableWidthAtPosition(headerPosition);
-    const inputSpace = getAvailableWidthAtPosition(inputPosition);
-
-    // Find the area with maximum available width for content
-    let maxContentWidth = 0;
-    let optimalContentStart = 0;
-    let optimalContentEnd = height;
-
-    // Sample points to find the best content area
-    for (let y = 0; y <= height; y += 20) {
-      const space = getAvailableWidthAtPosition(y);
-      if (space.availableWidth > maxContentWidth) {
-        maxContentWidth = space.availableWidth;
-        optimalContentStart = Math.max(0, y - 50);
-        optimalContentEnd = Math.min(height, y + 50);
-      }
-    }
-
-    return {
-      headerSpace,
-      inputSpace,
-      contentArea: {
-        start: optimalContentStart,
-        end: optimalContentEnd,
-        maxWidth: maxContentWidth,
-      },
-      adjustedCenter,
-    };
-  };
-
-  const contentLayout = getOptimalContentLayout();
+  // Mock resources data - in a real app, this would be dynamic based on the current page
+  const resources = [
+    {
+      title: "MeshJS Documentation",
+      description: "Official MeshJS documentation and API reference",
+      url: "https://meshjs.dev/",
+      type: "docs",
+    },
+    {
+      title: "Cardano Developer Portal",
+      description: "Learn about Cardano development and tools",
+      url: "https://developers.cardano.org/",
+      type: "portal",
+    },
+    {
+      title: "Blockfrost API",
+      description: "Cardano blockchain data and analytics",
+      url: "https://blockfrost.io/",
+      type: "api",
+    },
+    {
+      title: "DexHunter",
+      description: "Cardano DEX aggregator and analytics",
+      url: "https://dexhunter.io/",
+      type: "tool",
+    },
+    {
+      title: "Taptools",
+      description: "Cardano portfolio tracking and analytics",
+      url: "https://taptools.io/",
+      type: "tool",
+    },
+  ];
 
   return (
     <div
       style={{
         position: "fixed",
-        right: 0,
-        top: 64,
-        bottom: 36,
+        right: "16px",
+        top: `${top}px`,
         width: collapsed ? COLLAPSED_WIDTH : width,
-        height: "calc(100vh - 100px)",
+        height: height,
         zIndex: 40,
       }}
     >
-      {/* Parabolic border */}
-      {!collapsed && (
-        <svg
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: width,
-            height: "calc(100vh - 100px)",
-            pointerEvents: "none",
-            zIndex: 50, // Higher z-index to ensure visibility
-          }}
-          viewBox={`0 0 ${width} ${isClient ? window.innerHeight - 100 : 600}`}
-          preserveAspectRatio="none"
-        >
-          <path
-            d={(() => {
-              const height = isClient ? window.innerHeight - 100 : 600;
-              const points = generateParabolicCurve(width, height);
-
-              let pathData = "";
-              points.forEach((point, i) => {
-                if (i === 0) {
-                  pathData = `M ${point.x} ${point.y}`;
-                } else {
-                  pathData += ` L ${point.x} ${point.y}`;
-                }
-              });
-              return pathData;
-            })()}
-            fill="none"
-            stroke="#00d4ff"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      )}
-
       <aside
         ref={sidebarRef}
         style={
           {
-            width: collapsed ? COLLAPSED_WIDTH : width,
+            width: animatingWidth,
             minWidth: collapsed ? 0 : 120,
             maxWidth: collapsed ? COLLAPSED_WIDTH : maxWidth,
-            transition: dragging ? "none" : "width 0.2s",
-            height: "calc(100vh - 100px)",
+            transition:
+              dragging || draggingVertical
+                ? "none"
+                : "width 0.6s cubic-bezier(0.4, 0, 0.2, 1), height 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+            height: height,
             top: 0,
             bottom: 0,
             position: "absolute",
             right: 0,
             zIndex: 40,
-            "--ai-chat-width": collapsed
-              ? `${COLLAPSED_WIDTH}px`
-              : `${width}px`,
-            clipPath: collapsed ? "none" : clipPath,
-          } as React.CSSProperties & { "--ai-chat-width": string }
+            "--resource-sidebar-width": `${animatingWidth}px`,
+          } as React.CSSProperties & { "--resource-sidebar-width": string }
         }
-        className={`bg-surface flex flex-col shadow-2xl ${
-          collapsed ? "min-w-0" : "rounded-l-2xl"
-        }`}
-        aria-label="AI Chat sidebar"
+        className={`bg-surface/30 backdrop-blur-md flex flex-col shadow-2xl rounded-3xl overflow-hidden isolate transition-all duration-500 ease-out ${
+          collapsed ? "cursor-pointer" : "cursor-pointer"
+        } ${collapsed && isHolding ? "scale-105 opacity-90" : ""} ${!collapsed && isHolding ? "scale-95 opacity-90" : ""} ${isAnimating ? "animate-pulse" : ""}`}
+        aria-label="Resource sidebar"
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
+        title={
+          collapsed
+            ? "Click and hold for 0.5s to expand"
+            : "Click and hold for 1s to collapse"
+        }
       >
-        {/* Combined Horizontal/Vertical Drag Handle */}
+        {/* Horizontal Drag Handle */}
         <div
           className={`absolute left-0 top-0 h-full w-1 cursor-ew-resize z-50 group ${dragging ? "bg-primary" : "bg-transparent hover:bg-primary/30"}`}
           onMouseDown={e => {
@@ -390,304 +415,336 @@ export default function AIChatSidebar({
               setDragging(true);
               dragStartX.current = e.clientX;
               dragStartWidth.current = width;
-              dragStartY.current = e.clientY;
-              dragStartCenterOffset.current = centerOffset;
               e.preventDefault();
+              e.stopPropagation();
             }
           }}
         />
 
-        {/* Collapsed state: show only icon */}
+        {/* Vertical Drag Handle (bottom only) */}
+        <div
+          className={`absolute left-0 bottom-0 w-full h-1 cursor-ns-resize z-50 group ${draggingVertical ? "bg-primary" : "bg-transparent hover:bg-primary/30"}`}
+          onMouseDown={e => {
+            if (e.button === 0) {
+              setDraggingVertical(true);
+              dragStartY.current = e.clientY;
+              dragStartHeight.current = height;
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          }}
+        />
+
+        {/* Collapsed state: show both icons at top */}
         {collapsed ? (
-          <div className="flex flex-col items-center justify-center flex-1">
-            <Bot className="w-5 h-5 text-primary" />
+          <div className="flex flex-col items-center justify-center gap-8 h-full px-2">
+            <button
+              onClick={() => {
+                setIsAnimating(true);
+                setCollapsed(false);
+                setWidth(260);
+                setAnimatingWidth(260);
+                updatePersistedState({
+                  collapsed: false,
+                  width: 260,
+                  activeTab: "resources",
+                });
+                setActiveTab("resources");
+                setTimeout(() => setIsAnimating(false), 600);
+              }}
+              onMouseDown={e => e.stopPropagation()}
+              className="text-primary hover:text-primary-hover transition-all duration-300 ease-out cursor-pointer hover:scale-105"
+            >
+              <Link className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => {
+                setIsAnimating(true);
+                setCollapsed(false);
+                setWidth(260);
+                setAnimatingWidth(260);
+                updatePersistedState({
+                  collapsed: false,
+                  width: 260,
+                  activeTab: "ai-chat",
+                });
+                setActiveTab("ai-chat");
+                setTimeout(() => setIsAnimating(false), 600);
+              }}
+              onMouseDown={e => e.stopPropagation()}
+              className="text-primary hover:text-primary-hover transition-all duration-300 ease-out cursor-pointer hover:scale-105"
+            >
+              <MessageSquare className="w-5 h-5" />
+            </button>
+            {isHolding && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            )}
           </div>
         ) : !isClient ? (
           // Loading state while client-side calculations are being set up
           <div className="flex flex-col items-center justify-center flex-1">
-            <Bot className="w-5 h-5 text-primary" />
+            <BookOpen className="w-5 h-5 text-primary" />
           </div>
         ) : (
           <>
-            {/* Dynamic Header - Adapts to available space */}
+            {/* Sidebar Title */}
             <div
-              className="flex items-center gap-1 px-2 py-1 bg-surface-elevated min-w-0 flex-shrink-0 sticky top-0 z-50 rounded-t-lg"
-              style={{
-                height:
-                  contentLayout.headerSpace.availableWidth < 150
-                    ? "20px"
-                    : contentLayout.headerSpace.availableWidth < 200
-                      ? "24px"
-                      : "28px",
-                minHeight:
-                  contentLayout.headerSpace.availableWidth < 150
-                    ? "20px"
-                    : contentLayout.headerSpace.availableWidth < 200
-                      ? "24px"
-                      : "28px",
-                width: `${contentLayout.headerSpace.availableWidth}px`,
-                maxWidth: `${contentLayout.headerSpace.availableWidth}px`,
-                position: "absolute",
-                top: "8px",
-                left: `${contentLayout.headerSpace.curveOutset + 2}px`,
-              }}
-            >
-              <Bot
-                className="text-primary"
-                style={{
-                  width:
-                    contentLayout.headerSpace.availableWidth < 150
-                      ? "8px"
-                      : contentLayout.headerSpace.availableWidth < 200
-                        ? "10px"
-                        : "12px",
-                  height:
-                    contentLayout.headerSpace.availableWidth < 150
-                      ? "8px"
-                      : contentLayout.headerSpace.availableWidth < 200
-                        ? "10px"
-                        : "12px",
-                }}
-              />
-              <div className="flex items-center gap-1 min-w-0 flex-1">
-                <span
-                  className="font-display font-semibold text-text-primary truncate"
-                  style={{
-                    fontSize:
-                      contentLayout.headerSpace.availableWidth < 150
-                        ? "8px"
-                        : contentLayout.headerSpace.availableWidth < 200
-                          ? "10px"
-                          : "12px",
-                  }}
-                >
-                  AI CHAT
-                </span>
-                <div
-                  className="bg-primary rounded-full animate-pulse flex-shrink-0"
-                  style={{
-                    width:
-                      contentLayout.headerSpace.availableWidth < 150
-                        ? "2px"
-                        : contentLayout.headerSpace.availableWidth < 200
-                          ? "3px"
-                          : "4px",
-                    height:
-                      contentLayout.headerSpace.availableWidth < 150
-                        ? "2px"
-                        : contentLayout.headerSpace.availableWidth < 200
-                          ? "3px"
-                          : "4px",
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Chat Area - Dynamically positioned and sized */}
-            <div
-              className="flex-1 flex flex-col bg-surface min-w-0 overflow-hidden"
-              style={{
-                minHeight: 0,
-                width: `${contentLayout.contentArea.maxWidth}px`,
-                maxWidth: `${contentLayout.contentArea.maxWidth}px`,
-                marginLeft: `${getAvailableWidthAtPosition(contentLayout.contentArea.start).curveOutset + 2}px`,
-                position: "absolute",
-                top: "40px", // Fixed top position below header
-                bottom: "60px", // Fixed bottom position above input
-                left: 0,
-                right: 0,
-              }}
+              className={`border-b border-border px-4 py-3 bg-surface-elevated rounded-t-3xl transition-all duration-300 ease-out ${collapsed ? "opacity-0 pointer-events-none h-0 overflow-hidden" : "opacity-100"}`}
             >
               <div
-                className="w-full h-full overflow-y-auto flex flex-col gap-1 py-1 min-w-0 chat-scroll"
-                style={{
-                  paddingTop: "8px",
-                  paddingBottom: "24px",
-                  marginTop: "0px",
-                  width: "100%",
-                  maxWidth: "100%",
-                  height: "100%",
+                className="flex items-center justify-between cursor-move"
+                onMouseDown={e => {
+                  if (e.button === 0) {
+                    setDraggingPosition(true);
+                    dragStartY.current = e.clientY;
+                    dragStartTop.current = top;
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }
                 }}
               >
-                {messages.map((msg, idx) => {
-                  // Calculate message style based on available width
-                  const availableWidth =
-                    contentLayout.contentArea.maxWidth - 32;
-                  let fontSize = "12px";
-                  let padding = 12;
-                  let maxWidth = "90%";
-
-                  if (availableWidth < 150) {
-                    fontSize = "10px";
-                    padding = 8;
-                    maxWidth = "95%";
-                  } else if (availableWidth < 200) {
-                    fontSize = "11px";
-                    padding = 10;
-                    maxWidth = "92%";
-                  } else if (availableWidth > 300) {
-                    fontSize = "14px";
-                    padding = 16;
-                    maxWidth = "85%";
-                  }
-
-                  // Calculate the message's vertical position to determine parabolic offset
-                  const messageElement = messageRefs.current[idx];
-                  const messageTop = messageElement?.offsetTop || 0;
-                  const messageHeight = messageElement?.offsetHeight || 0;
-                  const messageCenterY = messageTop + messageHeight / 2;
-
-                  // Get the parabolic offset for this message's position
-                  const parabolicOffset =
-                    getAvailableWidthAtPosition(messageCenterY);
-
-                  // Calculate wider message width based on available space
-                  const messageWidth = Math.min(
-                    parabolicOffset.availableWidth - 16, // Use more of available width
-                    msg.from === "ai"
-                      ? parabolicOffset.availableWidth -
-                          parabolicOffset.curveOutset -
-                          16
-                      : parabolicOffset.availableWidth - 16
-                  );
-
-                  return (
-                    <div
-                      ref={el => {
-                        messageRefs.current[idx] = el;
-                      }}
-                      key={idx}
-                      className={`w-fit rounded-lg shadow-sm transition-all duration-300 ${
-                        msg.from === "ai"
-                          ? "bg-surface-elevated text-text-primary self-start"
-                          : "bg-primary/20 text-primary self-end ml-auto"
-                      }`}
-                      style={{
-                        wordBreak: "break-word",
-                        padding: `${padding}px`,
-                        fontSize: fontSize,
-                        opacity: 1,
-                        marginLeft:
-                          msg.from === "user"
-                            ? "auto"
-                            : `${parabolicOffset.curveOutset + 8}px`,
-                        marginRight: msg.from === "ai" ? "auto" : undefined,
-                        minWidth: "60px",
-                        width: "fit-content",
-                        maxWidth: `${messageWidth}px`,
-                      }}
-                    >
-                      <div
-                        className="font-mono text-text-muted mb-1 truncate"
-                        style={{
-                          fontSize: `${parseInt(fontSize) - 2}px`,
-                        }}
-                      >
-                        {msg.from === "ai" ? "AI" : "You"}
-                      </div>
-                      <div className="break-words whitespace-pre-wrap">
-                        {msg.text}
-                      </div>
-                    </div>
-                  );
-                })}
-                <div ref={chatEndRef} />
-                <div className="h-12" />
-                <div className="h-12" />
+                <div className="flex items-center gap-2">
+                  <MetallicCardanoLogo size={24} className="flex-shrink-0" />
+                  <span className="font-display font-semibold text-text-primary text-sm">
+                    RESOURCES & AI CHAT
+                  </span>
+                </div>
+                <button
+                  onClick={() => {
+                    setCollapsed(true);
+                    setWidth(COLLAPSED_WIDTH);
+                    updatePersistedState({
+                      collapsed: true,
+                      width: COLLAPSED_WIDTH,
+                    });
+                  }}
+                  onMouseDown={e => e.stopPropagation()}
+                  className="p-1 rounded-full hover:bg-surface/50 text-text-secondary hover:text-primary transition-colors duration-200"
+                  title="Collapse sidebar"
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
             </div>
 
-            {/* Dynamic Input Box - Adapts to available space with guaranteed send button */}
-            <form
-              className="w-full flex items-center gap-2 p-1 bg-surface-elevated rounded-lg mt-1 min-w-0 flex-shrink-0 sticky bottom-0 z-10 rounded-b-lg"
-              onSubmit={e => {
-                e.preventDefault();
-                if (input.trim()) {
-                  setMessages([...messages, { from: "user", text: input }]);
-                  setInput("");
-                }
-              }}
-              style={{
-                fontSize:
-                  contentLayout.inputSpace.availableWidth < 150
-                    ? "10px"
-                    : contentLayout.inputSpace.availableWidth < 200
-                      ? "11px"
-                      : "12px",
-                padding:
-                  contentLayout.inputSpace.availableWidth < 150
-                    ? "2px"
-                    : contentLayout.inputSpace.availableWidth < 200
-                      ? "3px"
-                      : "4px",
-                height:
-                  contentLayout.inputSpace.availableWidth < 150
-                    ? "24px"
-                    : contentLayout.inputSpace.availableWidth < 200
-                      ? "28px"
-                      : "32px",
-                width: `${contentLayout.inputSpace.availableWidth}px`,
-                maxWidth: `${contentLayout.inputSpace.availableWidth}px`,
-                position: "absolute",
-                bottom: "8px",
-                left: `${contentLayout.inputSpace.curveOutset + 2}px`,
-                zIndex: 20,
-              }}
-            >
-              <input
-                type="text"
-                className="flex-1 bg-transparent text-text-primary border-none focus:outline-none focus:ring-0 font-mono placeholder:text-text-muted min-w-0"
-                placeholder={
-                  contentLayout.inputSpace.availableWidth < 150
-                    ? "..."
-                    : contentLayout.inputSpace.availableWidth < 200
-                      ? "Ask..."
-                      : "Ask me anything..."
-                }
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                disabled={collapsed}
-                style={{
-                  minWidth:
-                    contentLayout.inputSpace.availableWidth < 150
-                      ? "15px"
-                      : contentLayout.inputSpace.availableWidth < 200
-                        ? "20px"
-                        : "30px",
-                  fontSize: "inherit",
-                  flex: 1,
-                  maxWidth: "calc(100% - 50px)", // Reserve space for send button
-                }}
-              />
+            {/* Tab Navigation */}
+            <div className="flex border-b border-border/30 bg-surface-elevated/20">
               <button
-                type="submit"
-                className="rounded bg-primary text-background font-semibold hover:bg-primary-hover transition-all duration-200 font-mono disabled:opacity-50 flex items-center gap-1 flex-shrink-0"
-                disabled={!input.trim()}
+                onClick={() => {
+                  setActiveTab("resources");
+                  updatePersistedState({ activeTab: "resources" });
+                }}
+                onMouseDown={e => e.stopPropagation()}
+                className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium transition-all duration-200 ${
+                  activeTab === "resources"
+                    ? "text-primary bg-primary/10 border-b-2 border-primary"
+                    : "text-text-secondary hover:text-primary hover:bg-surface-elevated/50"
+                }`}
+              >
+                <BookOpen className="w-4 h-4" />
+                <span>Resources</span>
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab("ai-chat");
+                  updatePersistedState({ activeTab: "ai-chat" });
+                }}
+                onMouseDown={e => e.stopPropagation()}
+                className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium transition-all duration-200 ${
+                  activeTab === "ai-chat"
+                    ? "text-primary bg-primary/10 border-b-2 border-primary"
+                    : "text-text-secondary hover:text-primary hover:bg-surface-elevated/50"
+                }`}
+              >
+                <MessageSquare className="w-4 h-4" />
+                <span>AI Chat</span>
+              </button>
+            </div>
+
+            {/* Tab Content */}
+            <div className="flex-1 overflow-hidden">
+              {activeTab === "resources" ? (
+                /* Resources Tab */
+                <div className="h-full overflow-y-auto p-4 space-y-3">
+                  {resources.map((resource, idx) => (
+                    <a
+                      key={idx}
+                      href={resource.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block p-3 rounded-lg bg-surface-elevated/50 hover:bg-surface-elevated border border-border/30 hover:border-primary/30 transition-all duration-200 group"
+                      onMouseDown={e => e.stopPropagation()}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-text-primary text-sm mb-1 group-hover:text-primary transition-colors">
+                            {resource.title}
+                          </h4>
+                          <p className="text-text-secondary text-xs leading-relaxed">
+                            {resource.description}
+                          </p>
+                        </div>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              ) : (
+                /* AI Chat Tab */
+                <div className="h-full flex flex-col bg-surface/20 backdrop-blur-sm min-w-0 overflow-hidden">
+                  <div
+                    className="w-full h-full overflow-y-auto flex flex-col gap-1 py-1 min-w-0 chat-scroll"
+                    style={{
+                      paddingTop: "8px",
+                      paddingBottom: "24px",
+                      marginTop: "0px",
+                      width: "100%",
+                      maxWidth: "100%",
+                      height: "100%",
+                    }}
+                  >
+                    {messages.map((msg, idx) => {
+                      // Calculate message style based on available width
+                      const availableWidth = width - 32;
+                      let fontSize = "12px";
+                      let padding = 12;
+
+                      if (availableWidth < 150) {
+                        fontSize = "10px";
+                        padding = 8;
+                      } else if (availableWidth < 200) {
+                        fontSize = "11px";
+                        padding = 10;
+                      } else if (availableWidth > 300) {
+                        fontSize = "14px";
+                        padding = 16;
+                      }
+
+                      return (
+                        <div
+                          ref={el => {
+                            messageRefs.current[idx] = el;
+                          }}
+                          key={idx}
+                          className={`w-fit rounded-lg shadow-sm transition-all duration-300 ${
+                            msg.from === "ai"
+                              ? "bg-surface-elevated text-text-primary self-start"
+                              : "bg-primary/20 text-primary self-end ml-auto"
+                          }`}
+                          style={{
+                            wordBreak: "break-word",
+                            padding: `${padding}px`,
+                            fontSize: fontSize,
+                            opacity: 1,
+                            marginLeft: msg.from === "user" ? "auto" : "8px",
+                            marginRight: msg.from === "ai" ? "auto" : "8px",
+                            minWidth: "60px",
+                            width: "fit-content",
+                            maxWidth: `${Math.min(availableWidth - 16, 400)}px`,
+                          }}
+                        >
+                          <div
+                            className="font-mono text-text-muted mb-1 truncate"
+                            style={{
+                              fontSize: `${parseInt(fontSize) - 2}px`,
+                            }}
+                          >
+                            {msg.from === "ai" ? "AI" : "You"}
+                          </div>
+                          <div className="break-words whitespace-pre-wrap">
+                            {msg.text}
+                          </div>
+                        </div>
+                      );
+                    })}
+                    <div ref={chatEndRef} />
+                    <div className="h-12" />
+                    <div className="h-12" />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Input Box - Only show for AI Chat tab */}
+            {activeTab === "ai-chat" && (
+              <form
+                className="w-full flex items-center gap-2 p-1 bg-surface-elevated rounded-lg mt-1 min-w-0 flex-shrink-0 sticky bottom-0 z-10 rounded-b-lg"
+                onSubmit={e => {
+                  e.preventDefault();
+                  if (input.trim()) {
+                    setMessages([...messages, { from: "user", text: input }]);
+                    setInput("");
+                  }
+                }}
                 style={{
-                  padding:
-                    contentLayout.inputSpace.availableWidth < 150
-                      ? "2px 3px"
-                      : contentLayout.inputSpace.availableWidth < 200
-                        ? "3px 4px"
-                        : "4px 6px",
-                  fontSize: "inherit",
-                  minWidth: "40px", // Guarantee minimum send button width
-                  flexShrink: 0,
-                  width: "40px", // Fixed width for send button
+                  fontSize:
+                    width < 150 ? "10px" : width < 200 ? "11px" : "12px",
+                  padding: width < 150 ? "2px" : width < 200 ? "3px" : "4px",
+                  height: width < 150 ? "24px" : width < 200 ? "28px" : "32px",
+                  width: "100%",
+                  maxWidth: "100%",
+                  position: "absolute",
+                  bottom: "8px",
+                  left: "8px",
+                  right: "8px",
+                  zIndex: 20,
                 }}
               >
-                <Send
-                  className={
-                    contentLayout.inputSpace.availableWidth < 150
-                      ? "w-2 h-2"
-                      : contentLayout.inputSpace.availableWidth < 200
-                        ? "w-2.5 h-2.5"
-                        : "w-3 h-3"
+                <input
+                  type="text"
+                  className="flex-1 bg-transparent text-text-primary border-none focus:outline-none focus:ring-0 font-mono placeholder:text-text-muted min-w-0"
+                  placeholder={
+                    width < 150
+                      ? "..."
+                      : width < 200
+                        ? "Ask..."
+                        : "Ask me anything..."
                   }
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  onMouseDown={e => e.stopPropagation()}
+                  disabled={collapsed}
+                  style={{
+                    minWidth:
+                      width < 150 ? "15px" : width < 200 ? "20px" : "30px",
+                    fontSize: "inherit",
+                    flex: 1,
+                    maxWidth: "calc(100% - 50px)", // Reserve space for send button
+                  }}
                 />
-                <span className="hidden sm:inline">Send</span>
-              </button>
-            </form>
+                <button
+                  type="submit"
+                  className="rounded bg-primary text-background font-semibold hover:bg-primary-hover transition-all duration-200 font-mono disabled:opacity-50 flex items-center gap-1 flex-shrink-0"
+                  disabled={!input.trim()}
+                  onMouseDown={e => e.stopPropagation()}
+                  style={{
+                    padding:
+                      width < 150
+                        ? "2px 3px"
+                        : width < 200
+                          ? "3px 4px"
+                          : "4px 6px",
+                    fontSize: "inherit",
+                    minWidth: "40px", // Guarantee minimum send button width
+                    flexShrink: 0,
+                    width: "40px", // Fixed width for send button
+                  }}
+                >
+                  <Send
+                    className={
+                      width < 150
+                        ? "w-2 h-2"
+                        : width < 200
+                          ? "w-2.5 h-2.5"
+                          : "w-3 h-3"
+                    }
+                  />
+                  <span className="hidden sm:inline">Send</span>
+                </button>
+              </form>
+            )}
           </>
         )}
       </aside>
