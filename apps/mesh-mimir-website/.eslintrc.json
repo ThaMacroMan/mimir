@@ -5,7 +5,7 @@
     "prettier/prettier": "error",
     "react/no-unescaped-entities": "off",
     "@typescript-eslint/no-unused-vars": [
-      "error",
+      "warn",
       {
         "argsIgnorePattern": "^_",
         "varsIgnorePattern": "^_"

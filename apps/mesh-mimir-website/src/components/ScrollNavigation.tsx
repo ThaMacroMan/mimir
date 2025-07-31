@@ -11,8 +11,6 @@ interface ScrollNavigationProps {
 
 export default function ScrollNavigation({
   containerRef,
-  className = "",
-  style,
   aiChatWidth = 260,
 }: ScrollNavigationProps) {
   const [showUpArrow, setShowUpArrow] = useState(false);

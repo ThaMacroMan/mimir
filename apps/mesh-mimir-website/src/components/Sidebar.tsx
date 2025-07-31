@@ -1,8 +1,17 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { getSidebarSlides } from "./ai-tools/data/slides";
-import { BookOpen, Rocket, ChevronDown } from "lucide-react";
+import {
+  BookOpen,
+  Rocket,
+  ChevronDown,
+  Layout,
+  Code,
+  Home,
+  X,
+} from "lucide-react";
+import { MetallicCardanoLogo } from "./MetallicCardanoLogo";
+import { useSidebarPersistence } from "../hooks/useSidebarPersistence";
 
 // Collapsed width constant
 const COLLAPSED_WIDTH = 48;
@@ -13,35 +22,81 @@ interface SidebarSection {
   items: { label: string; href: string }[];
 }
 
-// Generate AI Tools items dynamically from slides configuration
-const aiToolsItems = getSidebarSlides().map(slide => ({
-  label: slide.sidebarLabel || slide.title,
-  href: slide.route,
-}));
-
 const sections: SidebarSection[] = [
+  {
+    title: "Home",
+    icon: <Home className="w-5 h-5" />,
+    items: [{ label: "Main Page", href: "/" }],
+  },
   {
     title: "Learn",
     icon: <BookOpen className="w-5 h-5" />,
-    items: aiToolsItems,
+    items: [
+      { label: "AI Tools Revolution", href: "/docs/ai-tools" },
+      { label: "Choose Your Tool", href: "/docs/ai-tools/selection" },
+      { label: "Cursor Setup Quest", href: "/docs/ai-tools/cursor-setup" },
+      { label: "Windsurf Setup", href: "/docs/ai-tools/windsurf-setup" },
+      { label: "Live Coding Sessions", href: "/docs/live-coding" },
+      { label: "Practice Workflow", href: "/docs/practice" },
+      { label: "Cardano APIs", href: "/docs/apis" },
+      { label: "GitHub Workflow", href: "/docs/github-workflow" },
+    ],
   },
   {
     title: "Build",
     icon: <Rocket className="w-5 h-5" />,
-    items: [{ label: "First Transaction", href: "/guides/first_transaction" }],
+    items: [
+      { label: "First Transaction", href: "/guides/first_transaction" },
+      { label: "Getting Started", href: "/guides/getting-started" },
+      { label: "NFT Collection", href: "/guides/nft-collection" },
+      { label: "Token Swapper", href: "/guides/token-swap" },
+    ],
+  },
+  {
+    title: "Templates",
+    icon: <Layout className="w-5 h-5" />,
+    items: [
+      { label: "Content Template", href: "/docs/template" },
+      { label: "Example Content", href: "/docs/example-content" },
+      { label: "Guide Template", href: "/guides/getting-started" },
+    ],
+  },
+  {
+    title: "Examples",
+    icon: <Code className="w-5 h-5" />,
+    items: [
+      { label: "First Transaction", href: "/guides/first_transaction" },
+      { label: "AI Tools Setup", href: "/docs/ai-tools" },
+    ],
   },
 ];
 
 export default function Sidebar() {
-  const [openSections, setOpenSections] = useState(() =>
-    sections.map(() => true)
+  // Initialize persistence hook
+  const {
+    state: persistedState,
+    updateState: updatePersistedState,
+    isLoaded: isPersistedStateLoaded,
+  } = useSidebarPersistence({
+    sidebarId: "main-sidebar",
+    defaultState: {
+      collapsed: true,
+      width: COLLAPSED_WIDTH,
+      height: 800,
+      top: 16,
+      openSections: sections.map(() => true),
+    },
+  });
+
+  const [openSections, setOpenSections] = useState(
+    () => persistedState.openSections || sections.map(() => true)
   );
   const [selectedSection, setSelectedSection] = useState(0); // Track which section is selected
-  const [collapsed, setCollapsed] = useState(true);
-  const [width, setWidth] = useState(COLLAPSED_WIDTH);
-  const [animatingWidth, setAnimatingWidth] = useState(COLLAPSED_WIDTH); // For smooth transitions
-  const [height, setHeight] = useState(800); // Start with fallback, will be updated on client
-  const [top, setTop] = useState(16); // Vertical position of sidebar
+  const [collapsed, setCollapsed] = useState(persistedState.collapsed);
+  const [width, setWidth] = useState(persistedState.width);
+  const [animatingWidth, setAnimatingWidth] = useState(persistedState.width); // For smooth transitions
+  const [height, setHeight] = useState(persistedState.height); // Start with fallback, will be updated on client
+  const [top, setTop] = useState(persistedState.top); // Vertical position of sidebar
   const [dragging, setDragging] = useState(false);
   const [draggingVertical, setDraggingVertical] = useState(false);
   const [draggingPosition, setDraggingPosition] = useState(false);
@@ -51,7 +106,7 @@ export default function Sidebar() {
   const [maxHeight, setMaxHeight] = useState(
     typeof window !== "undefined" ? window.innerHeight - 32 : 800
   );
-  const [isClient, setIsClient] = useState(false);
+  const [_isClient, setIsClient] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const dragStartX = useRef<number | null>(null);
   const dragStartWidth = useRef<number | null>(null);
@@ -69,6 +124,20 @@ export default function Sidebar() {
   const [isAnimating, setIsAnimating] = useState(false);
 
   const router = useRouter();
+
+  // Sync with persisted state when it loads
+  useEffect(() => {
+    if (isPersistedStateLoaded) {
+      setCollapsed(persistedState.collapsed);
+      setWidth(persistedState.width);
+      setAnimatingWidth(persistedState.width);
+      setHeight(persistedState.height);
+      setTop(persistedState.top);
+      if (persistedState.openSections) {
+        setOpenSections(persistedState.openSections);
+      }
+    }
+  }, [isPersistedStateLoaded, persistedState]);
 
   // Set client-side flag and update maxWidth/maxHeight on window resize
   useEffect(() => {
@@ -106,7 +175,9 @@ export default function Sidebar() {
           );
           setWidth(newWidth);
           setAnimatingWidth(newWidth);
-          setCollapsed(newWidth <= COLLAPSED_WIDTH);
+          const newCollapsed = newWidth <= COLLAPSED_WIDTH;
+          setCollapsed(newCollapsed);
+          updatePersistedState({ width: newWidth, collapsed: newCollapsed });
         }
 
         // Handle vertical dragging for height (bottom handle only)
@@ -135,6 +206,7 @@ export default function Sidebar() {
             setHeight(adjustedHeight);
           } else {
             setHeight(newHeight);
+            updatePersistedState({ height: newHeight });
           }
         }
 
@@ -150,6 +222,7 @@ export default function Sidebar() {
             window.innerHeight - height - 16 // Maximum top position (keep sidebar in view)
           );
           setTop(newTop);
+          updatePersistedState({ top: newTop });
         }
       });
     };
@@ -179,6 +252,8 @@ export default function Sidebar() {
     maxWidth,
     maxHeight,
     height,
+    top,
+    updatePersistedState,
   ]);
 
   // Handle click and hold functionality
@@ -190,6 +265,7 @@ export default function Sidebar() {
         setCollapsed(false);
         setWidth(260); // Expand to default width
         setAnimatingWidth(260);
+        updatePersistedState({ collapsed: false, width: 260 });
         setIsHolding(false);
         // Reset animation state after transition
         setTimeout(() => setIsAnimating(false), 600);
@@ -204,6 +280,7 @@ export default function Sidebar() {
         setTimeout(() => {
           setCollapsed(true);
           setWidth(COLLAPSED_WIDTH);
+          updatePersistedState({ collapsed: true, width: COLLAPSED_WIDTH });
           setIsHolding(false);
           setIsAnimating(false);
         }, 600);
@@ -228,7 +305,11 @@ export default function Sidebar() {
   };
 
   const toggleSection = (idx: number) => {
-    setOpenSections(prev => prev.map((open, i) => (i === idx ? !open : open)));
+    setOpenSections(prev => {
+      const newSections = prev.map((open, i) => (i === idx ? !open : open));
+      updatePersistedState({ openSections: newSections });
+      return newSections;
+    });
   };
 
   return (
@@ -278,10 +359,10 @@ export default function Sidebar() {
       >
         {/* Sidebar Title */}
         <div
-          className={`flex items-center justify-between px-4 py-4 border-b border-border/30 bg-surface-elevated/40 backdrop-blur-sm rounded-t-3xl transition-all duration-300 ease-out ${collapsed ? "opacity-0 pointer-events-none h-0 overflow-hidden" : "opacity-100"}`}
+          className={`border-b border-border px-4 py-3 bg-surface-elevated rounded-t-3xl transition-all duration-300 ease-out ${collapsed ? "opacity-0 pointer-events-none h-0 overflow-hidden" : "opacity-100"}`}
         >
           <div
-            className="flex items-center gap-2 cursor-move"
+            className="flex items-center justify-between cursor-move"
             onMouseDown={e => {
               if (e.button === 0) {
                 setDraggingPosition(true);
@@ -292,36 +373,28 @@ export default function Sidebar() {
               }
             }}
           >
-            <div className="w-2 h-2 bg-primary rounded-full"></div>
-            <span className="font-display font-semibold text-text-primary text-sm">
-              LEARNING SECTIONS
-            </span>
-          </div>
-          <button
-            onClick={() => {
-              setIsAnimating(true);
-              setAnimatingWidth(COLLAPSED_WIDTH);
-              setCollapsed(true);
-              setWidth(COLLAPSED_WIDTH);
-              setTimeout(() => setIsAnimating(false), 600);
-            }}
-            className="text-text-secondary hover:text-primary transition-all duration-300 ease-out cursor-pointer p-2 rounded-lg hover:bg-surface-elevated hover:scale-105"
-            title="Collapse sidebar"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+            <div className="flex items-center gap-3">
+              <MetallicCardanoLogo size={24} className="flex-shrink-0" />
+              <span className="font-display font-semibold text-text-primary text-sm">
+                LEARNING SECTIONS
+              </span>
+            </div>
+            <button
+              onClick={() => {
+                setCollapsed(true);
+                setWidth(COLLAPSED_WIDTH);
+                updatePersistedState({
+                  collapsed: true,
+                  width: COLLAPSED_WIDTH,
+                });
+              }}
+              onMouseDown={e => e.stopPropagation()}
+              className="p-1 rounded-full hover:bg-surface/50 text-text-secondary hover:text-primary transition-colors duration-200"
+              title="Collapse sidebar"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {/* Loading spinner for collapsed state */}
@@ -369,10 +442,15 @@ export default function Sidebar() {
                   setCollapsed(false);
                   setWidth(260);
                   setAnimatingWidth(260);
+                  updatePersistedState({ collapsed: false, width: 260 });
                   setSelectedSection(idx);
-                  setOpenSections(prev =>
-                    prev.map((open, i) => (i === idx ? true : open))
-                  );
+                  setOpenSections(prev => {
+                    const newSections = prev.map((open, i) =>
+                      i === idx ? true : open
+                    );
+                    updatePersistedState({ openSections: newSections });
+                    return newSections;
+                  });
                   // Reset animation state after transition
                   setTimeout(() => setIsAnimating(false), 600);
                 }}

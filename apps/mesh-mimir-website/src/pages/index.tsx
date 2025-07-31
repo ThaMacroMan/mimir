@@ -1,20 +1,6 @@
 import Head from "next/head";
-import { CardanoWallet } from "@meshsdk/react";
 import { motion } from "framer-motion";
-import {
-  BookOpen,
-  Rocket,
-  Sparkles,
-  Bot,
-  Zap,
-  Link as LinkIcon,
-  User,
-  Briefcase,
-  Palette,
-  GraduationCap,
-} from "lucide-react";
 import FluidBackground from "../components/FluidBackground";
-import { MetallicCardanoLogo } from "../components/MetallicCardanoLogo";
 import MagicBento from "../components/MagicBento";
 import ClickCounter from "../components/ClickCounter";
 
@@ -54,7 +40,9 @@ export default function Home() {
           initial="initial"
           animate="animate"
           variants={staggerChildren}
-        ></motion.section>
+        >
+          {/* Hero content will go here */}
+        </motion.section>
 
         {/* Magic Bento Grid */}
         <motion.section

@@ -1,5 +1,7 @@
-import { useState, useRef, useEffect } from "react";
-import { Bot, Send, BookOpen, MessageSquare, Link } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { Send, BookOpen, MessageSquare, Link, X } from "lucide-react";
+import { MetallicCardanoLogo } from "./MetallicCardanoLogo";
+import { useSidebarPersistence } from "../hooks/useSidebarPersistence";
 
 interface ResourceSidebarProps {
   width?: number;
@@ -19,13 +21,27 @@ export default function ResourceSidebar({
   onWidthChange,
   onHeightChange,
 }: ResourceSidebarProps) {
-  const [collapsed, setCollapsed] = useState(true);
-  const [width, setWidth] = useState(externalWidth || COLLAPSED_WIDTH);
-  const [animatingWidth, setAnimatingWidth] = useState(
-    externalWidth || COLLAPSED_WIDTH
-  ); // For smooth transitions
-  const [height, setHeight] = useState(externalHeight || 800); // Start with fallback, will be updated on client
-  const [top, setTop] = useState(16); // Vertical position of sidebar
+  // Initialize persistence hook
+  const {
+    state: persistedState,
+    updateState: updatePersistedState,
+    isLoaded: isPersistedStateLoaded,
+  } = useSidebarPersistence({
+    sidebarId: "ai-chat-sidebar",
+    defaultState: {
+      collapsed: true,
+      width: externalWidth || COLLAPSED_WIDTH,
+      height: externalHeight || 800,
+      top: 16,
+      activeTab: "resources",
+    },
+  });
+
+  const [collapsed, setCollapsed] = useState(persistedState.collapsed);
+  const [width, setWidth] = useState(persistedState.width);
+  const [animatingWidth, setAnimatingWidth] = useState(persistedState.width); // For smooth transitions
+  const [height, setHeight] = useState(persistedState.height); // Start with fallback, will be updated on client
+  const [top, setTop] = useState(persistedState.top); // Vertical position of sidebar
   const [dragging, setDragging] = useState(false);
   const [draggingVertical, setDraggingVertical] = useState(false);
   const [draggingPosition, setDraggingPosition] = useState(false);
@@ -36,7 +52,9 @@ export default function ResourceSidebar({
     typeof window !== "undefined" ? window.innerHeight - 32 : 800
   );
   const [isClient, setIsClient] = useState(false);
-  const [activeTab, setActiveTab] = useState<TabType>("resources");
+  const [activeTab, setActiveTab] = useState<TabType>(
+    (persistedState.activeTab as TabType) || "resources"
+  );
   const sidebarRef = useRef<HTMLDivElement>(null);
   const dragStartX = useRef<number | null>(null);
   const dragStartWidth = useRef<number | null>(null);
@@ -73,16 +91,22 @@ export default function ResourceSidebar({
   }, [externalHeight]);
 
   // Notify parent of changes
-  const updateWidth = (newWidth: number) => {
-    setWidth(newWidth);
-    setAnimatingWidth(newWidth);
-    onWidthChange?.(newWidth);
-  };
+  const updateWidth = useCallback(
+    (newWidth: number) => {
+      setWidth(newWidth);
+      setAnimatingWidth(newWidth);
+      onWidthChange?.(newWidth);
+    },
+    [onWidthChange]
+  );
 
-  const updateHeight = (newHeight: number) => {
-    setHeight(newHeight);
-    onHeightChange?.(newHeight);
-  };
+  const updateHeight = useCallback(
+    (newHeight: number) => {
+      setHeight(newHeight);
+      onHeightChange?.(newHeight);
+    },
+    [onHeightChange]
+  );
 
   // Create refs for all messages upfront to avoid conditional hooks
   const messageRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -90,6 +114,20 @@ export default function ResourceSidebar({
   const [input, setInput] = useState("");
   const chatEndRef = useRef<HTMLDivElement>(null);
   const prevMessagesLength = useRef(messages.length);
+
+  // Sync with persisted state when it loads
+  useEffect(() => {
+    if (isPersistedStateLoaded) {
+      setCollapsed(persistedState.collapsed);
+      setWidth(persistedState.width);
+      setAnimatingWidth(persistedState.width);
+      setHeight(persistedState.height);
+      setTop(persistedState.top);
+      if (persistedState.activeTab) {
+        setActiveTab(persistedState.activeTab as TabType);
+      }
+    }
+  }, [isPersistedStateLoaded, persistedState]);
 
   // Set client-side flag and update maxWidth on window resize
   useEffect(() => {
@@ -108,7 +146,7 @@ export default function ResourceSidebar({
     handleResize(); // Call immediately
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [externalHeight]);
 
   // Only scroll to bottom when a new message is added
   useEffect(() => {
@@ -118,7 +156,7 @@ export default function ResourceSidebar({
       }, 100);
     }
     prevMessagesLength.current = messages.length;
-  }, [messages]);
+  }, [messages.length]);
 
   // Handle click and hold functionality
   const handleMouseDown = () => {
@@ -129,6 +167,7 @@ export default function ResourceSidebar({
         setCollapsed(false);
         setWidth(260); // Expand to default width
         setAnimatingWidth(260);
+        updatePersistedState({ collapsed: false, width: 260 });
         setIsHolding(false);
         // Reset animation state after transition
         setTimeout(() => setIsAnimating(false), 600);
@@ -143,6 +182,7 @@ export default function ResourceSidebar({
         setTimeout(() => {
           setCollapsed(true);
           setWidth(COLLAPSED_WIDTH);
+          updatePersistedState({ collapsed: true, width: COLLAPSED_WIDTH });
           setIsHolding(false);
           setIsAnimating(false);
         }, 600);
@@ -176,7 +216,7 @@ export default function ResourceSidebar({
         }
       }, 200);
     }
-  }, [collapsed, activeTab]);
+  }, [collapsed, activeTab, messages.length]);
 
   // Ensure first message is always visible on load
   useEffect(() => {
@@ -186,7 +226,7 @@ export default function ResourceSidebar({
         chatContainer.scrollTop = 0;
       }
     }
-  }, [collapsed, activeTab]);
+  }, [collapsed, activeTab, messages.length]);
 
   useEffect(() => {
     if (!dragging && !draggingVertical && !draggingPosition) return;
@@ -206,7 +246,9 @@ export default function ResourceSidebar({
             maxWidth
           );
           updateWidth(newWidth);
-          setCollapsed(newWidth <= COLLAPSED_WIDTH);
+          const newCollapsed = newWidth <= COLLAPSED_WIDTH;
+          setCollapsed(newCollapsed);
+          updatePersistedState({ width: newWidth, collapsed: newCollapsed });
         }
 
         // Handle vertical dragging for height (bottom handle only)
@@ -235,6 +277,7 @@ export default function ResourceSidebar({
             updateHeight(adjustedHeight);
           } else {
             updateHeight(newHeight);
+            updatePersistedState({ height: newHeight });
           }
         }
 
@@ -250,6 +293,7 @@ export default function ResourceSidebar({
             window.innerHeight - height - 16 // Maximum top position (keep sidebar in view)
           );
           setTop(newTop);
+          updatePersistedState({ top: newTop });
         }
       });
     };
@@ -279,6 +323,10 @@ export default function ResourceSidebar({
     maxWidth,
     maxHeight,
     height,
+    top,
+    updateHeight,
+    updatePersistedState,
+    updateWidth,
   ]);
 
   // Mock resources data - in a real app, this would be dynamic based on the current page
@@ -396,6 +444,11 @@ export default function ResourceSidebar({
                 setCollapsed(false);
                 setWidth(260);
                 setAnimatingWidth(260);
+                updatePersistedState({
+                  collapsed: false,
+                  width: 260,
+                  activeTab: "resources",
+                });
                 setActiveTab("resources");
                 setTimeout(() => setIsAnimating(false), 600);
               }}
@@ -410,6 +463,11 @@ export default function ResourceSidebar({
                 setCollapsed(false);
                 setWidth(260);
                 setAnimatingWidth(260);
+                updatePersistedState({
+                  collapsed: false,
+                  width: 260,
+                  activeTab: "ai-chat",
+                });
                 setActiveTab("ai-chat");
                 setTimeout(() => setIsAnimating(false), 600);
               }}
@@ -433,10 +491,10 @@ export default function ResourceSidebar({
           <>
             {/* Sidebar Title */}
             <div
-              className={`flex items-center justify-between px-4 py-4 border-b border-border/30 bg-surface-elevated/40 backdrop-blur-sm rounded-t-3xl transition-all duration-300 ease-out ${collapsed ? "opacity-0 pointer-events-none h-0 overflow-hidden" : "opacity-100"}`}
+              className={`border-b border-border px-4 py-3 bg-surface-elevated rounded-t-3xl transition-all duration-300 ease-out ${collapsed ? "opacity-0 pointer-events-none h-0 overflow-hidden" : "opacity-100"}`}
             >
               <div
-                className="flex items-center gap-2 cursor-move"
+                className="flex items-center justify-between cursor-move"
                 onMouseDown={e => {
                   if (e.button === 0) {
                     setDraggingPosition(true);
@@ -447,42 +505,37 @@ export default function ResourceSidebar({
                   }
                 }}
               >
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="font-display font-semibold text-text-primary text-sm">
-                  RESOURCES
-                </span>
-              </div>
-              <button
-                onClick={() => {
-                  setIsAnimating(true);
-                  setAnimatingWidth(COLLAPSED_WIDTH);
-                  setCollapsed(true);
-                  setWidth(COLLAPSED_WIDTH);
-                  setTimeout(() => setIsAnimating(false), 600);
-                }}
-                className="text-text-secondary hover:text-primary transition-all duration-300 ease-out cursor-pointer p-2 rounded-lg hover:bg-surface-elevated hover:scale-105"
-                title="Collapse sidebar"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+                <div className="flex items-center gap-2">
+                  <MetallicCardanoLogo size={24} className="flex-shrink-0" />
+                  <span className="font-display font-semibold text-text-primary text-sm">
+                    RESOURCES & AI CHAT
+                  </span>
+                </div>
+                <button
+                  onClick={() => {
+                    setCollapsed(true);
+                    setWidth(COLLAPSED_WIDTH);
+                    updatePersistedState({
+                      collapsed: true,
+                      width: COLLAPSED_WIDTH,
+                    });
+                  }}
+                  onMouseDown={e => e.stopPropagation()}
+                  className="p-1 rounded-full hover:bg-surface/50 text-text-secondary hover:text-primary transition-colors duration-200"
+                  title="Collapse sidebar"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
             {/* Tab Navigation */}
             <div className="flex border-b border-border/30 bg-surface-elevated/20">
               <button
-                onClick={() => setActiveTab("resources")}
+                onClick={() => {
+                  setActiveTab("resources");
+                  updatePersistedState({ activeTab: "resources" });
+                }}
                 onMouseDown={e => e.stopPropagation()}
                 className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium transition-all duration-200 ${
                   activeTab === "resources"
@@ -494,7 +547,10 @@ export default function ResourceSidebar({
                 <span>Resources</span>
               </button>
               <button
-                onClick={() => setActiveTab("ai-chat")}
+                onClick={() => {
+                  setActiveTab("ai-chat");
+                  updatePersistedState({ activeTab: "ai-chat" });
+                }}
                 onMouseDown={e => e.stopPropagation()}
                 className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium transition-all duration-200 ${
                   activeTab === "ai-chat"
@@ -554,20 +610,16 @@ export default function ResourceSidebar({
                       const availableWidth = width - 32;
                       let fontSize = "12px";
                       let padding = 12;
-                      let maxWidth = "90%";
 
                       if (availableWidth < 150) {
                         fontSize = "10px";
                         padding = 8;
-                        maxWidth = "95%";
                       } else if (availableWidth < 200) {
                         fontSize = "11px";
                         padding = 10;
-                        maxWidth = "92%";
                       } else if (availableWidth > 300) {
                         fontSize = "14px";
                         padding = 16;
-                        maxWidth = "85%";
                       }
 
                       return (

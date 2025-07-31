@@ -19,7 +19,6 @@ const TiltedCard: React.FC<TiltedCardProps> = ({
   maxTilt = 15,
   perspective = 1000,
   scale = 1.05,
-  speed = 500,
   reverse = false,
   disabled = false,
   asGridItem = false,

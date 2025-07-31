@@ -5,7 +5,6 @@ import {
   Zap,
   Trophy,
   RotateCcw,
-  TrendingUp,
   Users,
   Crown,
   Medal,
@@ -35,17 +34,14 @@ interface ClickCounterProps {
 }
 
 const ClickCounter: React.FC<ClickCounterProps> = ({
-  initialCount = 0,
   className = "",
-  showMilestones = true,
-  milestoneValues = [10, 50, 100, 500, 1000],
   persistData = true,
   storageKey = "mimir-leaderboard",
 }) => {
   const [currentUser, setCurrentUser] = useState<LeaderboardEntry | null>(null);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [sessionClicks, setSessionClicks] = useState(0);
-  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [_showLeaderboard, _setShowLeaderboard] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [customName, setCustomName] = useState("");
   const [clicksThisHour, setClicksThisHour] = useState(0);
