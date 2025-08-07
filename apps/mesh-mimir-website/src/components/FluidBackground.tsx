@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 
 interface LogoPosition {
@@ -12,51 +12,33 @@ interface LogoPosition {
 export default function FluidBackground() {
   const containerRef = useRef<HTMLDivElement>(null);
   const mouseRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | null>(null);
   const [logoPositions, setLogoPositions] = useState<LogoPosition[]>([]);
 
-  // Initialize base positions
+  // Initialize logo positions
   useEffect(() => {
     if (containerRef.current) {
       const container = containerRef.current;
-      const rect = container.getBoundingClientRect();
+      const positions: LogoPosition[] = [];
 
-      // Create many more particles for asteroid stream effect
-      const particleCount = 45; // Increased from 25 to 45
-      const newPositions: LogoPosition[] = [];
-
-      for (let i = 0; i < particleCount; i++) {
-        // Create flowing stream pattern - positioned further away
-        const streamAngle = (i / particleCount) * Math.PI * 2;
-        const streamRadius = Math.random() * 0.2 + 0.8; // 80-100% of screen - further away
-        const streamOffset = Math.random() * 0.3 - 0.15; // More random offset
-
-        // Position particles in flowing streams - further from center
-        const x =
-          rect.width *
-          (0.5 + Math.cos(streamAngle) * streamRadius + streamOffset);
-        const y =
-          rect.height *
-          (0.5 + Math.sin(streamAngle) * streamRadius + streamOffset);
-
-        // Add more random distribution for natural look
-        const randomX = x + (Math.random() - 0.5) * rect.width * 0.6;
-        const randomY = y + (Math.random() - 0.5) * rect.height * 0.6;
-
-        newPositions.push({
-          x: randomX,
-          y: randomY,
-          baseX: randomX,
-          baseY: randomY,
+      // Create 12 logo positions with random initial positions
+      for (let i = 0; i < 12; i++) {
+        const baseX = Math.random() * container.offsetWidth;
+        const baseY = Math.random() * container.offsetHeight;
+        positions.push({
+          x: baseX,
+          y: baseY,
+          baseX,
+          baseY,
           velocity: { x: 0, y: 0 },
         });
       }
 
-      setLogoPositions(newPositions);
+      setLogoPositions(positions);
     }
   }, []);
 
-  // Mouse movement handler
+  // Mouse move handler
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (containerRef.current) {
@@ -129,7 +111,7 @@ export default function FluidBackground() {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, []);
+  }, []); // Empty dependency array - only run once
 
   return (
     <div

@@ -2,6 +2,8 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { Send, BookOpen, MessageSquare, Link, X } from "lucide-react";
 import { MetallicCardanoLogo } from "./MetallicCardanoLogo";
 import { useSidebarPersistence } from "../hooks/useSidebarPersistence";
+import { usePersona } from "../contexts/PersonaContext";
+import { LearnerPersona } from "../types/personas";
 
 interface ResourceSidebarProps {
   width?: number;
@@ -15,12 +17,211 @@ type TabType = "resources" | "ai-chat";
 // Collapsed width constant
 const COLLAPSED_WIDTH = 48;
 
+// Define different resources based on persona
+const getPersonaResources = (persona: LearnerPersona | null) => {
+  switch (persona) {
+    case "brand-new-to-ai":
+      return [
+        {
+          title: "ChatGPT Guide",
+          description: "Learn how to use ChatGPT for beginners",
+          url: "/docs/chatgpt-guide",
+          type: "guide",
+        },
+        {
+          title: "AI Basics",
+          description: "Understanding artificial intelligence fundamentals",
+          url: "/docs/ai-basics",
+          type: "guide",
+        },
+        {
+          title: "Blockchain Basics",
+          description: "Simple explanations of blockchain technology",
+          url: "/docs/blockchain-basics",
+          type: "guide",
+        },
+        {
+          title: "Cardano Explained",
+          description: "Learn about Cardano in simple terms",
+          url: "/docs/cardano-explained",
+          type: "guide",
+        },
+        {
+          title: "Safety Guide",
+          description: "How to stay safe while learning blockchain",
+          url: "/docs/safety-guide",
+          type: "guide",
+        },
+        {
+          title: "Simple Examples",
+          description: "Easy-to-follow project examples",
+          url: "/docs/example-content",
+          type: "examples",
+        },
+        {
+          title: "Help & Support",
+          description: "Get help when you're stuck",
+          url: "/docs/help",
+          type: "support",
+        },
+      ];
+
+    case "ai-user":
+      return [
+        {
+          title: "Cursor Setup",
+          description: "Set up Cursor IDE for AI-powered development",
+          url: "/docs/ai-tools/cursor-setup",
+          type: "tool",
+        },
+        {
+          title: "Windsurf Integration",
+          description: "Connect Windsurf for enhanced AI capabilities",
+          url: "/docs/ai-tools/windsurf-setup",
+          type: "tool",
+        },
+        {
+          title: "Advanced Prompts",
+          description: "Learn to write better AI prompts for better results",
+          url: "/docs/advanced-prompts",
+          type: "guide",
+        },
+        {
+          title: "AI Best Practices",
+          description: "Best practices for AI-assisted development",
+          url: "/docs/ai-best-practices",
+          type: "guide",
+        },
+        {
+          title: "Blockfrost API",
+          description: "Cardano blockchain data and analytics",
+          url: "https://blockfrost.io/",
+          type: "api",
+        },
+        {
+          title: "DexHunter",
+          description: "Cardano DEX aggregator and analytics",
+          url: "https://dexhunter.io/",
+          type: "tool",
+        },
+        {
+          title: "Taptools",
+          description: "Cardano portfolio tracking and analytics",
+          url: "https://taptools.io/",
+          type: "tool",
+        },
+      ];
+
+    case "ai-power-user":
+      return [
+        {
+          title: "MCP Integration",
+          description: "Model Context Protocol for advanced AI workflows",
+          url: "/docs/mcp-integration",
+          type: "tool",
+        },
+        {
+          title: "Custom AI Models",
+          description: "Fine-tune and deploy custom AI models for development",
+          url: "/docs/custom-models",
+          type: "tool",
+        },
+        {
+          title: "AI Automation",
+          description: "Build automated AI-powered development pipelines",
+          url: "/docs/ai-automation",
+          type: "tool",
+        },
+        {
+          title: "Cardano Developer Portal",
+          description: "Learn about Cardano development and tools",
+          url: "https://developers.cardano.org/",
+          type: "portal",
+        },
+        {
+          title: "Plutus Documentation",
+          description: "Official Plutus smart contract documentation",
+          url: "https://docs.cardano.org/plutus/",
+          type: "docs",
+        },
+        {
+          title: "Advanced APIs",
+          description: "Complex Cardano ecosystem API integrations",
+          url: "/docs/advanced-apis",
+          type: "api",
+        },
+        {
+          title: "Performance Optimization",
+          description: "Optimize your Cardano applications for production",
+          url: "/docs/performance",
+          type: "guide",
+        },
+        {
+          title: "Security Best Practices",
+          description: "Advanced security practices for Cardano development",
+          url: "/docs/security",
+          type: "guide",
+        },
+      ];
+
+    default:
+      // Default resources for when no persona is selected
+      return [
+        {
+          title: "Mesh MCP",
+          description: "Model Context Protocol for MeshJS development tools",
+          url: "https://meshjs.dev/mcp",
+          type: "tool",
+        },
+        {
+          title: "Mesh Documentation",
+          description: "Official MeshJS documentation and API reference",
+          url: "https://meshjs-docs.vercel.app/",
+          type: "docs",
+        },
+        {
+          title: "Project Ideas",
+          description: "Inspiration and starter templates for Cardano projects",
+          url: "https://meshjs.dev/projects",
+          type: "ideas",
+        },
+        {
+          title: "Cardano Developer Portal",
+          description: "Learn about Cardano development and tools",
+          url: "https://developers.cardano.org/",
+          type: "portal",
+        },
+        {
+          title: "Blockfrost API",
+          description: "Cardano blockchain data and analytics",
+          url: "https://blockfrost.io/",
+          type: "api",
+        },
+        {
+          title: "DexHunter",
+          description: "Cardano DEX aggregator and analytics",
+          url: "https://dexhunter.io/",
+          type: "tool",
+        },
+        {
+          title: "Taptools",
+          description: "Cardano portfolio tracking and analytics",
+          url: "https://taptools.io/",
+          type: "tool",
+        },
+      ];
+  }
+};
+
 export default function ResourceSidebar({
   width: externalWidth,
   height: externalHeight,
   onWidthChange,
   onHeightChange,
 }: ResourceSidebarProps) {
+  const { selectedPersona } = usePersona();
+  const resources = getPersonaResources(selectedPersona);
+
   // Initialize persistence hook
   const {
     state: persistedState,
@@ -62,20 +263,77 @@ export default function ResourceSidebar({
   const dragStartHeight = useRef<number | null>(null);
   const dragStartTop = useRef<number | null>(null);
 
-  // Click and hold functionality
-  const [isHolding, setIsHolding] = useState(false);
-  const holdTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const expandDuration = 500; // 0.5 seconds to expand
-  const collapseDuration = 1000; // 1 second to collapse
-
   // Animation states
   const [isAnimating, setIsAnimating] = useState(false);
 
-  const [messages, setMessages] = useState([
-    { from: "ai", text: "Hi! I'm your AI coding buddy. Ask me anything!" },
-    { from: "user", text: "How do I send a Cardano transaction?" },
-    { from: "ai", text: "Great question! Here's a quick guide..." },
-  ]);
+  // Get persona-specific welcome messages
+  const getWelcomeMessages = (persona: LearnerPersona | null) => {
+    switch (persona) {
+      case "brand-new-to-ai":
+        return [
+          {
+            from: "ai",
+            text: "Hi! I'm here to help you learn about AI and blockchain. Don't worry if you're new to this - I'll guide you step by step!",
+          },
+          {
+            from: "user",
+            text: "I'm completely new to AI. Where should I start?",
+          },
+          {
+            from: "ai",
+            text: "Great question! Let's start with the basics. I recommend beginning with ChatGPT - it's the most user-friendly AI tool. Would you like me to explain what AI is first, or should we jump right into trying ChatGPT?",
+          },
+        ];
+      case "ai-user":
+        return [
+          {
+            from: "ai",
+            text: "Welcome back! I'm here to help you level up your AI skills and build more complex Cardano projects. What would you like to work on today?",
+          },
+          {
+            from: "user",
+            text: "I want to set up Cursor for better AI development",
+          },
+          {
+            from: "ai",
+            text: "Excellent choice! Cursor is a powerful AI-powered IDE. I can help you set it up and show you some advanced features. Would you like to start with the basic setup, or do you have any specific questions about Cursor's AI capabilities?",
+          },
+        ];
+      case "ai-power-user":
+        return [
+          {
+            from: "ai",
+            text: "Hello! I'm ready to help you push the boundaries of AI-assisted development. What advanced AI techniques or complex Cardano development are you working on?",
+          },
+          {
+            from: "user",
+            text: "I want to integrate MCP for advanced AI workflows",
+          },
+          {
+            from: "ai",
+            text: "Perfect! Model Context Protocol (MCP) is cutting-edge for AI development. I can help you set up custom MCP servers, integrate with advanced AI models, and create sophisticated development pipelines. What specific MCP functionality are you looking to implement?",
+          },
+        ];
+      default:
+        return [
+          {
+            from: "ai",
+            text: "Hi! I'm your AI coding buddy. Ask me anything!",
+          },
+          { from: "user", text: "How do I send a Cardano transaction?" },
+          { from: "ai", text: "Great question! Here's a quick guide..." },
+        ];
+    }
+  };
+
+  const [messages, setMessages] = useState(() =>
+    getWelcomeMessages(selectedPersona)
+  );
+
+  // Update messages when persona changes
+  useEffect(() => {
+    setMessages(getWelcomeMessages(selectedPersona));
+  }, [selectedPersona]);
 
   // Update internal state when external props change
   useEffect(() => {
@@ -158,52 +416,17 @@ export default function ResourceSidebar({
     prevMessagesLength.current = messages.length;
   }, [messages.length]);
 
-  // Handle click and hold functionality
-  const handleMouseDown = () => {
+  // Handle click to expand when collapsed
+  const handleCollapsedClick = () => {
     if (collapsed) {
-      setIsHolding(true);
-      holdTimeoutRef.current = setTimeout(() => {
-        setIsAnimating(true);
-        setCollapsed(false);
-        setWidth(260); // Expand to default width
-        setAnimatingWidth(260);
-        updatePersistedState({ collapsed: false, width: 260 });
-        setIsHolding(false);
-        // Reset animation state after transition
-        setTimeout(() => setIsAnimating(false), 600);
-      }, expandDuration);
-    } else {
-      // Hold to collapse when expanded
-      setIsHolding(true);
-      holdTimeoutRef.current = setTimeout(() => {
-        setIsAnimating(true);
-        setAnimatingWidth(COLLAPSED_WIDTH);
-        // Delay the collapsed state change to allow the transition to animate
-        setTimeout(() => {
-          setCollapsed(true);
-          setWidth(COLLAPSED_WIDTH);
-          updatePersistedState({ collapsed: true, width: COLLAPSED_WIDTH });
-          setIsHolding(false);
-          setIsAnimating(false);
-        }, 600);
-      }, collapseDuration);
+      setIsAnimating(true);
+      setCollapsed(false);
+      setWidth(260); // Expand to default width
+      setAnimatingWidth(260);
+      updatePersistedState({ collapsed: false, width: 260 });
+      // Reset animation state after transition
+      setTimeout(() => setIsAnimating(false), 600);
     }
-  };
-
-  const handleMouseUp = () => {
-    if (holdTimeoutRef.current) {
-      clearTimeout(holdTimeoutRef.current);
-      holdTimeoutRef.current = null;
-    }
-    setIsHolding(false);
-  };
-
-  const handleMouseLeave = () => {
-    if (holdTimeoutRef.current) {
-      clearTimeout(holdTimeoutRef.current);
-      holdTimeoutRef.current = null;
-    }
-    setIsHolding(false);
   };
 
   // Ensure proper scroll position on initial load
@@ -329,40 +552,6 @@ export default function ResourceSidebar({
     updateWidth,
   ]);
 
-  // Mock resources data - in a real app, this would be dynamic based on the current page
-  const resources = [
-    {
-      title: "MeshJS Documentation",
-      description: "Official MeshJS documentation and API reference",
-      url: "https://meshjs.dev/",
-      type: "docs",
-    },
-    {
-      title: "Cardano Developer Portal",
-      description: "Learn about Cardano development and tools",
-      url: "https://developers.cardano.org/",
-      type: "portal",
-    },
-    {
-      title: "Blockfrost API",
-      description: "Cardano blockchain data and analytics",
-      url: "https://blockfrost.io/",
-      type: "api",
-    },
-    {
-      title: "DexHunter",
-      description: "Cardano DEX aggregator and analytics",
-      url: "https://dexhunter.io/",
-      type: "tool",
-    },
-    {
-      title: "Taptools",
-      description: "Cardano portfolio tracking and analytics",
-      url: "https://taptools.io/",
-      type: "tool",
-    },
-  ];
-
   return (
     <div
       style={{
@@ -395,17 +584,11 @@ export default function ResourceSidebar({
           } as React.CSSProperties & { "--resource-sidebar-width": string }
         }
         className={`bg-surface/30 backdrop-blur-md flex flex-col shadow-2xl rounded-3xl overflow-hidden isolate transition-all duration-500 ease-out ${
-          collapsed ? "cursor-pointer" : "cursor-pointer"
-        } ${collapsed && isHolding ? "scale-105 opacity-90" : ""} ${!collapsed && isHolding ? "scale-95 opacity-90" : ""} ${isAnimating ? "animate-pulse" : ""}`}
+          collapsed ? "cursor-pointer" : ""
+        } ${isAnimating ? "animate-pulse" : ""}`}
         aria-label="Resource sidebar"
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseLeave}
-        title={
-          collapsed
-            ? "Click and hold for 0.5s to expand"
-            : "Click and hold for 1s to collapse"
-        }
+        onClick={collapsed ? handleCollapsedClick : undefined}
+        title={collapsed ? "Click to expand" : ""}
       >
         {/* Horizontal Drag Handle */}
         <div
@@ -476,11 +659,6 @@ export default function ResourceSidebar({
             >
               <MessageSquare className="w-5 h-5" />
             </button>
-            {isHolding && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-              </div>
-            )}
           </div>
         ) : !isClient ? (
           // Loading state while client-side calculations are being set up

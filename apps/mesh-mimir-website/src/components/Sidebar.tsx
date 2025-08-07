@@ -12,6 +12,10 @@ import {
 } from "lucide-react";
 import { MetallicCardanoLogo } from "./MetallicCardanoLogo";
 import { useSidebarPersistence } from "../hooks/useSidebarPersistence";
+import { getSidebarSections } from "../utils/sidebarUtils";
+import { usePersona } from "../contexts/PersonaContext";
+import { LearnerPersona } from "../types/personas";
+import PersonaSwitcher from "./PersonaSwitcher";
 
 // Collapsed width constant
 const COLLAPSED_WIDTH = 48;
@@ -22,56 +26,32 @@ interface SidebarSection {
   items: { label: string; href: string }[];
 }
 
-const sections: SidebarSection[] = [
-  {
-    title: "Home",
-    icon: <Home className="w-5 h-5" />,
-    items: [{ label: "Main Page", href: "/" }],
-  },
-  {
-    title: "Learn",
-    icon: <BookOpen className="w-5 h-5" />,
-    items: [
-      { label: "AI Tools Revolution", href: "/docs/ai-tools" },
-      { label: "Choose Your Tool", href: "/docs/ai-tools/selection" },
-      { label: "Cursor Setup Quest", href: "/docs/ai-tools/cursor-setup" },
-      { label: "Windsurf Setup", href: "/docs/ai-tools/windsurf-setup" },
-      { label: "Live Coding Sessions", href: "/docs/live-coding" },
-      { label: "Practice Workflow", href: "/docs/practice" },
-      { label: "Cardano APIs", href: "/docs/apis" },
-      { label: "GitHub Workflow", href: "/docs/github-workflow" },
-    ],
-  },
-  {
-    title: "Build",
-    icon: <Rocket className="w-5 h-5" />,
-    items: [
-      { label: "First Transaction", href: "/guides/first_transaction" },
-      { label: "Getting Started", href: "/guides/getting-started" },
-      { label: "NFT Collection", href: "/guides/nft-collection" },
-      { label: "Token Swapper", href: "/guides/token-swap" },
-    ],
-  },
-  {
-    title: "Templates",
-    icon: <Layout className="w-5 h-5" />,
-    items: [
-      { label: "Content Template", href: "/docs/template" },
-      { label: "Example Content", href: "/docs/example-content" },
-      { label: "Guide Template", href: "/guides/getting-started" },
-    ],
-  },
-  {
-    title: "Examples",
-    icon: <Code className="w-5 h-5" />,
-    items: [
-      { label: "First Transaction", href: "/guides/first_transaction" },
-      { label: "AI Tools Setup", href: "/docs/ai-tools" },
-    ],
-  },
-];
+// Icon mapping for dynamic sections
+const iconMap = {
+  Home: <Home className="w-5 h-5" />,
+  BookOpen: <BookOpen className="w-5 h-5" />,
+  Rocket: <Rocket className="w-5 h-5" />,
+  Layout: <Layout className="w-5 h-5" />,
+  Code: <Code className="w-5 h-5" />,
+};
+
+// Get sections with proper icons
+const getSectionsWithIcons = (
+  persona: LearnerPersona | null
+): SidebarSection[] => {
+  const sections = getSidebarSections(persona);
+  return sections.map(section => ({
+    ...section,
+    icon: iconMap[section.icon as keyof typeof iconMap] || (
+      <Home className="w-5 h-5" />
+    ),
+  }));
+};
 
 export default function Sidebar() {
+  const { selectedPersona } = usePersona();
+  const sections = getSectionsWithIcons(selectedPersona);
+
   // Initialize persistence hook
   const {
     state: persistedState,
@@ -114,12 +94,6 @@ export default function Sidebar() {
   const dragStartHeight = useRef<number | null>(null);
   const dragStartTop = useRef<number | null>(null);
 
-  // Click and hold functionality
-  const [isHolding, setIsHolding] = useState(false);
-  const holdTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const expandDuration = 500; // 0.5 seconds to expand
-  const collapseDuration = 1000; // 1 second to collapse
-
   // Animation states
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -138,6 +112,12 @@ export default function Sidebar() {
       }
     }
   }, [isPersistedStateLoaded, persistedState]);
+
+  // Update sections when persona changes
+  useEffect(() => {
+    const newSections = getSectionsWithIcons(selectedPersona);
+    setOpenSections(newSections.map(() => true));
+  }, [selectedPersona]);
 
   // Set client-side flag and update maxWidth/maxHeight on window resize
   useEffect(() => {
@@ -256,52 +236,17 @@ export default function Sidebar() {
     updatePersistedState,
   ]);
 
-  // Handle click and hold functionality
-  const handleMouseDown = () => {
+  // Handle click to expand when collapsed
+  const handleCollapsedClick = () => {
     if (collapsed) {
-      setIsHolding(true);
-      holdTimeoutRef.current = setTimeout(() => {
-        setIsAnimating(true);
-        setCollapsed(false);
-        setWidth(260); // Expand to default width
-        setAnimatingWidth(260);
-        updatePersistedState({ collapsed: false, width: 260 });
-        setIsHolding(false);
-        // Reset animation state after transition
-        setTimeout(() => setIsAnimating(false), 600);
-      }, expandDuration);
-    } else {
-      // Hold to collapse when expanded
-      setIsHolding(true);
-      holdTimeoutRef.current = setTimeout(() => {
-        setIsAnimating(true);
-        setAnimatingWidth(COLLAPSED_WIDTH);
-        // Delay the collapsed state change to allow the transition to animate
-        setTimeout(() => {
-          setCollapsed(true);
-          setWidth(COLLAPSED_WIDTH);
-          updatePersistedState({ collapsed: true, width: COLLAPSED_WIDTH });
-          setIsHolding(false);
-          setIsAnimating(false);
-        }, 600);
-      }, collapseDuration);
+      setIsAnimating(true);
+      setCollapsed(false);
+      setWidth(260); // Expand to default width
+      setAnimatingWidth(260);
+      updatePersistedState({ collapsed: false, width: 260 });
+      // Reset animation state after transition
+      setTimeout(() => setIsAnimating(false), 600);
     }
-  };
-
-  const handleMouseUp = () => {
-    if (holdTimeoutRef.current) {
-      clearTimeout(holdTimeoutRef.current);
-      holdTimeoutRef.current = null;
-    }
-    setIsHolding(false);
-  };
-
-  const handleMouseLeave = () => {
-    if (holdTimeoutRef.current) {
-      clearTimeout(holdTimeoutRef.current);
-      holdTimeoutRef.current = null;
-    }
-    setIsHolding(false);
   };
 
   const toggleSection = (idx: number) => {
@@ -326,18 +271,10 @@ export default function Sidebar() {
     >
       <nav
         ref={sidebarRef}
-        className={`bg-surface/30 backdrop-blur-md transition-all duration-500 ease-out flex flex-col overflow-hidden isolate ${collapsed ? "min-w-0 rounded-3xl cursor-pointer" : "rounded-3xl cursor-pointer"} ${
-          collapsed && isHolding ? "scale-105 opacity-90" : ""
-        } ${!collapsed && isHolding ? "scale-95 opacity-90" : ""} ${isAnimating ? "animate-pulse" : ""}`}
+        className={`bg-surface/30 backdrop-blur-md transition-all duration-500 ease-out flex flex-col overflow-hidden isolate ${collapsed ? "min-w-0 rounded-3xl cursor-pointer" : "rounded-3xl"} ${isAnimating ? "animate-pulse" : ""}`}
         aria-label="Sidebar navigation"
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseLeave}
-        title={
-          collapsed
-            ? "Click and hold for 0.5s to expand"
-            : "Click and hold for 1s to collapse"
-        }
+        onClick={collapsed ? handleCollapsedClick : undefined}
+        title={collapsed ? "Click to expand" : ""}
         style={
           {
             width: animatingWidth,
@@ -397,10 +334,19 @@ export default function Sidebar() {
           </div>
         </div>
 
-        {/* Loading spinner for collapsed state */}
-        {collapsed && isHolding && (
-          <div className="absolute inset-0 flex items-center justify-center z-50">
-            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+        {/* Home Section */}
+        {!collapsed && (
+          <div className="border-b border-border/30">
+            <Link
+              href="/"
+              className="flex items-center gap-3 px-4 py-3 hover:bg-surface-elevated/50 transition-colors duration-200"
+              onMouseDown={e => e.stopPropagation()}
+            >
+              <Home className="w-5 h-5 text-primary" />
+              <span className="font-display font-medium text-text-primary text-sm">
+                Home
+              </span>
+            </Link>
           </div>
         )}
 
@@ -434,36 +380,51 @@ export default function Sidebar() {
 
         {collapsed ? (
           <div className="flex flex-col items-center justify-center gap-8 h-full">
-            {sections.map((section, idx) => (
-              <button
-                key={section.title}
-                onClick={() => {
-                  setIsAnimating(true);
-                  setCollapsed(false);
-                  setWidth(260);
-                  setAnimatingWidth(260);
-                  updatePersistedState({ collapsed: false, width: 260 });
-                  setSelectedSection(idx);
-                  setOpenSections(prev => {
-                    const newSections = prev.map((open, i) =>
-                      i === idx ? true : open
-                    );
-                    updatePersistedState({ openSections: newSections });
-                    return newSections;
-                  });
-                  // Reset animation state after transition
-                  setTimeout(() => setIsAnimating(false), 600);
-                }}
-                onMouseDown={e => e.stopPropagation()}
-                className={`transition-all duration-300 ease-out cursor-pointer ${
-                  selectedSection === idx
-                    ? "text-primary-hover scale-110"
-                    : "text-primary hover:text-primary-hover hover:scale-105"
-                }`}
-              >
-                {section.icon}
-              </button>
-            ))}
+            {sections.map((section, idx) =>
+              section.title === "Home" ? (
+                <Link
+                  key={section.title}
+                  href="/"
+                  onMouseDown={e => e.stopPropagation()}
+                  className={`transition-all duration-300 ease-out cursor-pointer ${
+                    router.pathname === "/"
+                      ? "text-primary-hover scale-110"
+                      : "text-primary hover:text-primary-hover hover:scale-105"
+                  }`}
+                >
+                  {section.icon}
+                </Link>
+              ) : (
+                <button
+                  key={section.title}
+                  onClick={() => {
+                    setIsAnimating(true);
+                    setCollapsed(false);
+                    setWidth(260);
+                    setAnimatingWidth(260);
+                    updatePersistedState({ collapsed: false, width: 260 });
+                    setSelectedSection(idx);
+                    setOpenSections(prev => {
+                      const newSections = prev.map((open, i) =>
+                        i === idx ? true : open
+                      );
+                      updatePersistedState({ openSections: newSections });
+                      return newSections;
+                    });
+                    // Reset animation state after transition
+                    setTimeout(() => setIsAnimating(false), 600);
+                  }}
+                  onMouseDown={e => e.stopPropagation()}
+                  className={`transition-all duration-300 ease-out cursor-pointer ${
+                    selectedSection === idx
+                      ? "text-primary-hover scale-110"
+                      : "text-primary hover:text-primary-hover hover:scale-105"
+                  }`}
+                >
+                  {section.icon}
+                </button>
+              )
+            )}
           </div>
         ) : (
           <ul className="space-y-4 flex-1 overflow-y-auto py-4 px-2 scrollbar-none">
@@ -473,31 +434,48 @@ export default function Sidebar() {
               );
               return (
                 <li key={section.title} className="relative group">
-                  <button
-                    className={`flex items-center w-full text-left py-4 px-3 rounded-lg hover:bg-surface-elevated focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 ${
-                      isActiveSection || selectedSection === idx
-                        ? "bg-primary/10 border border-primary/30"
-                        : ""
-                    }`}
-                    aria-expanded={openSections[idx]}
-                    aria-controls={`sidebar-section-${idx}`}
-                    onClick={() => {
-                      toggleSection(idx);
-                      setSelectedSection(idx);
-                    }}
-                    onMouseDown={e => e.stopPropagation()}
-                    tabIndex={0}
-                  >
-                    <span className="text-primary mr-3">{section.icon}</span>
-                    <span className="flex-1 font-display font-medium text-text-primary">
-                      {section.title}
-                    </span>
-                    <ChevronDown
-                      className={`w-4 h-4 text-text-secondary transition-transform duration-200 ${
-                        openSections[idx] ? "rotate-180" : ""
+                  {section.title === "Home" ? (
+                    <Link
+                      href="/"
+                      className={`flex items-center w-full text-left py-4 px-3 rounded-lg hover:bg-surface-elevated focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 ${
+                        router.pathname === "/"
+                          ? "bg-primary/10 border border-primary/30"
+                          : ""
                       }`}
-                    />
-                  </button>
+                      onMouseDown={e => e.stopPropagation()}
+                    >
+                      <span className="text-primary mr-3">{section.icon}</span>
+                      <span className="flex-1 font-display font-medium text-text-primary">
+                        {section.title}
+                      </span>
+                    </Link>
+                  ) : (
+                    <button
+                      className={`flex items-center w-full text-left py-4 px-3 rounded-lg hover:bg-surface-elevated focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 ${
+                        isActiveSection || selectedSection === idx
+                          ? "bg-primary/10 border border-primary/30"
+                          : ""
+                      }`}
+                      aria-expanded={openSections[idx]}
+                      aria-controls={`sidebar-section-${idx}`}
+                      onClick={() => {
+                        toggleSection(idx);
+                        setSelectedSection(idx);
+                      }}
+                      onMouseDown={e => e.stopPropagation()}
+                      tabIndex={0}
+                    >
+                      <span className="text-primary mr-3">{section.icon}</span>
+                      <span className="flex-1 font-display font-medium text-text-primary">
+                        {section.title}
+                      </span>
+                      <ChevronDown
+                        className={`w-4 h-4 text-text-secondary transition-transform duration-200 ${
+                          openSections[idx] ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+                  )}
 
                   {/* Tooltip for collapsed state */}
                   {collapsed && (
@@ -540,16 +518,10 @@ export default function Sidebar() {
           </ul>
         )}
 
-        {/* Status Bar */}
+        {/* Persona Switcher */}
         {!collapsed && (
           <div className="border-t border-border px-4 py-3 bg-surface-elevated rounded-b-3xl">
-            <div className="flex items-center justify-between text-xs text-text-muted font-mono">
-              <span>Section: AI Tools</span>
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span>Mesh</span>
-              </div>
-            </div>
+            <PersonaSwitcher variant="compact" />
           </div>
         )}
       </nav>
