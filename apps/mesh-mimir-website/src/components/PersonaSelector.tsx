@@ -1,14 +1,56 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { CheckCircle } from "lucide-react";
 import { PERSONAS, LearnerPersona, PersonaConfig } from "../types/personas";
 import { MetallicCardanoLogo } from "./MetallicCardanoLogo";
 import Image from "next/image";
+import { useCyclingText } from "../hooks/useCyclingText";
 
 interface PersonaSelectorProps {
   onPersonaSelect: (persona: LearnerPersona) => void;
   selectedPersona?: LearnerPersona | null;
 }
+
+const characters =
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
+
+// Custom hook for decrypted text animation
+const useDecryptedText = (text: string, _interval: number) => {
+  const [displayText, setDisplayText] = useState("");
+  const [isDecrypting, setIsDecrypting] = useState(false);
+
+  useEffect(() => {
+    if (!text) return;
+
+    setIsDecrypting(true);
+    let iterations = 0;
+
+    const decryptInterval = setInterval(() => {
+      setDisplayText(
+        text
+          .split("")
+          .map((_letter, index) => {
+            if (index < iterations) {
+              return text[index];
+            }
+            return characters[Math.floor(Math.random() * characters.length)];
+          })
+          .join("")
+      );
+
+      if (iterations >= text.length) {
+        clearInterval(decryptInterval);
+        setIsDecrypting(false);
+      }
+
+      iterations += 1 / 3;
+    }, 50);
+
+    return () => clearInterval(decryptInterval);
+  }, [text]);
+
+  return { displayText, isDecrypting };
+};
 
 export default function PersonaSelector({
   onPersonaSelect,
@@ -17,6 +59,45 @@ export default function PersonaSelector({
   const [hoveredPersona, setHoveredPersona] = useState<LearnerPersona | null>(
     null
   );
+  const [currentChangingIndex, setCurrentChangingIndex] = useState(0);
+  const [cardTexts, setCardTexts] = useState<Record<number, string>>({
+    0: PERSONAS["brand-new-to-ai"].subtexts[0],
+    1: PERSONAS["ai-user"].subtexts[0],
+    2: PERSONAS["ai-power-user"].subtexts[0],
+  });
+
+  // Global interval to cycle through cards sequentially
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentChangingIndex(prev => (prev + 1) % 3);
+    }, 6180); // 6.18 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Get the current changing persona
+  const currentChangingPersona =
+    PERSONAS[Object.keys(PERSONAS)[currentChangingIndex] as LearnerPersona];
+
+  // Only use cycling text for the currently changing card
+  const { currentText } = useCyclingText(
+    currentChangingPersona.subtexts,
+    currentChangingIndex >= 0 ? 6180 : 0
+  );
+  const { displayText, isDecrypting } = useDecryptedText(
+    currentText,
+    currentChangingIndex >= 0 ? 6180 : 0
+  );
+
+  // Update the card's text when it's currently changing
+  useEffect(() => {
+    if (displayText) {
+      setCardTexts(prev => ({
+        ...prev,
+        [currentChangingIndex]: displayText,
+      }));
+    }
+  }, [displayText, currentChangingIndex]);
 
   const renderPersonaLogo = (persona: PersonaConfig) => {
     if (persona.logo.type === "metallic") {
@@ -54,6 +135,7 @@ export default function PersonaSelector({
           const persona = PERSONAS[personaId];
           const isSelected = selectedPersona === personaId;
           const isHovered = hoveredPersona === personaId;
+          const isCurrentlyChanging = currentChangingIndex === index;
 
           return (
             <motion.div
@@ -95,11 +177,17 @@ export default function PersonaSelector({
 
                   {/* Text content */}
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-xl font-mono font-semibold text-text-secondary mb-2">
+                    <h3 className="text-xl font-mono font-semibold text-primary mb-2">
                       {persona.name}
                     </h3>
-                    <p className="text-text-secondary text-sm leading-relaxed font-mono">
-                      {persona.description}
+                    <p
+                      className={`text-text-secondary text-sm leading-relaxed font-mono ${
+                        isDecrypting && isCurrentlyChanging
+                          ? "text-text-secondary/80"
+                          : "text-text-secondary"
+                      }`}
+                    >
+                      {isCurrentlyChanging ? displayText : cardTexts[index]}
                     </p>
                   </div>
                 </div>

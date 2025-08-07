@@ -1,24 +1,43 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, Code, TrendingUp, ChevronDown } from "lucide-react";
-import { PERSONAS, LearnerPersona } from "../types/personas";
+import { ChevronDown } from "lucide-react";
+import { PERSONAS, LearnerPersona, PersonaConfig } from "../types/personas";
 import { usePersona } from "../contexts/PersonaContext";
+import { MetallicCardanoLogo } from "./MetallicCardanoLogo";
+import Image from "next/image";
 
 interface PersonaSwitcherProps {
   variant?: "compact" | "full";
   className?: string;
 }
 
-const personaIcons = {
-  "brand-new-to-ai": <User className="w-4 h-4" />,
-  "ai-user": <Code className="w-4 h-4" />,
-  "ai-power-user": <TrendingUp className="w-4 h-4" />,
-};
-
-const personaColors = {
-  "brand-new-to-ai": "from-blue-500 to-cyan-500",
-  "ai-user": "from-green-500 to-emerald-500",
-  "ai-power-user": "from-purple-500 to-pink-500",
+const renderPersonaLogo = (persona: PersonaConfig) => {
+  if (persona.logo.type === "metallic") {
+    return (
+      <div className="flex-shrink-0 relative">
+        <div className="w-6 h-6 rounded-full flex items-center justify-center">
+          <MetallicCardanoLogo size={24} className="flex-shrink-0" />
+        </div>
+      </div>
+    );
+  } else if (persona.logo.type === "image" && persona.logo.src) {
+    return (
+      <div className="flex-shrink-0 relative">
+        <div className="w-6 h-6 rounded-full flex items-center justify-center">
+          <Image
+            src={persona.logo.src}
+            alt={`${persona.name} logo`}
+            width={24}
+            height={18}
+            className={`flex-shrink-0 ${
+              persona.id === "ai-user" ? "brightness-0" : ""
+            }`}
+          />
+        </div>
+      </div>
+    );
+  }
+  return null;
 };
 
 export default function PersonaSwitcher({
@@ -40,19 +59,19 @@ export default function PersonaSwitcher({
           <div className="flex items-center gap-2">
             {currentPersona ? (
               <>
-                <div
-                  className={`w-6 h-6 rounded-full bg-gradient-to-br ${personaColors[selectedPersona!]} flex items-center justify-center text-white`}
-                >
-                  {personaIcons[selectedPersona!]}
-                </div>
-                <span className="text-sm font-medium text-white">
+                {renderPersonaLogo(currentPersona)}
+                <span className="text-sm font-mono font-semibold text-primary">
                   {currentPersona.name}
                 </span>
               </>
             ) : (
               <>
-                <User className="w-4 h-4 text-gray-400" />
-                <span className="text-sm text-gray-400">Choose Persona</span>
+                <div className="w-6 h-6 rounded-full bg-surface/50 flex items-center justify-center">
+                  <MetallicCardanoLogo size={24} className="flex-shrink-0" />
+                </div>
+                <span className="text-sm font-mono text-text-secondary">
+                  Choose Persona
+                </span>
               </>
             )}
           </div>
@@ -64,49 +83,48 @@ export default function PersonaSwitcher({
         <AnimatePresence>
           {isOpen && (
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              className="absolute bottom-full left-0 mb-2 w-64 bg-surface/95 backdrop-blur-md border border-border rounded-lg shadow-xl z-50"
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              transition={{
+                duration: 0.3,
+                ease: "easeOut",
+                scale: { duration: 0.2 },
+              }}
+              className="absolute bottom-full -left-4 -right-4 mb-3 bg-surface-elevated backdrop-blur-md border border-border rounded-lg shadow-xl z-50"
             >
-              <div className="p-2">
-                <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-3 py-2">
-                  Select Your Path
-                </div>
-                {(Object.keys(PERSONAS) as LearnerPersona[]).map(personaId => {
-                  const persona = PERSONAS[personaId];
-                  const isSelected = selectedPersona === personaId;
-
-                  return (
-                    <button
-                      key={personaId}
-                      onClick={() => {
-                        setSelectedPersona(personaId);
-                        setIsOpen(false);
-                      }}
-                      className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors duration-200 ${
-                        isSelected
-                          ? "bg-primary/20 border border-primary/30"
-                          : "hover:bg-surface/50 border border-transparent"
-                      }`}
-                    >
-                      <div
-                        className={`w-8 h-8 rounded-lg bg-gradient-to-br ${personaColors[personaId]} flex items-center justify-center text-white`}
-                      >
-                        {personaIcons[personaId]}
-                      </div>
-                      <div className="flex-1">
-                        <div className="font-medium text-white">
-                          {persona.name}
-                        </div>
-                        <div className="text-xs text-gray-400">
-                          {persona.description}
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
+              <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-3 py-2">
+                Select Your Path
               </div>
+              {(Object.keys(PERSONAS) as LearnerPersona[]).map(personaId => {
+                const persona = PERSONAS[personaId];
+                const isSelected = selectedPersona === personaId;
+
+                return (
+                  <button
+                    key={personaId}
+                    onClick={() => {
+                      setSelectedPersona(personaId);
+                      setIsOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-2 px-3 py-3 rounded-none text-left transition-colors duration-200 ${
+                      isSelected
+                        ? "bg-primary/20 border-l-4 border-l-primary"
+                        : "hover:bg-surface/50"
+                    }`}
+                  >
+                    {renderPersonaLogo(persona)}
+                    <div className="flex-1">
+                      <div className="font-mono font-semibold text-primary">
+                        {persona.name}
+                      </div>
+                      <div className="text-xs text-text-secondary font-mono">
+                        {persona.description}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
             </motion.div>
           )}
         </AnimatePresence>
@@ -132,15 +150,13 @@ export default function PersonaSwitcher({
             }`}
           >
             <div className="text-center">
-              <div
-                className={`w-12 h-12 rounded-xl bg-gradient-to-br ${personaColors[personaId]} flex items-center justify-center text-white mx-auto mb-3`}
-              >
-                {personaIcons[personaId]}
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3">
+                {renderPersonaLogo(persona)}
               </div>
-              <h3 className="font-semibold text-white text-sm mb-1">
+              <h3 className="font-mono font-semibold text-primary text-sm mb-1">
                 {persona.name}
               </h3>
-              <p className="text-xs text-gray-400 leading-relaxed">
+              <p className="text-xs text-text-secondary font-mono leading-relaxed">
                 {persona.description}
               </p>
             </div>
