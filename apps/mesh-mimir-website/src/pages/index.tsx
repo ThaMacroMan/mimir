@@ -1,8 +1,12 @@
 import Head from "next/head";
 import { motion } from "framer-motion";
 import FluidBackground from "../components/FluidBackground";
-import MagicBento from "../components/MagicBento";
+import MimirHero from "../components/MimirHero";
+import PersonaSelector from "../components/PersonaSelector";
+import BentoGrid from "../components/BentoGrid";
+import CommunitySection from "../components/CommunitySection";
 import ClickCounter from "../components/ClickCounter";
+import { usePersona } from "../contexts/PersonaContext";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 60 },
@@ -19,6 +23,8 @@ const staggerChildren = {
 };
 
 export default function Home() {
+  const { selectedPersona, setSelectedPersona } = usePersona();
+
   return (
     <div className="w-full h-screen cardano-gradient-bg fixed inset-0">
       {/* Fluid Cardano logos background */}
@@ -41,7 +47,23 @@ export default function Home() {
           animate="animate"
           variants={staggerChildren}
         >
-          {/* Hero content will go here */}
+          <MimirHero />
+        </motion.section>
+
+        {/* Persona Selector - positioned right after the hero description */}
+        <motion.section
+          className="mb-16 w-full relative z-10"
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true }}
+          variants={staggerChildren}
+        >
+          <motion.div variants={fadeInUp}>
+            <PersonaSelector
+              onPersonaSelect={setSelectedPersona}
+              selectedPersona={selectedPersona}
+            />
+          </motion.div>
         </motion.section>
 
         {/* Magic Bento Grid */}
@@ -52,7 +74,18 @@ export default function Home() {
           viewport={{ once: true }}
           variants={staggerChildren}
         >
-          <MagicBento />
+          <BentoGrid />
+        </motion.section>
+
+        {/* Community Section */}
+        <motion.section
+          className="mb-16 w-full relative z-10"
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true }}
+          variants={staggerChildren}
+        >
+          <CommunitySection />
         </motion.section>
 
         {/* Click Counter Section */}
