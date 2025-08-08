@@ -380,7 +380,7 @@ export default function ResourceSidebar({
       setWidth(persistedState.width);
       setAnimatingWidth(persistedState.width);
       setHeight(persistedState.height);
-      setTop(persistedState.top);
+      setTop(Math.max(16, persistedState.top));
       if (persistedState.activeTab) {
         setActiveTab(persistedState.activeTab as TabType);
       }

@@ -130,7 +130,7 @@ export default function PersonaSelector({
 
   return (
     <div className="w-full max-w-6xl mx-auto px-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {(Object.keys(PERSONAS) as LearnerPersona[]).map((personaId, index) => {
           const persona = PERSONAS[personaId];
           const isSelected = selectedPersona === personaId;

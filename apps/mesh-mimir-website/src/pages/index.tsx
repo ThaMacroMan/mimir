@@ -42,7 +42,7 @@ export default function Home() {
       <div className="relative z-10 w-full h-full overflow-y-auto">
         {/* Hero Section */}
         <motion.section
-          className="text-center mb-16 mt-16 px-6 w-full relative z-10"
+          className="text-center mb-16 mt-4 px-6 w-full relative z-10"
           initial="initial"
           animate="animate"
           variants={staggerChildren}

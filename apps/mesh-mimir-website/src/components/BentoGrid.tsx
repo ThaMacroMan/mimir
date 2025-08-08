@@ -403,9 +403,9 @@ export default function BentoGrid() {
   }, [bentoItems.length]); // Only re-run when the number of items changes
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4">
+    <div className="w-full max-w-6xl mx-auto px-6">
       {/* Bento Grid Container */}
-      <div className="grid grid-cols-1 md:grid-cols-6 gap-6 auto-rows-[200px] justify-items-center">
+      <div className="grid grid-cols-1 md:grid-cols-6 gap-4 auto-rows-[200px]">
         {bentoItems.map((item, index) => (
           <BentoCard
             key={item.title}
