@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from .db.db import router as db_router
+from .ingest.ingest import router as ingest_router
 
 api_router = APIRouter()
-api_router.include_router(db_router, prefix="/db", tags=["db"])
+api_router.include_router(ingest_router, prefix="/ingest", tags=["ingest"])

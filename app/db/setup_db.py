@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 load_dotenv()
 import os
 import asyncpg
+import asyncio
 
 db_host = os.getenv("DB_HOST")
 db_port = int(os.getenv("DB_PORT", 5432))
@@ -101,3 +102,6 @@ async def setup_db():
     if conn:
       await conn.close()
       print("Disconnected from the database")
+
+if __name__ == "__main__":
+  asyncio.run(setup_db())
