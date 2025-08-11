@@ -179,7 +179,7 @@ async def process_file_and_update_db(file_content: str, relative_path: str, supa
 ###########################################################################################################
 
 @router.post("/")
-async def ingest_docs(req: Request, supabase: AsyncClient = Depends(get_db_client)):
+async def ingest_docs(supabase: AsyncClient = Depends(get_db_client)):
   docs_dir = pathlib.Path(__file__).resolve().parents[4] / "docs"
 
   try:
