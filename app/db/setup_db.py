@@ -20,9 +20,10 @@ CREATE EXTENSION IF NOT EXISTS vector;
 CREATE TABLE IF NOT EXISTS docs(
   id bigserial primary key,
   content text,
+  contextual_text text,
   embedding vector(1536),
   filepath text NOT NULL,
-  chunk_id text NOT NULL,
+  chunk_id INTEGER NOT NULL,
   chunk_title text NOT NULL,
   checksum text NOT NULL,
   created_at timestamptz DEFAULT now() NOT NULL,
@@ -55,10 +56,10 @@ CREATE OR REPLACE FUNCTION match_docs(
 )
 RETURNS TABLE(
   id bigint,
-  content text,
+  contextual_text text,
   similarity float,
   filepath text,
-  chunk_id text,
+  chunk_id INTEGER,
   chunk_title text,
   checksum text
 )
@@ -66,7 +67,7 @@ LANGUAGE sql STABLE
 AS $$
   SELECT
     docs.id,
-    docs.content,
+    docs.contextual_text,
     1 - (docs.embedding <=> query_embedding) AS similarity,
     docs.filepath,
     docs.chunk_id,
