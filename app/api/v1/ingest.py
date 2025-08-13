@@ -81,6 +81,7 @@ async def process_file_and_update_db(file_content: str, relative_path: str, supa
         print(f"Updating chunk: {chunk_title}")
         try:
           response = await openai_service.situate_context(file_content, current["chunk"], cache_key=cache_key)
+          await asyncio.sleep(1)
           contextual_chunk = "---".join([response, current["chunk"]])
           chunks_to_embed.append(contextual_chunk)
 
@@ -107,6 +108,7 @@ async def process_file_and_update_db(file_content: str, relative_path: str, supa
       print(f"New chunk {chunk_title}")
       try:
         response = await openai_service.situate_context(file_content, current["chunk"], cache_key=cache_key)
+        await asyncio.sleep(1)
         contextual_chunk = "---".join([response, current["chunk"]])
         chunks_to_embed.append(contextual_chunk)
         db_operations.append({
@@ -180,8 +182,8 @@ async def process_file_and_update_db(file_content: str, relative_path: str, supa
 
 @router.post("/")
 async def ingest_docs(supabase: AsyncClient = Depends(get_db_client)):
-  docs_dir = pathlib.Path(__file__).resolve().parents[4] / "docs"
-
+  docs_dir = pathlib.Path(__file__).resolve().parents[3] / "docs"
+  print(docs_dir)
   try:
     file_paths = get_file_paths(docs_dir)
   except FileNotFoundError as e:
@@ -195,21 +197,15 @@ async def ingest_docs(supabase: AsyncClient = Depends(get_db_client)):
       detail=f"An I/O error occurred while accessing the documents directory: {e}"
     )
 
-  file_processing_tasks = []
   for relative_path in file_paths:
     abs_path = docs_dir / relative_path
     try:
       file_content = get_file_content(abs_path)
-      file_processing_tasks.append(
-        process_file_and_update_db(file_content, relative_path, supabase)
-      )
+      await process_file_and_update_db(file_content, relative_path, supabase)
     except (FileNotFoundError, IOError) as e:
       print(f"Skipping file due to error: {e}")
       continue
 
-  if file_processing_tasks:
-    try:
-      await asyncio.gather(*file_processing_tasks)
     except Exception as e:
       raise HTTPException(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

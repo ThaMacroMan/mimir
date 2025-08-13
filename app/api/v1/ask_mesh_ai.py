@@ -1,3 +1,4 @@
+from typing import Literal, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
@@ -14,21 +15,27 @@ openai_service = OpenAIService()
 ###########################################################################################################
 # MODELS
 ###########################################################################################################
-class Query(BaseModel):
-  query: str
+class ChatMessage(BaseModel):
+  role: Literal["system", "user", "assistant"]
+  content: str
 
-
+class ChatCompletionRequest(BaseModel):
+  model: str
+  messages: List[ChatMessage]
+  stream: Optional[bool] = False
 
 ###########################################################################################################
 # ENDPOINTS
 ###########################################################################################################
-@router.post("/")
-async def ask_mesh_ai(body: Query, supabase: AsyncClient = Depends(get_db_client)):
+@router.post("/chat/completions")
+async def ask_mesh_ai(body: ChatCompletionRequest, supabase: AsyncClient = Depends(get_db_client)):
   try:
-    embedded_query = await openai_service.embed_query(body.query)
+    question = body.messages[-1].content
+
+    embedded_query = await openai_service.embed_query(question)
     context = await get_context(embedded_query, supabase)
-    generator = await openai_service.get_answer(question=body.query, context=context)
-    return StreamingResponse(generator, media_type="text/plain")
+    generator = openai_service.get_answer(question=question, context=context)
+    return StreamingResponse(generator, media_type="text/event-stream")
 
   except (openai.APIError, openai.AuthenticationError, openai.RateLimitError) as e:
     raise HTTPException(

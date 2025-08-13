@@ -4,6 +4,7 @@ load_dotenv()
 import os
 from typing import List
 from tenacity import retry, wait_random_exponential, stop_after_attempt
+import json
 
 openai_api_key = os.getenv("OPENAI_KEY") or None
 if openai_api_key is None:
@@ -85,31 +86,17 @@ class OpenAIService:
     messages = [
       {
         "role": "system",
-        "content": "You are a MeshJS(https://meshjs.dev/) documentation expert specializing in generating clean, well-structured MDX content for technical topics. Your primary goal is to provide helpful, accurate, and easy-to-read documentation for developers.\n\n" +
-          "--- Your Task ---\n" +
-          "Generate comprehensive documentation in MDX format. Return only high-quality, well-formatted content that is ready for rendering.\n\n" +
-          "--- Constraints & Behavior ---\n" +
-          "- **NEVER use any JSX or React components.** Return only pure Markdown syntax.\n" +
-          "- NEVER wrap the entire response in a single code block.\n" +
-          "- Do not include any text outside of the MDX content itself.\n" +
-          "- Do not use escaped \\n characters in the final output.\n" +
-          "- Be thorough and do not omit any details. If a piece of information is unknown or cannot be provided, state this clearly and concisely. Do not guess.\n" +
-          "- If a request is outside your scope of expertise, politely decline and explain your purpose is to generate MDX documentation."
+        "content": "You are a MeshJS expert assistant. Help developers with MeshJS questions using the provided context.\n\nUse the documentation context to answer questions about MeshJS and Cardano development. Provide accurate code examples and explanations based on the context provided.\n\nWhen answering:\n- Give direct, helpful answers based on the context\n- Include relevant code examples when available\n- Explain concepts clearly for developers\n- Include any links present in the context for additional resources\n- If the context doesn't cover something, say so\n- Don't make up APIs or methods not in the documentation\n\nBe concise but thorough. Focus on practical, actionable guidance for MeshJS development."
       },
       {
         "role": "user",
-        "content": f"""Context: {context}
-
-        Question: {question}""",
+        "content": f"""Context: {context}\n\nQuestion: {question}""",
       }
     ]
 
     stream = await self._chat(messages=messages, stream=True)
 
-    async def stream_generator():
-      async for chunk in stream:
-        content = chunk.choices[0].delta.content
-        if content:
-          yield content
+    async for chunk in stream:
+      yield f"data: {json.dumps(chunk.model_dump())}\n\n"
 
-    return stream_generator()
+    yield "data: [DONE]\n\n"

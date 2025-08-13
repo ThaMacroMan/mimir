@@ -74,7 +74,8 @@ AS $$
     docs.chunk_title,
     docs.checksum
   FROM docs
-  WHERE docs.embedding <=> query_embedding < 1 - match_threshold
+  WHERE 1 - (docs.embedding <=> query_embedding) > match_threshold
+  ORDER BY similarity DESC
   LIMIT match_count;
 $$;
 """

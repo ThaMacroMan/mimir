@@ -6,7 +6,7 @@ from supabase import AsyncClient
 async def get_context(embedded_query: List[float], supabase: AsyncClient) -> str:
   response = await supabase.rpc("match_docs", {
     "query_embedding": embedded_query,
-    "match_threshold": 0.6,
+    "match_threshold": 0.2,
     "match_count": 5
   }).execute()
 
