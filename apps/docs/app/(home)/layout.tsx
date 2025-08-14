@@ -158,7 +158,7 @@ const navbarLinks: LinkItemType[] = [
               </span>
             </div>
           </NavbarMenuLink>
-          <NavbarMenuLink href="https://web3.meshjs.dev/">
+          <NavbarMenuLink href="https://utxos.dev/">
             <div className="mr-3 h-5 w-5">
               {iconResolver("icons/mesh.svg")}
             </div>
@@ -229,7 +229,7 @@ const navbarLinks: LinkItemType[] = [
       <NavbarMenu>
         <NavbarMenuTrigger>Solutions</NavbarMenuTrigger>
         <NavbarMenuContent>
-          <NavbarMenuLink href="https://web3.meshjs.dev/">
+          <NavbarMenuLink href="https://utxos.dev/">
             <GlobeAltIcon className="mr-3 h-5 w-5 text-sky-500" />
             <div className="flex flex-col">
               <span className="font-medium">Web3 Services</span>
@@ -340,7 +340,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       text: "Discord",
       type: "icon",
       icon: <SiDiscord className="w-4 h-4 text-foreground" />,
-      url: "https://t.co/zWLL0PBWrv"
+      url: "https://discord.gg/WvnCNqmAxy"
     }
     ]}
   >

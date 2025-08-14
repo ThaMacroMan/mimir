@@ -39,7 +39,7 @@ export const baseOptions: BaseLayoutProps = {
       text: "Discord",
       type: "icon",
       icon: <SiDiscord className="w-4 h-4 text-foreground" />,
-      url: "https://t.co/zWLL0PBWrv"
+      url: "https://discord.gg/WvnCNqmAxy"
     }
   ],
 };
