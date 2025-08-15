@@ -23,8 +23,8 @@
       {
         "name": "next"
       }
-    ]
+    ],
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/(home)/page.mdx", "**/*.d.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/(home)/page.mdx"],
   "exclude": ["node_modules"]
 }

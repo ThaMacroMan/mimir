@@ -11,6 +11,7 @@ export const CatalystCard = (
   const h1Title = <h1>{title}</h1>
 
   return (<Card
+    title={undefined}
   >
     <h2>{title}</h2>
 
