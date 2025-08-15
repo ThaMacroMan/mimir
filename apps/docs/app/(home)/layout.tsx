@@ -285,15 +285,15 @@ const navbarLinks: LinkItemType[] = [
             <ScaleIcon className="mr-3 h-5 w-5 text-stone-500" />
             <span className="font-medium">Governance</span>
           </NavbarMenuLink>
-          <NavbarMenuLink href="https://meshjs.dev/about/catalyst">
+          <NavbarMenuLink href="/about/catalyst">
             <LightBulbIcon className="mr-3 h-5 w-5 text-emerald-500" />
             <span className="font-medium">Project Catalyst</span>
           </NavbarMenuLink>
-          <NavbarMenuLink href="https://meshjs.dev/about/support-us">
+          <NavbarMenuLink href="/about/support-us">
             <HeartIcon className="mr-3 h-5 w-5 text-pink-500" />
             <span className="font-medium">Support Us</span>
           </NavbarMenuLink>
-          <NavbarMenuLink href="https://meshjs.dev/about/branding">
+          <NavbarMenuLink href="/about/branding">
             <PaintBrushIcon className="mr-3 h-5 w-5 text-cyan-500" />
             <span className="font-medium">Branding</span>
           </NavbarMenuLink>
