@@ -230,17 +230,21 @@ export default function ResourceSidebar({
   } = useSidebarPersistence({
     sidebarId: "ai-chat-sidebar",
     defaultState: {
-      collapsed: true,
-      width: externalWidth || COLLAPSED_WIDTH,
+      collapsed: false, // Default to expanded for better UX
+      width: externalWidth || 260, // Default to a reasonable expanded width
       height: externalHeight || 800,
       top: 16,
       activeTab: "resources",
     },
   });
 
-  const [collapsed, setCollapsed] = useState(persistedState.collapsed);
-  const [width, setWidth] = useState(persistedState.width);
-  const [animatingWidth, setAnimatingWidth] = useState(persistedState.width); // For smooth transitions
+  const [collapsed, setCollapsed] = useState(
+    () => persistedState.collapsed ?? false
+  );
+  const [width, setWidth] = useState(() => persistedState.width ?? 260);
+  const [animatingWidth, setAnimatingWidth] = useState(
+    () => persistedState.width ?? 260
+  ); // For smooth transitions
   const [height, setHeight] = useState(persistedState.height); // Start with fallback, will be updated on client
   const [top, setTop] = useState(persistedState.top); // Vertical position of sidebar
   const [dragging, setDragging] = useState(false);

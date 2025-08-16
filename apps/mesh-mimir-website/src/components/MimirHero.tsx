@@ -23,7 +23,7 @@ export default function MimirHero() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentBuilderIndex(prev => (prev + 1) % builderNames.length);
-    }, 6180); // 6.18 seconds
+    }, 12360); // 12.36 seconds (doubled from 6.18)
 
     return () => clearInterval(interval);
   }, [builderNames.length]);
@@ -59,7 +59,7 @@ export default function MimirHero() {
   }, [targetText]);
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4">
+    <div className="w-full max-w-7xl mx-auto px-6">
       {/* Mimir Badge - now much larger, with "powered by MeshJS" inside */}
       <motion.div
         className="flex justify-center"

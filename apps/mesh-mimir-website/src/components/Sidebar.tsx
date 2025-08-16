@@ -60,8 +60,8 @@ export default function Sidebar() {
   } = useSidebarPersistence({
     sidebarId: "main-sidebar",
     defaultState: {
-      collapsed: true,
-      width: COLLAPSED_WIDTH,
+      collapsed: false, // Default to expanded for better UX
+      width: 260, // Default to a reasonable expanded width
       height: 800,
       top: 16,
       openSections: sections.map(() => true),
@@ -72,9 +72,13 @@ export default function Sidebar() {
     () => persistedState.openSections || sections.map(() => true)
   );
   const [selectedSection, setSelectedSection] = useState(0); // Track which section is selected
-  const [collapsed, setCollapsed] = useState(persistedState.collapsed);
-  const [width, setWidth] = useState(persistedState.width);
-  const [animatingWidth, setAnimatingWidth] = useState(persistedState.width); // For smooth transitions
+  const [collapsed, setCollapsed] = useState(
+    () => persistedState.collapsed ?? false
+  );
+  const [width, setWidth] = useState(() => persistedState.width ?? 260);
+  const [animatingWidth, setAnimatingWidth] = useState(
+    () => persistedState.width ?? 260
+  ); // For smooth transitions
   const [height, setHeight] = useState(persistedState.height); // Start with fallback, will be updated on client
   const [top, setTop] = useState(persistedState.top); // Vertical position of sidebar
   const [dragging, setDragging] = useState(false);

@@ -129,7 +129,7 @@ export default function PersonaSelector({
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-6">
+    <div className="w-full max-w-5xl mx-auto px-2">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {(Object.keys(PERSONAS) as LearnerPersona[]).map((personaId, index) => {
           const persona = PERSONAS[personaId];
@@ -143,13 +143,13 @@ export default function PersonaSelector({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
-              className="relative group"
+              className="relative group flex justify-center"
             >
               <motion.button
                 onClick={() => onPersonaSelect(personaId)}
                 onMouseEnter={() => setHoveredPersona(personaId)}
                 onMouseLeave={() => setHoveredPersona(null)}
-                className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 relative overflow-hidden ${
+                className={`w-80 p-4 rounded-2xl border-2 transition-all duration-300 relative overflow-hidden ${
                   isSelected
                     ? "border-primary bg-primary/10 shadow-lg shadow-primary/20"
                     : "border-gray-700 bg-surface/30 hover:border-primary/50 hover:bg-surface/50"
@@ -169,7 +169,7 @@ export default function PersonaSelector({
                 )}
 
                 {/* Content with logo on the left */}
-                <div className="relative z-10 flex items-center gap-4">
+                <div className="relative z-10 flex items-center gap-3">
                   {/* Logo */}
                   <div className="flex-shrink-0">
                     {renderPersonaLogo(persona)}
@@ -177,11 +177,11 @@ export default function PersonaSelector({
 
                   {/* Text content */}
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-xl font-mono font-semibold text-primary mb-2">
+                    <h3 className="text-base font-mono font-semibold text-primary mb-1">
                       {persona.name}
                     </h3>
                     <p
-                      className={`text-text-secondary text-sm leading-relaxed font-mono ${
+                      className={`text-text-secondary text-xs leading-tight font-mono ${
                         isDecrypting && isCurrentlyChanging
                           ? "text-text-secondary/80"
                           : "text-text-secondary"

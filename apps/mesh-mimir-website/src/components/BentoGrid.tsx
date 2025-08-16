@@ -47,7 +47,7 @@ const getBentoItems = (persona: LearnerPersona | null): BentoItem[] => {
           description:
             "Take your first steps into AI-powered development. No experience needed.",
           icon: <Play className="w-8 h-8" />,
-          className: "col-span-3 row-span-4",
+          className: "col-span-1 md:col-start-2 row-span-4",
           href: "/docs/ai-tools",
           isHero: true,
           size: "mega",
@@ -82,7 +82,7 @@ const getBentoItems = (persona: LearnerPersona | null): BentoItem[] => {
           description:
             "Understand blockchain and Cardano fundamentals in simple terms.",
           icon: <BookOpen className="w-8 h-8" />,
-          className: "col-span-3 row-span-4",
+          className: "col-span-1 md:col-start-4 row-span-4",
           href: "/docs/cardano-basics",
           size: "mega",
           isContainer: true,
@@ -157,6 +157,7 @@ const getBentoItems = (persona: LearnerPersona | null): BentoItem[] => {
           icon: <Code className="w-8 h-8" />,
           className: "col-span-3 row-span-4",
           href: "/docs/build",
+          isHero: true,
           size: "mega",
           isContainer: true,
           children: [
@@ -229,6 +230,7 @@ const getBentoItems = (persona: LearnerPersona | null): BentoItem[] => {
           icon: <Code className="w-8 h-8" />,
           className: "col-span-3 row-span-4",
           href: "/docs/advanced-cardano",
+          isHero: true,
           size: "mega",
           isContainer: true,
           children: [
@@ -305,6 +307,7 @@ const getBentoItems = (persona: LearnerPersona | null): BentoItem[] => {
           icon: <Code className="w-8 h-8" />,
           className: "col-span-3 row-span-4",
           href: "/docs/build",
+          isHero: true,
           size: "mega",
           isContainer: true,
           children: [
@@ -403,9 +406,9 @@ export default function BentoGrid() {
   }, [bentoItems.length]); // Only re-run when the number of items changes
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-6">
+    <div className="w-full max-w-5xl mx-auto px-6">
       {/* Bento Grid Container */}
-      <div className="grid grid-cols-1 md:grid-cols-6 gap-4 auto-rows-[200px]">
+      <div className="grid grid-cols-1 md:grid-cols-6 gap-2 auto-rows-[200px]">
         {bentoItems.map((item, index) => (
           <BentoCard
             key={item.title}

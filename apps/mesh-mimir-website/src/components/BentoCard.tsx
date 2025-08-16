@@ -156,7 +156,7 @@ export default function BentoCard({
               <h3
                 className={`font-mono font-bold text-primary group-hover:text-secondary transition-colors duration-300 ${
                   item.isHero
-                    ? "text-3xl md:text-4xl"
+                    ? "text-2xl"
                     : isSubCard
                       ? "text-sm md:text-base"
                       : "text-lg md:text-xl"
@@ -168,11 +168,7 @@ export default function BentoCard({
 
             <p
               className={`font-mono text-text-secondary leading-relaxed group-hover:text-text-primary transition-colors duration-300 ${
-                item.isHero
-                  ? "text-base md:text-lg"
-                  : isSubCard
-                    ? "text-xs md:text-sm"
-                    : "text-sm md:text-base"
+                item.isHero ? "text-base" : isSubCard ? "text-sm" : "text-base"
               }`}
             >
               {item.description}
@@ -212,12 +208,12 @@ export default function BentoCard({
                         <div className="text-primary group-hover:text-secondary transition-colors duration-200">
                           {child.icon}
                         </div>
-                        <h4 className="text-xs font-mono font-semibold text-primary group-hover:text-secondary transition-colors duration-200">
+                        <h4 className="text-sm font-mono font-semibold text-primary group-hover:text-secondary transition-colors duration-200">
                           {child.title}
                         </h4>
                       </div>
                       <div className="flex items-center justify-between">
-                        <p className="text-xs font-mono text-text-secondary group-hover:text-text-primary transition-colors duration-200 leading-tight">
+                        <p className="text-sm font-mono text-text-secondary group-hover:text-text-primary transition-colors duration-200 leading-tight">
                           {child.description}
                         </p>
                         <div className="text-xs text-primary/60 group-hover:text-primary transition-colors duration-200">
@@ -238,11 +234,11 @@ export default function BentoCard({
                         <div className="text-primary group-hover:text-secondary transition-colors duration-200">
                           {child.icon}
                         </div>
-                        <h4 className="text-xs font-mono font-semibold text-primary group-hover:text-secondary transition-colors duration-200">
+                        <h4 className="text-sm font-mono font-semibold text-primary group-hover:text-secondary transition-colors duration-200">
                           {child.title}
                         </h4>
                       </div>
-                      <p className="text-xs text-text-secondary group-hover:text-text-primary transition-colors duration-200 leading-tight">
+                      <p className="text-sm font-mono text-text-secondary group-hover:text-text-primary transition-colors duration-200 leading-tight">
                         {child.description}
                       </p>
                     </motion.div>
