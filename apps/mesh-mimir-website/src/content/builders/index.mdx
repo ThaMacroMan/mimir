@@ -1,0 +1,86 @@
+---
+title: "Builder Onboarding"
+description: "Start here: simple AI tooling overview and a gentle Cardano introduction."
+---
+
+# New Builder: Start Here
+
+Welcome. This track is designed to get you productive fast, without assuming prior blockchain or AI experience.
+
+<Callout type="info" title="What you’ll achieve">
+  - Understand which AI tools to use first (and why) - Learn the day‑to‑day
+  workflow we expect you to follow - Get a clear mental model of Cardano
+  fundamentals
+</Callout>
+
+## AI coding tools (the simple starting set)
+
+### ChatGPT (Beginner‑friendly)
+
+- **What it is**: A general AI assistant for questions, explanations, and quick guidance.
+- **When to use**: Brainstorming, concept explanations, step‑by‑step walkthroughs.
+- **Plans**: Free tier is fine to start; paid offers better reasoning and longer context.
+
+### Cursor (Beginner → Intermediate)
+
+- **What it is**: A code editor with built‑in AI that edits files, runs diffs, and helps refactor.
+- **When to use**: Implementing changes, navigating a codebase, creating components/pages, applying edits.
+- **Plans**: Free to start; paid tiers unlock longer context and faster assistance.
+
+### Windsurf (Optional, Cardano‑focused)
+
+- **What it is**: AI assistant tuned for blockchain workflows and repo‑scale tasks.
+- **When to use**: Larger refactors, new feature scaffolds, or Cardano‑specific guidance.
+- **Plans**: Paid tiers recommended for heavier usage.
+
+<Callout type="success" title="Keep it simple">
+  Start with ChatGPT for understanding, then move to Cursor as soon as you’re
+  ready to write and modify code inside the repo. Windsurf is helpful later for
+  larger tasks.
+</Callout>
+
+## How we use AI day‑to‑day
+
+- **Small, focused tasks**: Ask for one change at a time. Avoid multi‑goal prompts.
+- **Structured prompts**: Provide file paths, constraints, acceptance criteria.
+- **Edits, not walls of code**: Prefer file edits and diffs over pasted blobs.
+- **Review everything**: Never merge AI output blindly. Run, test, verify.
+- **Tight feedback loop**: Build → Run → Inspect → Iterate.
+
+### Minimal setup checklist
+
+- Create a **ChatGPT** account (free tier OK).
+- Install **Cursor** and sign in.
+- Ensure **Node 18+** is installed.
+- Optionally create a **Windsurf** account for later phases.
+
+<Callout type="warning" title="Security">
+  Never share seed phrases or private keys with any AI tool. Use test wallets
+  for development. Keep secrets in environment variables, not committed to git.
+</Callout>
+
+## Cardano in 5 minutes (mental model)
+
+- **Asset & unit**: ADA (smallest unit: Lovelace).
+- **Wallets**: Manage keys and addresses; connect via browser wallets or SDKs.
+- **UTXO model**: Transactions consume UTXOs and produce new ones; think of them like spendable “bills.”
+- **Networks**: Mainnet (real ADA) vs Testnets (practice). We’ll use a test network for learning.
+- **Providers**: Third‑party APIs (e.g., Blockfrost) to query chain data without running a node.
+
+### What this means for you
+
+- You’ll build transactions by selecting inputs (UTXOs) and outputs.
+- You’ll use a wallet integration (Mesh React hooks/components) for UX.
+- You’ll call a provider for data (balances, UTXOs, status).
+
+## What’s next
+
+- Set up your AI tools and editor preferences.
+- Learn the repo’s structure and how we author content with MDX.
+- Prepare a test wallet and provider key (we’ll show you when needed).
+
+<Callout type="info" title="You’re on track">
+  Next, we’ll move into practical flows: repository navigation, branching, and
+  your first change requests. No on‑chain code yet—just confidence with the
+  workflow.
+</Callout>

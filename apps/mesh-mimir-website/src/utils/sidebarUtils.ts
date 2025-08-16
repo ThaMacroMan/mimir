@@ -160,6 +160,11 @@ export function getSidebarSections(
             icon: "Rocket",
             items: [
               {
+                label: "Builder Track",
+                href: "/docs/builders",
+                difficulty: "intermediate",
+              },
+              {
                 label: "First Transaction",
                 href: "/guides/first_transaction",
                 difficulty: "intermediate",
@@ -384,6 +389,11 @@ export function getSidebarSections(
               {
                 label: "Windsurf Setup",
                 href: "/docs/ai-tools/windsurf-setup",
+                difficulty: "beginner",
+              },
+              {
+                label: "Builder Track",
+                href: "/docs/builders",
                 difficulty: "beginner",
               },
               {

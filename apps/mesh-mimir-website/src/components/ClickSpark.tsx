@@ -164,7 +164,7 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
         position: "relative",
         width: "100%",
         height: "100%",
-        zIndex: 9999,
+        zIndex: 9999
       }}
       onClick={handleClick}
     >
@@ -179,7 +179,7 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
           top: 0,
           left: 0,
           pointerEvents: "none",
-          zIndex: 10000,
+          zIndex: 10000
         }}
       />
       {children}
