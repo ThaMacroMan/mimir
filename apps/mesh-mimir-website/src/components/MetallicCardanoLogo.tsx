@@ -69,14 +69,16 @@ export function parseLogoImage(file: File) {
       const shapeCtx = shapeCanvas.getContext("2d");
       shapeCtx?.drawImage(img, 0, 0, width, height);
 
-      const shapeImageData = shapeCtx?.getImageData(0, 0, width, height);
-      if (!shapeImageData) {
+      // Create a mask for the logo (blue parts only)
+      const originalImageData = shapeCtx?.getImageData(0, 0, width, height);
+      if (!originalImageData) {
         reject(new Error("Failed to get image data"));
         return;
       }
 
-      const data = shapeImageData.data;
-      const shapeMask = new Array(width * height).fill(false);
+      const data = originalImageData.data;
+      const logoMask = new Array(width * height).fill(false);
+
       for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
           const idx4 = (y * width + x) * 4;
@@ -84,106 +86,40 @@ export function parseLogoImage(file: File) {
           const g = data[idx4 + 1];
           const b = data[idx4 + 2];
           const a = data[idx4 + 3];
-          shapeMask[y * width + x] = !(
-            (r === 255 && g === 255 && b === 255 && a === 255) ||
-            a === 0
-          );
+
+          // Detect blue logo pixels (the actual logo parts)
+          // Look for blue-ish pixels with good alpha
+          const isBlue = b > r && b > g && a > 100;
+          logoMask[y * width + x] = isBlue;
         }
       }
 
-      function inside(x: number, y: number) {
-        if (x < 0 || x >= width || y < 0 || y >= height) return false;
-        return shapeMask[y * width + x];
-      }
-
-      const boundaryMask = new Array(width * height).fill(false);
-      for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
-          const idx = y * width + x;
-          if (!shapeMask[idx]) continue;
-          let isBoundary = false;
-          for (let ny = y - 1; ny <= y + 1 && !isBoundary; ny++) {
-            for (let nx = x - 1; nx <= x + 1 && !isBoundary; nx++) {
-              if (!inside(nx, ny)) {
-                isBoundary = true;
-              }
-            }
-          }
-          if (isBoundary) {
-            boundaryMask[idx] = true;
-          }
-        }
-      }
-
-      const interiorMask = new Array(width * height).fill(false);
-      for (let y = 1; y < height - 1; y++) {
-        for (let x = 1; x < width - 1; x++) {
-          const idx = y * width + x;
-          if (
-            shapeMask[idx] &&
-            shapeMask[idx - 1] &&
-            shapeMask[idx + 1] &&
-            shapeMask[idx - width] &&
-            shapeMask[idx + width]
-          ) {
-            interiorMask[idx] = true;
-          }
-        }
-      }
-
-      const u = new Float32Array(width * height).fill(0);
-      const newU = new Float32Array(width * height).fill(0);
-      const C = 0.01;
-      const ITERATIONS = 300;
-
-      function getU(x: number, y: number, arr: Float32Array) {
-        if (x < 0 || x >= width || y < 0 || y >= height) return 0;
-        if (!shapeMask[y * width + x]) return 0;
-        return arr[y * width + x];
-      }
-
-      for (let iter = 0; iter < ITERATIONS; iter++) {
-        for (let y = 0; y < height; y++) {
-          for (let x = 0; x < width; x++) {
-            const idx = y * width + x;
-            if (!shapeMask[idx] || boundaryMask[idx]) {
-              newU[idx] = 0;
-              continue;
-            }
-            const sumN =
-              getU(x + 1, y, u) +
-              getU(x - 1, y, u) +
-              getU(x, y + 1, u) +
-              getU(x, y - 1, u);
-            newU[idx] = (C + sumN) / 4;
-          }
-        }
-        u.set(newU);
-      }
-
-      let maxVal = 0;
-      for (let i = 0; i < width * height; i++) {
-        if (u[i] > maxVal) maxVal = u[i];
-      }
-      const alpha = 2.0;
+      // Create grayscale image with logo mask
       const outImg = ctx.createImageData(width, height);
       for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
           const idx = y * width + x;
           const px = idx * 4;
-          if (!shapeMask[idx]) {
-            outImg.data[px] = 255;
-            outImg.data[px + 1] = 255;
-            outImg.data[px + 2] = 255;
-            outImg.data[px + 3] = 255;
-          } else {
-            const raw = u[idx] / maxVal;
-            const remapped = Math.pow(raw, alpha);
-            const gray = 255 * (1 - remapped);
+          const origPx = idx * 4;
+
+          const r = data[origPx];
+          const g = data[origPx + 1];
+          const b = data[origPx + 2];
+          const a = data[origPx + 3];
+
+          if (logoMask[idx]) {
+            // For logo pixels, create grayscale for metallic effect
+            const gray = 0.299 * r + 0.587 * g + 0.114 * b;
             outImg.data[px] = gray;
             outImg.data[px + 1] = gray;
             outImg.data[px + 2] = gray;
-            outImg.data[px + 3] = 255;
+            outImg.data[px + 3] = a;
+          } else {
+            // For non-logo pixels, make them transparent
+            outImg.data[px] = 255;
+            outImg.data[px + 1] = 255;
+            outImg.data[px + 2] = 255;
+            outImg.data[px + 3] = 0;
           }
         }
       }
@@ -542,7 +478,7 @@ export default function MetallicPaint({
       const side = 1000;
       canvasEl.width = side * devicePixelRatio;
       canvasEl.height = side * devicePixelRatio;
-      gl.viewport(0, 0, canvasEl.height, canvasEl.height);
+      gl.viewport(0, 0, canvasEl.width, canvasEl.height);
       gl.uniform1f(uniforms.u_ratio, 1);
       gl.uniform1f(uniforms.u_img_ratio, imgRatio);
     }
@@ -627,7 +563,7 @@ export function MetallicCardanoLogo({
 
         // Fetch the Cardano logo as a blob
         const response = await fetch(
-          "/cardano_we_logos/PNG/Cardano-RGB_Logo-Icon-Blue.png"
+          "/cardano_we_logos/cardanologo_border_blue.002.png"
         );
         const blob = await response.blob();
         const file = new File([blob], "cardano-logo.png", {
