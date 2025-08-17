@@ -1,4 +1,4 @@
-import { DocsLayout } from 'fumadocs-ui/layouts/notebook';
+import { DocsLayout } from 'fumadocs-ui/layouts/docs';
 import type { ReactNode } from 'react';
 import { baseOptions } from '@/app/layout.config';
 import { source } from '@/lib/source';
@@ -13,7 +13,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     <DocsLayout
       {...baseOptions}
       tree={source.pageTree}
-      nav={{ ...baseOptions.nav, mode: 'top' }}
+      links={baseOptions.links?.filter(item => item.type === "icon")}
       searchToggle={{
         components: {
           lg: (
@@ -29,11 +29,31 @@ export default function Layout({ children }: { children: ReactNode }) {
                   }),
                 )}
               >
-                <Sparkles className="size-4" />
+                <Sparkles className="size-4 mr-2" />
+                Mesh AI
               </AISearchTrigger>
             </div>
           ),
         },
+      }}
+      nav={{ ...baseOptions.nav, children: (
+        <AISearchTrigger
+          className={cn(
+            buttonVariants({
+              color: 'secondary',
+              size: 'sm',
+              className:
+                'absolute left-1/2 top-1/2 -translate-1/2 text-fd-muted-foreground rounded-full gap-2 md:hidden',
+            }),
+          )}
+        >
+          <Sparkles className="size-4.5 fill-current" />
+          Ask Mesh AI
+        </AISearchTrigger>
+      ),
+    }}
+    sidebar={{
+        collapsible: false
       }}
     >
       {children}

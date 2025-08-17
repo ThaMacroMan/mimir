@@ -309,7 +309,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       components: {
         lg: (
           <div className="flex gap-1.5 max-md:hidden">
-            <LargeSearchToggle className="flex-1" />
+            <LargeSearchToggle className="flex-1 w-72" />
             <AISearchTrigger
               aria-label="Ask AI"
               className={cn(
@@ -318,9 +318,11 @@ export default function Layout({ children }: { children: ReactNode }) {
                   size: 'icon',
                   className: 'text-fd-muted-foreground',
                 }),
+                "flex gap-2"
               )}
             >
               <Sparkles className="size-4" />
+              Ask Mesh AI
             </AISearchTrigger>
           </div>
         ),
