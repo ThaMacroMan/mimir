@@ -2,7 +2,7 @@ import { DocsLayout } from 'fumadocs-ui/layouts/docs';
 import type { ReactNode } from 'react';
 import { baseOptions } from '@/app/layout.config';
 import { source } from '@/lib/source';
-import { LargeSearchToggle } from 'fumadocs-ui/components/layout/search-toggle';
+import { LargeSearchToggle, SearchToggle } from 'fumadocs-ui/components/layout/search-toggle';
 import { Sparkles } from 'lucide-react';
 import { AISearchTrigger } from '@/components/ai';
 import { cn } from '@/lib/cn';
@@ -34,24 +34,24 @@ export default function Layout({ children }: { children: ReactNode }) {
               </AISearchTrigger>
             </div>
           ),
+          sm: (
+            <div className="flex justify-end items-center gap-1 md:hidden">
+              <SearchToggle />
+              <AISearchTrigger
+                className={cn(
+                  buttonVariants({
+                    color: 'secondary',
+                    size: 'sm',
+                    className: 'text-fd-muted-foreground rounded-lg',
+                  }),
+                )}
+              >
+                <Sparkles className="size-4.5 fill-current" />
+              </AISearchTrigger>
+            </div>
+          )
         },
       }}
-      nav={{ ...baseOptions.nav, children: (
-        <AISearchTrigger
-          className={cn(
-            buttonVariants({
-              color: 'secondary',
-              size: 'sm',
-              className:
-                'absolute left-1/2 top-1/2 -translate-1/2 text-fd-muted-foreground rounded-full gap-2 md:hidden',
-            }),
-          )}
-        >
-          <Sparkles className="size-4.5 fill-current" />
-          Ask Mesh AI
-        </AISearchTrigger>
-      ),
-    }}
     sidebar={{
         collapsible: false
       }}
