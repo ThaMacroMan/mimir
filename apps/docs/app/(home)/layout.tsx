@@ -1,8 +1,6 @@
 import type { ReactNode } from 'react';
 import { HomeLayout } from 'fumadocs-ui/layouts/home';
 import { baseOptions } from '@/app/layout.config';
-import Image from 'next/image';
-import Link from "fumadocs-core/link";
 import {
   NavbarMenu,
   NavbarMenuContent,
@@ -22,6 +20,7 @@ import { Sparkles } from 'lucide-react';
 import { AISearchTrigger } from '@/components/ai';
 import { cn } from '@/lib/cn';
 import { buttonVariants } from '@/components/ui/button';
+import Footer from '@/components/ui/Footer';
 
 const navbarLinks: LinkItemType[] = [
   {
@@ -303,7 +302,6 @@ const navbarLinks: LinkItemType[] = [
   },
 ];
 
-
 export default function Layout({ children }: { children: ReactNode }) {
   return <HomeLayout
     {...baseOptions}
@@ -330,61 +328,23 @@ export default function Layout({ children }: { children: ReactNode }) {
     }}
     links={[
       ...navbarLinks,
-    {
-      text: "X",
-      type: "icon",
-      icon: <SiX className="w-4 h-4 text-foreground" />,
-      url: "https://x.com/meshsdk/"
-    },
-    {
-      text: "Discord",
-      type: "icon",
-      icon: <SiDiscord className="w-4 h-4 text-foreground" />,
-      url: "https://discord.gg/WvnCNqmAxy"
-    }
+      {
+        text: "X",
+        type: "icon",
+        icon: <SiX className="w-4 h-4 text-foreground" />,
+        url: "https://x.com/meshsdk/"
+      },
+      {
+        text: "Discord",
+        type: "icon",
+        icon: <SiDiscord className="w-4 h-4 text-foreground" />,
+        url: "https://discord.gg/WvnCNqmAxy"
+      }
     ]}
   >
     <Banner />
     {children}
     <Footer />
   </HomeLayout>;
-}
-
-function Footer() {
-  return (
-    <footer className="mt-16 border-t border-border bg-fd-card py-12 text-muted-foreground">
-      <div className="container flex flex-col gap-12">
-        <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-10">
-          <div className="flex flex-col gap-2 min-w-[200px]">
-            <div className="flex items-center gap-2">
-              <Image
-                src="/logo-mesh/black/logo-mesh-vector.svg"
-                width={40}
-                height={40}
-                alt="Mesh Logo"
-                className="dark:invert"
-              />
-              <span className="text-xl font-semibold text-foreground">Mesh</span>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Mesh is an open-source library to build Web3 applications.
-            </p>
-          </div>
-        </div>
-
-        <div className="border-t border-border pt-8 text-center text-sm">
-          <p>
-            &copy; 2025 Mesh.{' '}
-            <Link
-              href="https://github.com/MeshJS/mesh/blob/main/LICENSE.md"
-              className="underline hover:text-foreground transition-colors"
-            >
-              Apache-2.0 license.
-            </Link>
-          </p>
-        </div>
-      </div>
-    </footer>
-  );
 }
 

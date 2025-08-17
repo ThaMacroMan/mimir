@@ -1,4 +1,4 @@
-import { DocsLayout } from 'fumadocs-ui/layouts/docs';
+import { DocsLayout } from 'fumadocs-ui/layouts/notebook';
 import type { ReactNode } from 'react';
 import { baseOptions } from '@/app/layout.config';
 import { source } from '@/lib/source';
@@ -11,7 +11,9 @@ import { buttonVariants } from '@/components/ui/button';
 export default function Layout({ children }: { children: ReactNode }) {
   return (
     <DocsLayout
-      tree={source.pageTree} {...baseOptions}
+      {...baseOptions}
+      tree={source.pageTree}
+      nav={{ ...baseOptions.nav, mode: 'top' }}
       searchToggle={{
         components: {
           lg: (
