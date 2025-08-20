@@ -1,0 +1,62 @@
+---
+alwaysApply: true
+description: Mnemos project roadmap and deliverables
+---
+
+# Mnemos ‑ Cardano Beginners Guide
+
+The Mnemos initiative aims to transform absolute beginners into proficient Cardano developers by leveraging modern AI tooling and carefully-curated learning material.
+
+## Phase 1 – ‘0 → 1, but with AI’
+
+The core of Phase 1 is to build an approachable learning pipeline that walks a newcomer through AI-powered tooling, Mnemos utilities, and hands-on practice.
+
+### Objectives (must all be addressed)
+
+1. Survey and document the available AI tools (Cursor, Windsurf, ChatGPT).
+2. Explain usage patterns for each tool (terminal commands, folder structure, prompt design, dependency installation).
+3. Provide setup instructions (settings, plan tiers – free vs paid).
+4. Introduce Mnemos utilities (MCP, pre-built prompts & rules, templates, `npx meshjs-<app-name>` scaffolding).
+5. Walk through Mnemos setup (MCP, docs indexing, configuration).
+6. Demonstrate day-to-day usage of Mnemos utilities.
+7. Build a first ‘hello-world’ Cardano project – simple, small, approachable.
+8. Supply a goal-oriented, provable practice workflow (consider incentives for completion).
+9. Cover design theory & advanced AI tips.
+10. GitHub workflow primer (branches, PRs, CI checks).
+11. Overview of Cardano developer APIs (Blockfrost, Taptools, Charlie3, DexHunter, etc.).
+12. Produce how-to videos, live coding sessions, and host interactive classes.
+
+### Deliverables
+
+- [ ] Public MNEMOS marketing/landing website (Next.js + Tailwind).
+- [ ] Simplified docs & guides accessible to non-technical builders (MDX + search).
+- [ ] Recorded live-coding sessions (Mesh YouTube).
+- [ ] Step-by-step how-to videos (Mesh YouTube).
+- [ ] Community forum channel on Mesh Discord.
+
+### Evidence of Completion
+
+Provide public URLs for:
+
+1. Deployed MNEMOS website.
+2. Docs & guides repository (open-source, SEO & AI-optimised).
+3. Live-coding session recordings.
+4. How-to video playlist.
+5. Open-source MNEMOS GitHub repos (with license).
+6. MNEMOS discussion channel in Mesh Discord.
+
+---
+
+## How to Use This Rule
+
+When suggesting or implementing code:
+
+1. Default to the best-practice guidelines from [nextjs-best-practices.mdc](mdc:nextjs-best-practices.mdc).
+2. Align tasks, components, and folder structure with the objectives and deliverables above.
+3. Keep PRs small and focused on a single objective.
+4. Attach evidence links in PR descriptions when a deliverable is met.
+5. Update this rule file’s checklists as items are completed (tick the boxes).
+
+---
+
+_Let’s build the next generation of Cardano developers, one AI-assisted step at a time._
