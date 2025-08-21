@@ -14,13 +14,16 @@ import {
   SiDiscord,
   SiX
 } from "@icons-pack/react-simple-icons";
-import Banner from '@/components/ui/Banner';
+import { Banner } from 'fumadocs-ui/components/banner';
 import { LargeSearchToggle, SearchToggle } from 'fumadocs-ui/components/layout/search-toggle';
 import { Sparkles } from 'lucide-react';
 import { AISearchTrigger } from '@/components/ai';
 import { cn } from '@/lib/cn';
 import { buttonVariants } from '@/components/ui/button';
 import Footer from '@/components/ui/Footer';
+import Link from 'fumadocs-core/link';
+import { WrapperLayout } from '@/components/layout/WrapperLayout';
+import { AISidebarProvider } from '../../context/AISidebarContext';
 
 const navbarLinks: LinkItemType[] = [
   {
@@ -303,66 +306,91 @@ const navbarLinks: LinkItemType[] = [
 ];
 
 export default function Layout({ children }: { children: ReactNode }) {
-  return <HomeLayout
-    {...baseOptions}
-    searchToggle={{
-      components: {
-        lg: (
-          <div className="flex gap-1.5 max-md:hidden">
-            <LargeSearchToggle className="flex-1 w-72" />
-            <AISearchTrigger
-              aria-label="Ask AI"
-              className={cn(
-                buttonVariants({
-                  color: 'outline',
-                  size: 'icon',
-                  className: 'text-fd-muted-foreground',
-                }),
-                "flex gap-2"
-              )}
-            >
-              <Sparkles className="size-4" />
-              Ask Mesh AI
-            </AISearchTrigger>
-          </div>
-        ),
-        sm: (
-          <div className="flex justify-end items-center gap-1 md:hidden">
-            <SearchToggle />
-            <AISearchTrigger
-              className={cn(
-                buttonVariants({
-                  color: 'secondary',
-                  size: 'sm',
-                  className: 'text-fd-muted-foreground rounded-lg',
-                }),
-              )}
-            >
-              <Sparkles className="size-4.5 fill-current" />
-            </AISearchTrigger>
-          </div>
-        )
-      },
-    }}
-    links={[
-      ...navbarLinks,
-      {
-        text: "X",
-        type: "icon",
-        icon: <SiX className="w-4 h-4 text-foreground" />,
-        url: "https://x.com/meshsdk/"
-      },
-      {
-        text: "Discord",
-        type: "icon",
-        icon: <SiDiscord className="w-4 h-4 text-foreground" />,
-        url: "https://discord.gg/WvnCNqmAxy"
-      }
-    ]}
-  >
-    <Banner />
-    {children}
-    <Footer />
-  </HomeLayout>;
+  return (
+  <AISidebarProvider>
+    <div className="flex flex-col">
+      <Banner
+        id="mesh-banner"
+        variant="rainbow"
+        className='border'
+        rainbowColors={[
+          '#232323',
+          'white',
+          'transparent',
+        ]}
+      >
+        🎉 Mesh now provides LLMs.txt to give you better AI coding assistance for Cardano development. You can find it at
+          <Link
+            href="/llms.txt"
+            className="underline underline-offset-4 decoration-2 ml-1"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            /llms.txt
+          </Link>
+      </Banner>
+      <HomeLayout
+        {...baseOptions}
+        searchToggle={{
+          components: {
+            lg: (
+              <div className="flex justify-end gap-1.5 max-md:hidden">
+                <LargeSearchToggle className="flex-1 w-72" />
+                <AISearchTrigger
+                  aria-label="Ask AI"
+                  className={cn(
+                    buttonVariants({
+                      color: 'outline',
+                      size: 'icon',
+                      className: 'text-fd-muted-foreground',
+                    }),
+                    "flex gap-2"
+                  )}
+                >
+                  <Sparkles className="size-4" />
+                  Ask Mesh AI
+                </AISearchTrigger>
+              </div>
+            ),
+            sm: (
+              <div className="flex justify-end items-center gap-1 md:hidden">
+                <SearchToggle />
+                <AISearchTrigger
+                  className={cn(
+                    buttonVariants({
+                      color: 'secondary',
+                      size: 'sm',
+                      className: 'text-fd-muted-foreground rounded-lg',
+                    }),
+                  )}
+                >
+                  <Sparkles className="size-4.5 fill-current" />
+                </AISearchTrigger>
+              </div>
+            )
+          },
+        }}
+        links={[
+          ...navbarLinks,
+          {
+            text: "X",
+            type: "icon",
+            icon: <SiX className="w-4 h-4 text-foreground" />,
+            url: "https://x.com/meshsdk/"
+          },
+          {
+            text: "Discord",
+            type: "icon",
+            icon: <SiDiscord className="w-4 h-4 text-foreground" />,
+            url: "https://discord.gg/WvnCNqmAxy"
+          }
+        ]}
+      >
+        <WrapperLayout isHomeLayout={true}>{children}</WrapperLayout>
+        <Footer />
+      </HomeLayout>
+    </div>
+  </AISidebarProvider>
+  )
 }
 

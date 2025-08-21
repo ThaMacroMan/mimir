@@ -7,9 +7,12 @@ import { Sparkles } from 'lucide-react';
 import { AISearchTrigger } from '@/components/ai';
 import { cn } from '@/lib/cn';
 import { buttonVariants } from '@/components/ui/button';
+import { WrapperLayout } from '@/components/layout/WrapperLayout';
+import { AISidebarProvider } from '../../context/AISidebarContext';
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
+  <AISidebarProvider>
     <DocsLayout
       {...baseOptions}
       tree={source.pageTree}
@@ -53,10 +56,13 @@ export default function Layout({ children }: { children: ReactNode }) {
         },
       }}
     sidebar={{
-        collapsible: false
+        collapsible: false,
       }}
     >
-      {children}
+        <WrapperLayout isHomeLayout={false}>
+          {children}
+        </WrapperLayout>
     </DocsLayout>
+  </AISidebarProvider>
   );
 }
