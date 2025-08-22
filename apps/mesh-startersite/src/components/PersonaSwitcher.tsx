@@ -91,9 +91,9 @@ export default function PersonaSwitcher({
                 ease: "easeOut",
                 scale: { duration: 0.2 },
               }}
-              className="absolute bottom-full -left-4 -right-4 mb-3 bg-surface-elevated backdrop-blur-md border border-border rounded-lg shadow-xl z-50"
+              className="absolute bottom-full left-0 right-0 mb-3 bg-surface-elevated backdrop-blur-md border border-border rounded-lg shadow-xl z-50 max-w-[calc(100vw-32px)]"
             >
-              <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-3 py-2">
+              <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-3 py-2 border-b border-border/30">
                 Select Your Path
               </div>
               {(Object.keys(PERSONAS) as LearnerPersona[]).map(personaId => {
@@ -114,11 +114,11 @@ export default function PersonaSwitcher({
                     }`}
                   >
                     {renderPersonaLogo(persona)}
-                    <div className="flex-1">
-                      <div className="font-mono font-semibold text-primary">
+                    <div className="flex-1 min-w-0">
+                      <div className="font-mono font-semibold text-primary text-sm truncate">
                         {persona.name}
                       </div>
-                      <div className="text-xs text-text-secondary font-mono">
+                      <div className="text-xs text-text-secondary font-mono leading-relaxed line-clamp-2">
                         {persona.description}
                       </div>
                     </div>

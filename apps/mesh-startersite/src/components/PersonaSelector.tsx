@@ -130,7 +130,7 @@ export default function PersonaSelector({
 
   return (
     <div className="w-full max-w-6xl mx-auto px-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
         {(Object.keys(PERSONAS) as LearnerPersona[]).map((personaId, index) => {
           const persona = PERSONAS[personaId];
           const isSelected = selectedPersona === personaId;
@@ -149,10 +149,10 @@ export default function PersonaSelector({
                 onClick={() => onPersonaSelect(personaId)}
                 onMouseEnter={() => setHoveredPersona(personaId)}
                 onMouseLeave={() => setHoveredPersona(null)}
-                className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 relative overflow-hidden ${
+                className={`w-full max-w-sm mx-auto h-40 p-5 rounded-3xl bg-gradient-to-br from-surface/60 to-background/60 border border-primary/20 backdrop-blur-sm transition-all duration-300 relative overflow-hidden ${
                   isSelected
-                    ? "border-primary bg-primary/10 shadow-lg shadow-primary/20"
-                    : "border-gray-700 bg-surface/30 hover:border-primary/50 hover:bg-surface/50"
+                    ? "border-primary/40 bg-primary/10 shadow-lg shadow-primary/20"
+                    : "hover:border-primary/30 hover:from-surface/70 hover:to-background/70"
                 } ${isHovered ? "scale-105" : "scale-100"}`}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -169,7 +169,7 @@ export default function PersonaSelector({
                 )}
 
                 {/* Content with logo on the left */}
-                <div className="relative z-10 flex items-center gap-4">
+                <div className="relative z-10 flex items-center gap-4 h-full">
                   {/* Logo */}
                   <div className="flex-shrink-0">
                     {renderPersonaLogo(persona)}
@@ -177,11 +177,11 @@ export default function PersonaSelector({
 
                   {/* Text content */}
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-xl font-mono font-semibold text-primary mb-2">
+                    <h3 className="text-lg font-mono font-bold text-primary mb-3 leading-tight">
                       {persona.name}
                     </h3>
                     <p
-                      className={`text-text-secondary text-sm leading-relaxed font-mono ${
+                      className={`text-sm font-mono text-text-secondary leading-relaxed ${
                         isDecrypting && isCurrentlyChanging
                           ? "text-text-secondary/80"
                           : "text-text-secondary"

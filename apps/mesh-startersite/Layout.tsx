@@ -1,4 +1,3 @@
-
 import { motion, AnimatePresence } from "framer-motion";
 import { ReactNode, useEffect, useState, useRef } from "react";
 import Sidebar from "./src/components/Sidebar";
@@ -21,7 +20,6 @@ export default function Layout({ children }: { children: ReactNode }) {
   const mainContentRef = useRef<HTMLElement>(null);
   const minTerminalHeight = 120;
   const maxTerminalHeight = 600;
-
 
   // Update sidebar positions and main content dimensions dynamically
   useEffect(() => {

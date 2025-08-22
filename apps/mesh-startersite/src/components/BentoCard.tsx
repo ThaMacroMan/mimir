@@ -147,41 +147,23 @@ export default function BentoCard({
         <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
         {/* Content */}
-        <div className="relative z-10 h-full p-6 flex flex-col justify-between">
+        <div className="relative z-10 h-full p-4 flex flex-col justify-between">
           <div>
-            <div className="flex items-center gap-3 mb-4">
-              <div className={`text-primary ${item.isHero ? "text-2xl" : ""}`}>
-                {item.icon}
-              </div>
-              <h3
-                className={`font-mono font-bold text-primary group-hover:text-secondary transition-colors duration-300 ${
-                  item.isHero
-                    ? "text-3xl md:text-4xl"
-                    : isSubCard
-                      ? "text-sm md:text-base"
-                      : "text-lg md:text-xl"
-                }`}
-              >
+            <div className="flex items-center gap-2 mb-3">
+              <div className="text-primary text-lg">{item.icon}</div>
+              <h3 className="font-mono font-bold text-primary group-hover:text-secondary transition-colors duration-300 text-lg md:text-xl">
                 {item.title}
               </h3>
             </div>
 
-            <p
-              className={`font-mono text-text-secondary leading-relaxed group-hover:text-text-primary transition-colors duration-300 ${
-                item.isHero
-                  ? "text-base md:text-lg"
-                  : isSubCard
-                    ? "text-xs md:text-sm"
-                    : "text-sm md:text-base"
-              }`}
-            >
+            <p className="font-mono text-text-secondary leading-relaxed group-hover:text-text-primary transition-colors duration-300 text-sm">
               {item.description}
             </p>
           </div>
 
           {/* Sub-cards container for mega cards */}
           {item.isContainer && item.children && (
-            <div className="mt-6 grid grid-cols-1 gap-4">
+            <div className="mt-4 grid grid-cols-1 gap-4">
               {item.children.map((child, _childIndex) => (
                 <TiltedCard
                   key={child.title}
@@ -201,7 +183,7 @@ export default function BentoCard({
                           ? "noopener noreferrer"
                           : undefined
                       }
-                      className="block bg-gradient-to-br from-surface/40 to-background/40 border border-primary/10 rounded-xl p-3 hover:border-primary/30 hover:from-surface/60 hover:to-background/60 transition-all duration-200 group cursor-pointer"
+                      className="block bg-gradient-to-br from-surface/40 to-background/40 border border-primary/10 rounded-lg p-3 hover:border-primary/30 hover:from-surface/60 hover:to-background/60 transition-all duration-200 group cursor-pointer"
                       whileHover={{
                         scale: 1.02,
                         borderColor: "rgba(14, 165, 233, 0.4)", // primary/40
@@ -212,22 +194,22 @@ export default function BentoCard({
                         <div className="text-primary group-hover:text-secondary transition-colors duration-200">
                           {child.icon}
                         </div>
-                        <h4 className="text-xs font-mono font-semibold text-primary group-hover:text-secondary transition-colors duration-200">
+                        <h4 className="text-sm font-mono font-semibold text-primary group-hover:text-secondary transition-colors duration-200">
                           {child.title}
                         </h4>
                       </div>
                       <div className="flex items-center justify-between">
-                        <p className="text-xs font-mono text-text-secondary group-hover:text-text-primary transition-colors duration-200 leading-tight">
+                        <p className="text-sm font-mono text-text-secondary group-hover:text-text-primary transition-colors duration-200 leading-tight">
                           {child.description}
                         </p>
-                        <div className="text-xs text-primary/60 group-hover:text-primary transition-colors duration-200">
+                        <div className="text-sm text-primary/60 group-hover:text-primary transition-colors duration-200">
                           →
                         </div>
                       </div>
                     </motion.a>
                   ) : (
                     <motion.div
-                      className="bg-gradient-to-br from-surface/40 to-background/40 border border-primary/10 rounded-xl p-3 hover:border-primary/30 transition-all duration-200 group"
+                      className="bg-gradient-to-br from-surface/40 to-background/40 border border-primary/10 rounded-lg p-3 hover:border-primary/30 transition-all duration-200 group"
                       whileHover={{
                         scale: 1.02,
                         borderColor: "rgba(14, 165, 233, 0.4)", // primary/40
@@ -238,11 +220,11 @@ export default function BentoCard({
                         <div className="text-primary group-hover:text-secondary transition-colors duration-200">
                           {child.icon}
                         </div>
-                        <h4 className="text-xs font-mono font-semibold text-primary group-hover:text-secondary transition-colors duration-200">
+                        <h4 className="text-sm font-mono font-semibold text-primary group-hover:text-secondary transition-colors duration-200">
                           {child.title}
                         </h4>
                       </div>
-                      <p className="text-xs text-text-secondary group-hover:text-text-primary transition-colors duration-200 leading-tight">
+                      <p className="text-sm font-mono text-text-secondary group-hover:text-text-primary transition-colors duration-200 leading-tight">
                         {child.description}
                       </p>
                     </motion.div>
@@ -253,7 +235,7 @@ export default function BentoCard({
           )}
 
           {/* Bottom accent */}
-          <div className="mt-4 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="mt-3 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
 
         {/* Interactive overlay - only for cards without children */}
