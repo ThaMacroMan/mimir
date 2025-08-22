@@ -7,7 +7,7 @@ import { TooltipProvider } from '@radix-ui/react-tooltip';
 import { SharedProps } from 'fumadocs-ui/contexts/search';
 
 const SearchDialog = dynamic<SharedProps>(
-  () => import('../components/ai/search').then(mod => mod.default),
+  () => import('../components/ai/search').then(mod => mod.AISearch),
   { ssr: false }
 );
 

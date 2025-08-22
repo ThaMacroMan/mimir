@@ -23,7 +23,7 @@ export default function Banner() {
   if (!visible) return null
 
   return (
-    <div className="w-full px-4 sm:px-6 py-3 border-t border-border bg-fd-card text-muted-foreground relative">
+    <div className="w-full px-4 sm:px-6 py-3 border-t border-border bg-fd-card text-muted-foreground absolute top-0 left-0 z-50">
       <div className="flex justify-center pr-12 sm:pr-16">
         <div className="text-sm sm:text-base text-center max-w-none">
           <span className="text-lg mr-2">🎉</span>

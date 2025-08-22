@@ -176,7 +176,7 @@ function List(props: Omit<ComponentProps<'div'>, 'dir'>) {
       ref={containerRef}
       {...props}
       className={cn(
-        'fd-scroll-container overflow-y-auto max-h-[calc(100dvh-240px)] min-w-0 flex flex-col',
+        'fd-scroll-container overflow-y-auto max-h-[calc(100dvh-164px)] min-w-0 flex flex-col',
         props.className,
       )}
     >
@@ -262,7 +262,96 @@ function Message({
   );
 }
 
-export default function AISearch(props: DialogProps) {
+export function AISearch(props: DialogProps) {
+  const chat = useChat({
+    id: 'search',
+    transport: new DefaultChatTransport({
+      api: '/api/chat',
+    }),
+    messages: getInitialChatHistory()
+  });
+
+  useEffect(() => {
+    localStorage.setItem("mesh-ai-chat-history", JSON.stringify(chat.messages));
+  }, [chat.messages])
+
+  const messages = chat.messages.filter((msg) => msg.role !== 'system');
+
+  return (
+    <Dialog {...props} modal={false}>
+      {props.children}
+        <DialogContent
+        onOpenAutoFocus={(e) => {
+          document.getElementById('nd-ai-input')?.focus();
+          e.preventDefault();
+        }}
+        onInteractOutside={(e) => e.preventDefault()}
+        aria-describedby={undefined}
+        className="flex flex-col h-full w-full bg-fd-popover/80 backdrop-blur-xl p-1 rounded-2xl shadow-2xl border max-md:top-12 md:bottom-12 max-w-screen-sm focus-visible:outline-none"
+      >
+        <ChatContext value={chat}>
+          <div className="px-3 py-2">
+            <DialogTitle className="text-sm font-bold">
+              Mesh AI
+            </DialogTitle>
+            <DialogDescription className="text-xs text-fd-muted-foreground">
+              AI can be inaccurate, please verify the information.
+            </DialogDescription>
+          </div>
+          <DialogClose
+            aria-label="Close"
+            tabIndex={-1}
+            className={cn(
+              buttonVariants({
+                size: 'icon-sm',
+                color: 'ghost',
+                className: 'absolute top-1 end-1 text-fd-muted-foreground',
+              }),
+            )}
+          >
+            <X />
+          </DialogClose>
+
+          { messages.length > 0 ? (
+            <List
+              className="flex-1 overflow-y-auto"
+              style={{
+                maskImage:
+                  'linear-gradient(to bottom, transparent, black 20px, black calc(100% - 20px), transparent)',
+              }}
+            >
+              <div className="flex flex-col gap-4 p-3">
+                {messages.map((item) => (
+                  <Message key={item.id} message={item} />
+                ))}
+              </div>
+            </List>
+          ) : (
+            <List
+              className="flex-1 overflow-y-auto"
+              style={{
+                maskImage:
+                  'linear-gradient(to bottom, transparent, black 20px, black calc(100% - 20px), transparent)',
+              }}
+            >
+              <div className="flex flex-col gap-4 p-3 min-h-screen items-center justify-center">
+                No messages yet. Ask Mesh AI a question!
+              </div>
+            </List>
+          )}
+
+          <div className="rounded-xl overflow-hidden border border-fd-foreground/20 text-fd-popover-foreground">
+            <SearchAIInput />
+            <SearchAIActions className="flex flex-row items-center gap-1.5 p-1 empty:hidden" />
+          </div>
+        </ChatContext>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+
+export function MobileAISearch(props: DialogProps) {
   const chat = useChat({
     id: 'search',
     transport: new DefaultChatTransport({
@@ -319,6 +408,7 @@ export default function AISearch(props: DialogProps) {
                   maskImage:
                     'linear-gradient(to bottom, transparent, black 20px, black calc(100% - 20px), transparent)',
                 }}
+                className='max-h-[calc(100dvh-240px)]'
               >
                 <div className="flex flex-col gap-4 p-3">
                   {messages.map((item) => (
@@ -337,7 +427,6 @@ export default function AISearch(props: DialogProps) {
     </Dialog>
   );
 }
-
 
 function getInitialChatHistory(): UIMessage[] {
   try {

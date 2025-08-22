@@ -3,7 +3,7 @@ import Link from "fumadocs-core/link";
 
 export default function Footer() {
   return (
-    <footer className="mt-16 border-t border-border bg-fd-card py-12 text-muted-foreground">
+    <footer className="border-t border-border bg-fd-card py-12 text-muted-foreground">
       <div className="container flex flex-col gap-12">
         <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-10">
           <div className="flex flex-col gap-2 min-w-[200px]">
