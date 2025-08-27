@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { MetallicCardanoLogo } from "./MetallicCardanoLogo";
+import { MetallicCardanoLogo } from "../../shared/Logo";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
@@ -77,7 +77,7 @@ export default function MimirHero() {
         </div>
       </motion.div>
 
-      <div className="flex justify-center mt-12">
+      <div className="flex justify-center mt-8">
         <span className="text-lg md:text-xl text-center text-text-secondary font-mono font-medium max-w-2xl">
           Learn to build on Cardano as a{" "}
           <span

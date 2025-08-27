@@ -1,8 +1,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { ReactNode, useEffect, useState, useRef } from "react";
-import Sidebar from "./src/components/Sidebar";
-import ResourceSidebar from "./src/components/AIChatSidebar";
-import ScrollNavigation from "./src/components/ScrollNavigation";
+import Sidebar from "./src/components/layout/Sidebar/Sidebar";
+import ResourceSidebar from "./src/components/layout/Sidebar/AIChatSidebar";
+import ScrollNavigation from "./src/components/layout/ScrollNavigation";
 import { Terminal } from "./src/components/magicui/terminal";
 import { resetAllSidebarStates } from "./src/utils/sidebarUtils";
 
@@ -256,7 +256,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         <Sidebar />
         <main
           ref={mainContentRef}
-          className="flex-1 overflow-auto px-8 pt-8 max-w-none mx-0 transition-all duration-300"
+          className="flex-1 overflow-auto px-8 max-w-none mx-0 transition-all duration-300"
           style={{
             height: `calc(100vh - var(--terminal-height, 0px))`,
             marginTop: "0px", // Removed header spacing

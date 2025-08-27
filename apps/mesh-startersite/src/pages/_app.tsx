@@ -3,7 +3,7 @@ import "@meshsdk/react/styles.css";
 import type { AppProps } from "next/app";
 import { AnimatePresence } from "framer-motion";
 import Layout from "../../Layout";
-import ClickSpark from "../components/ClickSpark";
+import ClickSpark from "../components/features/ClickCounter/ClickSpark";
 import { PersonaProvider } from "../contexts/PersonaContext";
 
 function MyApp({ Component, pageProps }: AppProps) {

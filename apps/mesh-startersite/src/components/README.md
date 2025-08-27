@@ -1,219 +1,149 @@
-# Content Layout Components
+# Components Directory Structure
 
-This directory contains reusable layout components for creating consistent content pages that maintain the same sidebar structure and background as the main page.
+This directory contains all React components organized by their purpose and responsibility.
 
-## Components
+## 📁 **Directory Organization**
 
-### ContentLayout
+### **`/layout/` - Page Structure Components**
 
-The main layout wrapper that provides the consistent background and structure for content pages.
+Components responsible for the overall page layout and structure.
 
-```tsx
-import ContentLayout from "../components/ContentLayout";
+- **`Sidebar/`** - Navigation sidebar components
+  - `Sidebar.tsx` - Main left sidebar
+  - `AIChatSidebar.tsx` - Right AI chat sidebar
+- **`Header/`** - Page header components
+  - `Header.tsx` - Main page header
+- **`Footer/`** - Page footer components
+  - `Footer.tsx` - Main page footer
+- **`ContentLayout.tsx`** - Main content wrapper
+- **`ContentSection.tsx`** - Content section wrapper
+- **`ScrollNavigation.tsx`** - Scroll navigation component
 
-export default function MyPage() {
-  return (
-    <ContentLayout title="Page Title" subtitle="Page subtitle or description">
-      {/* Your content here */}
-    </ContentLayout>
-  );
-}
-```
+### **`/features/` - Business Logic Components**
 
-**Props:**
+Components specific to application features and business logic.
 
-- `children`: ReactNode - The content to render
-- `title?: string` - Optional page title
-- `subtitle?: string` - Optional page subtitle
-- `showBreadcrumbs?: boolean` - Whether to show breadcrumbs (default: true)
-- `className?: string` - Additional CSS classes
+- **`Persona/`** - Persona-related components
+  - `PersonaSelector.tsx` - Persona selection interface
+  - `PersonaSwitcher.tsx` - Persona switching component
+  - `MimirHero.tsx` - Main hero section
+- **`Bento/`** - Bento grid components
+  - `BentoGrid.tsx` - Main bento grid container
+  - `BentoCard.tsx` - Individual bento card
+  - `MagicBento.tsx` - Special bento component
+- **`ClickCounter/`** - Click counter feature
+  - `ClickCounter.tsx` - Main click counter
+  - `ClickSpark.tsx` - Click spark effects
+- **`Community/`** - Community features
+  - `CommunitySection.tsx` - Community section
 
-### ContentSection
+### **`/shared/` - Common Components**
 
-A flexible content section component that provides different layout options.
+Components used across multiple features and pages.
 
-```tsx
-import ContentSection from "../components/ContentSection";
+- **`Logo/`** - Logo components
+  - `MetallicCardanoLogo.tsx` - Cardano logo component
+- **`Background/`** - Background components
+  - `FluidBackground.tsx` - Fluid background effects
 
-// Cards layout
-<ContentSection
-  title="Section Title"
-  subtitle="Section description"
-  cards={[
-    {
-      title: "Card Title",
-      description: "Card description",
-      icon: <SomeIcon />,
-      href: "/some-link",
-      primary: true, // Makes the card highlighted
-    }
-  ]}
-  layout="cards"
-/>
+### **`/ui/` - Reusable UI Components**
 
-// Text layout
-<ContentSection
-  title="Section Title"
-  subtitle="Section description"
-  layout="text"
->
-  <p>Your content here...</p>
-</ContentSection>
+Generic, reusable UI components that can be used anywhere.
 
-// Hero layout
-<ContentSection
-  layout="hero"
-  cards={[
-    {
-      title: "Hero Title",
-      description: "Hero description",
-      icon: <HeroIcon />,
-      href: "/hero-link",
-    }
-  ]}
-/>
+- **`Card/`** - Card components
+  - `TiltedCard.tsx` - Tilted card effect
+- **`PressEnterToContinue.tsx`** - Press enter prompt
 
-// Grid layout
-<ContentSection
-  title="Grid Section"
-  layout="grid"
->
-  <div>Grid item 1</div>
-  <div>Grid item 2</div>
-</ContentSection>
-```
+### **`/mdx/` - MDX Content Components**
 
-**Props:**
+Components specifically for MDX content rendering.
 
-- `children?: ReactNode` - Content for text/grid layouts
-- `title?: string` - Section title
-- `subtitle?: string` - Section subtitle
-- `cards?: ContentCard[]` - Cards for cards/hero layouts
-- `layout?: "grid" | "cards" | "text" | "hero"` - Layout type (default: "text")
-- `className?: string` - Additional CSS classes
-- `maxWidth?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl" | "7xl"` - Max width constraint
+- `Callout.tsx` - Callout/info boxes
+- `LiveCode.tsx` - Live code examples
+- `Quiz.tsx` - Quiz components
 
-**ContentCard Interface:**
+### **`/magicui/` - Magic UI Components**
+
+Special UI components with advanced effects.
+
+- `terminal.tsx` - Terminal component
+
+## 🚀 **Usage Examples**
+
+### **Importing Layout Components**
 
 ```tsx
-interface ContentCard {
-  title: string;
-  description: string;
-  icon?: ReactNode;
-  href?: string;
-  className?: string;
-  primary?: boolean; // Makes the card highlighted
-}
+import { Sidebar, AIChatSidebar, Header } from "@/components/layout";
 ```
 
-## Layout Types
-
-### Cards Layout
-
-Displays content in a responsive grid of cards. Perfect for feature lists, navigation, or content collections.
-
-### Hero Layout
-
-Creates a prominent hero section with a single large card. Ideal for page introductions or call-to-action sections.
-
-### Text Layout
-
-Simple text content layout with optional title and subtitle. Good for articles, documentation, or detailed content.
-
-### Grid Layout
-
-Two-column grid layout for comparing content or organizing related information side by side.
-
-## Examples
-
-### Documentation Page
+### **Importing Feature Components**
 
 ```tsx
-import ContentLayout from "../components/ContentLayout";
-import ContentSection from "../components/ContentSection";
-
-export default function DocsPage() {
-  return (
-    <ContentLayout
-      title="Documentation"
-      subtitle="Learn how to build on Cardano"
-    >
-      <ContentSection
-        layout="hero"
-        cards={[
-          {
-            title: "Get Started",
-            description: "Begin your Cardano journey",
-            icon: <Rocket />,
-            href: "/docs/getting-started",
-          },
-        ]}
-      />
-
-      <ContentSection title="Guides" cards={guideCards} layout="cards" />
-    </ContentLayout>
-  );
-}
+import {
+  PersonaSelector,
+  BentoGrid,
+  ClickCounter,
+} from "@/components/features";
 ```
 
-### Guide Page
+### **Importing Shared Components**
 
 ```tsx
-export default function GuidePage() {
-  return (
-    <ContentLayout title="How to Build a DApp">
-      <ContentSection title="Prerequisites" layout="text">
-        <ul>
-          <li>Basic JavaScript knowledge</li>
-          <li>Node.js installed</li>
-        </ul>
-      </ContentSection>
-
-      <ContentSection title="Steps" layout="text">
-        <div className="space-y-4">
-          <div>Step 1: Setup</div>
-          <div>Step 2: Build</div>
-          <div>Step 3: Deploy</div>
-        </div>
-      </ContentSection>
-    </ContentLayout>
-  );
-}
+import { MetallicCardanoLogo, FluidBackground } from "@/components/shared";
 ```
 
-## Styling
+### **Importing UI Components**
 
-All components use the same design system as the main page:
-
-- **Colors**: Primary (`#0ea5e9`), Secondary (`#38bdf8`), Surface (`#161b22`), Background (`#0d1117`)
-- **Typography**: Inter font family with consistent sizing
-- **Animations**: Framer Motion with staggered children and fade-in effects
-- **Borders**: Subtle borders with primary color accents
-- **Gradients**: Surface to background gradients with backdrop blur
-
-## Best Practices
-
-1. **Use appropriate layouts**: Choose the layout type that best fits your content
-2. **Keep titles concise**: Section titles should be clear and brief
-3. **Use icons consistently**: Include relevant icons for better visual hierarchy
-4. **Maintain spacing**: Use consistent margins between sections (`mb-16`)
-5. **Test responsiveness**: Ensure content looks good on all screen sizes
-6. **Follow the design system**: Use the established color palette and typography
-
-## File Structure
-
-```
-src/components/
-├── ContentLayout.tsx      # Main layout wrapper
-├── ContentSection.tsx     # Flexible content sections
-└── README.md             # This documentation
+```tsx
+import { TiltedCard, PressEnterToContinue } from "@/components/ui";
 ```
 
-## Integration with Existing Layout
+### **Importing Everything**
 
-These components work seamlessly with the existing layout system:
+```tsx
+import {
+  Sidebar,
+  PersonaSelector,
+  MetallicCardanoLogo,
+  TiltedCard,
+} from "@/components";
+```
 
-- **Sidebars**: Left navigation and right AI chat sidebars remain functional
-- **Background**: Fluid Cardano logos background is maintained
-- **Terminal**: Optional bottom terminal panel continues to work
-- **Navigation**: Breadcrumbs and scroll navigation are preserved
+## 📋 **Component Guidelines**
+
+### **Naming Conventions**
+
+- Use PascalCase for component files: `MyComponent.tsx`
+- Use kebab-case for directories: `my-feature/`
+- Export components as default exports
+- Create index.ts files for clean imports
+
+### **File Organization**
+
+- One component per file
+- Co-locate related components in feature directories
+- Keep components focused and single-purpose
+- Extract complex logic into custom hooks
+
+### **Import/Export Strategy**
+
+- Use barrel exports (index.ts files) for clean imports
+- Export components from their respective category directories
+- Maintain backward compatibility during refactoring
+
+## 🔄 **Migration Notes**
+
+This structure was created to improve:
+
+- **Discoverability**: Easy to find components by purpose
+- **Maintainability**: Related components are grouped together
+- **Reusability**: Clear separation between generic and specific components
+- **Scalability**: Easy to add new features without cluttering the root
+
+## 📝 **Adding New Components**
+
+1. **Layout Components**: Add to `/layout/` directory
+2. **Feature Components**: Add to appropriate `/features/` subdirectory
+3. **Shared Components**: Add to `/shared/` directory
+4. **UI Components**: Add to `/ui/` directory
+5. **Update index files**: Export new components from appropriate index.ts files

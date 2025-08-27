@@ -1,0 +1,1 @@
+export { MetallicCardanoLogo } from "./MetallicCardanoLogo";

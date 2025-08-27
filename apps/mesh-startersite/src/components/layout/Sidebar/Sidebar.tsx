@@ -10,12 +10,12 @@ import {
   Home,
   X,
 } from "lucide-react";
-import { MetallicCardanoLogo } from "./MetallicCardanoLogo";
-import { useSidebarPersistence } from "../hooks/useSidebarPersistence";
-import { getSidebarSections } from "../utils/sidebarUtils";
-import { usePersona } from "../contexts/PersonaContext";
-import { LearnerPersona } from "../types/personas";
-import PersonaSwitcher from "./PersonaSwitcher";
+import { MetallicCardanoLogo } from "../../shared/Logo";
+import { useSidebarPersistence } from "../../../hooks/useSidebarPersistence";
+import { getSidebarSections } from "../../../utils/sidebarUtils";
+import { usePersona } from "../../../contexts/PersonaContext";
+import { LearnerPersona } from "../../../types/personas";
+import PersonaSwitcher from "../../features/Persona/PersonaSwitcher";
 
 // Collapsed width constant
 const COLLAPSED_WIDTH = 48;

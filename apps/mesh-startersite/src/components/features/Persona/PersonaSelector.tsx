@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { CheckCircle } from "lucide-react";
-import { PERSONAS, LearnerPersona, PersonaConfig } from "../types/personas";
-import { MetallicCardanoLogo } from "./MetallicCardanoLogo";
+import { PERSONAS, LearnerPersona, PersonaConfig } from "../../../types/personas";
+import { MetallicCardanoLogo } from "../../shared/Logo";
 import Image from "next/image";
-import { useCyclingText } from "../hooks/useCyclingText";
+import { useCyclingText } from "../../../hooks/useCyclingText";
 
 interface PersonaSelectorProps {
   onPersonaSelect: (persona: LearnerPersona) => void;

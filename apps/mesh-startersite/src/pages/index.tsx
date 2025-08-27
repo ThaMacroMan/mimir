@@ -1,11 +1,11 @@
 import Head from "next/head";
 import { motion } from "framer-motion";
-import FluidBackground from "../components/FluidBackground";
-import MimirHero from "../components/MimirHero";
-import PersonaSelector from "../components/PersonaSelector";
-import BentoGrid from "../components/BentoGrid";
-import CommunitySection from "../components/CommunitySection";
-import ClickCounter from "../components/ClickCounter";
+import FluidBackground from "../components/shared/Background/FluidBackground";
+import MimirHero from "../components/features/Persona/MimirHero";
+import PersonaSelector from "../components/features/Persona/PersonaSelector";
+import BentoGrid from "../components/features/Bento/BentoGrid";
+import CommunitySection from "../components/features/Community/CommunitySection";
+import ClickCounter from "../components/features/ClickCounter/ClickCounter";
 import { usePersona } from "../contexts/PersonaContext";
 
 const fadeInUp = {
@@ -42,7 +42,7 @@ export default function Home() {
       <div className="relative z-10 w-full h-full overflow-y-auto">
         {/* Hero Section */}
         <motion.section
-          className="text-center mb-16 mt-16 px-6 w-full relative z-10"
+          className="text-center mb-8 mt-4 px-6 w-full relative z-10"
           initial="initial"
           animate="animate"
           variants={staggerChildren}
@@ -52,7 +52,7 @@ export default function Home() {
 
         {/* Persona Selector - positioned right after the hero description */}
         <motion.section
-          className="mb-16 w-full relative z-10"
+          className="mb-8 w-full relative z-10"
           initial="initial"
           whileInView="animate"
           viewport={{ once: true }}
@@ -68,7 +68,7 @@ export default function Home() {
 
         {/* Magic Bento Grid */}
         <motion.section
-          className="mb-16 w-full relative z-10"
+          className="mb-8 w-full relative z-10"
           initial="initial"
           whileInView="animate"
           viewport={{ once: true }}

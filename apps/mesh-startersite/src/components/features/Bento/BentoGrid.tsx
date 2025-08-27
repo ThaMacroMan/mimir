@@ -19,8 +19,8 @@ import {
   MessageSquare,
 } from "lucide-react";
 import BentoCard from "./BentoCard";
-import { usePersona } from "../contexts/PersonaContext";
-import { LearnerPersona } from "../types/personas";
+import { usePersona } from "../../../contexts/PersonaContext";
+import { LearnerPersona } from "../../../types/personas";
 
 interface BentoItem {
   title: string;

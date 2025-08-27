@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Send, BookOpen, MessageSquare, Link, X } from "lucide-react";
-import { MetallicCardanoLogo } from "./MetallicCardanoLogo";
-import { useSidebarPersistence } from "../hooks/useSidebarPersistence";
-import { usePersona } from "../contexts/PersonaContext";
-import { LearnerPersona } from "../types/personas";
+import { MetallicCardanoLogo } from "../../shared/Logo";
+import { useSidebarPersistence } from "../../../hooks/useSidebarPersistence";
+import { usePersona } from "../../../contexts/PersonaContext";
+import { LearnerPersona } from "../../../types/personas";
 
 interface ResourceSidebarProps {
   width?: number;
