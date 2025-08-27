@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import { LearnerPersona } from "../../../types/personas";
 
 interface LogoPosition {
   x: number;
@@ -9,11 +10,44 @@ interface LogoPosition {
   velocity: { x: number; y: number };
 }
 
-export default function FluidBackground() {
+interface FluidBackgroundProps {
+  persona?: LearnerPersona | null;
+}
+
+export default function FluidBackground({ persona }: FluidBackgroundProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mouseRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const animationRef = useRef<number | null>(null);
   const [logoPositions, setLogoPositions] = useState<LogoPosition[]>([]);
+
+  // Get persona-specific color scheme
+  const getPersonaColors = () => {
+    switch (persona) {
+      case "ai-user": // Developing Builder - Purple theme
+        return {
+          primary: "rgba(147, 51, 234, 0.5)", // Purple with higher opacity
+          secondary: "rgba(168, 85, 247, 0.5)", // Lighter purple
+          accent: "rgba(196, 181, 253, 0.5)", // Very light purple
+          background: "rgba(147, 51, 234, 0.5)", // Subtle purple background tint
+        };
+      case "ai-power-user": // Advanced Builder - Red theme
+        return {
+          primary: "rgba(239, 68, 68, 0.5)", // Red with higher opacity
+          secondary: "rgba(248, 113, 113, 0.5)", // Lighter red
+          accent: "rgba(254, 202, 202, 0.5)", // Very light red
+          background: "rgba(239, 68, 68, 0.5)", // Subtle red background tint
+        };
+      default: // brand-new-to-ai or no persona - Default blue theme
+        return {
+          primary: "rgba(0, 51, 173, 0.5)", // Dark Blue #0033AD with opacity
+          secondary: "rgba(51, 102, 204, 0.5)", // Lighter variant of the dark blue
+          accent: "rgba(102, 153, 230, 0.5)", // Even lighter variant
+          background: "rgba(0, 51, 173, 0.5)", // Subtle dark blue background tint
+        };
+    }
+  };
+
+  const colors = getPersonaColors();
 
   // Initialize logo positions
   useEffect(() => {
@@ -114,53 +148,81 @@ export default function FluidBackground() {
   }, []); // Empty dependency array - only run once
 
   return (
-    <div
-      ref={containerRef}
-      className="cardano-logos"
-      style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        pointerEvents: "none",
-      }}
-    >
-      {logoPositions.map((logo, index) => {
-        // Create varying sizes for asteroid-like effect - smaller for distance
-        const baseSize = 40 + (index % 5) * 15; // 40-100px range - smaller
-        const sizeVariation = Math.sin(index * 0.5) * 8;
-        const finalSize = baseSize + sizeVariation;
+    <>
+      {/* Persona-specific background overlay */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          pointerEvents: "none",
+          background: `radial-gradient(circle at 20% 80%, ${colors.background} 0%, transparent 50%), radial-gradient(circle at 80% 20%, ${colors.background} 0%, transparent 50%)`,
+          zIndex: 1,
+        }}
+      />
 
-        // Varying opacity for depth effect - less transparent
-        const baseOpacity = 0.08; // Increased from 0.025
-        const opacityVariation = (index % 4) * 0.015; // More variation
-        const finalOpacity = baseOpacity + opacityVariation;
+      <div
+        ref={containerRef}
+        className="cardano-logos"
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          pointerEvents: "none",
+          zIndex: 2,
+        }}
+      >
+        {logoPositions.map((logo, index) => {
+          // Create varying sizes for asteroid-like effect - smaller for distance
+          const baseSize = 40 + (index % 5) * 15; // 40-100px range - smaller
+          const sizeVariation = Math.sin(index * 0.5) * 8;
+          const finalSize = baseSize + sizeVariation;
 
-        return (
-          <Image
-            key={index}
-            src={`/cardano_we_logos/PNG/Cardano-RGB_Logo-Icon-${index % 2 === 0 ? "White" : "Black"}.png`}
-            alt="Cardano"
-            width={finalSize}
-            height={finalSize}
-            className="cardano-logo"
-            style={{
-              position: "absolute",
-              left: `${logo.x}px`,
-              top: `${logo.y}px`,
-              transform: "translate(-50%, -50%)",
-              width: `${finalSize}px`,
-              height: `${finalSize}px`,
-              opacity: finalOpacity,
-              filter: "brightness(1.1) contrast(1.3) blur(0.3px)",
-              transition: "transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-              willChange: "transform",
-              pointerEvents: "none",
-            }}
-          />
-        );
-      })}
-    </div>
+          // Varying opacity for depth effect with persona-specific colors
+          const baseOpacity = 0.12; // Higher base opacity for more visibility
+          const opacityVariation = (index % 4) * 0.02; // More variation
+          const finalOpacity = baseOpacity + opacityVariation;
+
+          // Apply persona-specific color tinting with more prominent colors
+          const colorIndex = index % 3;
+          let tintColor = colors.primary;
+          if (colorIndex === 1) tintColor = colors.secondary;
+          if (colorIndex === 2) tintColor = colors.accent;
+
+          return (
+            <Image
+              key={index}
+              src={`/cardano_we_logos/PNG/Cardano-RGB_Logo-Icon-${index % 2 === 0 ? "White" : "Black"}.png`}
+              alt="Cardano"
+              width={finalSize}
+              height={finalSize}
+              className="cardano-logo"
+              style={{
+                position: "absolute",
+                left: `${logo.x}px`,
+                top: `${logo.y}px`,
+                transform: "translate(-50%, -50%)",
+                width: `${finalSize}px`,
+                height: `${finalSize}px`,
+                opacity: finalOpacity,
+                filter: "brightness(1.2) contrast(1.4) blur(0.2px)",
+                transition:
+                  "transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+                willChange: "transform",
+                pointerEvents: "none",
+                backgroundColor: tintColor,
+                borderRadius: "50%",
+                mixBlendMode: "screen",
+                boxShadow: `0 0 20px ${tintColor}`,
+              }}
+            />
+          );
+        })}
+      </div>
+    </>
   );
 }

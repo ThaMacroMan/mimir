@@ -53,26 +53,16 @@ export function getSidebarSections(
       case "brand-new-to-ai":
         return [
           {
-            title: "Home",
-            icon: "Home",
-            items: [],
-          },
-          {
-            title: "Getting Started",
+            title: "AI Fundamentals",
             icon: "BookOpen",
             items: [
               {
-                label: "What is AI?",
+                label: "AI Basics",
                 href: "/docs/ai-basics",
                 difficulty: "beginner",
               },
               {
-                label: "Try ChatGPT",
-                href: "/docs/chatgpt-guide",
-                difficulty: "beginner",
-              },
-              {
-                label: "What is Blockchain?",
+                label: "Blockchain Basics",
                 href: "/docs/blockchain-basics",
                 difficulty: "beginner",
               },
@@ -84,38 +74,64 @@ export function getSidebarSections(
             ],
           },
           {
-            title: "First Steps",
-            icon: "Rocket",
+            title: "AI Tools",
+            icon: "Code",
             items: [
               {
-                label: "Your First Project",
-                href: "/guides/first-project",
+                label: "AI Tools Overview",
+                href: "/docs/ai-tools",
                 difficulty: "beginner",
               },
               {
-                label: "Safe Practices",
-                href: "/docs/safety-guide",
+                label: "ChatGPT Guide",
+                href: "/docs/chatgpt-guide",
                 difficulty: "beginner",
               },
               {
-                label: "Simple Examples",
-                href: "/docs/example-content",
+                label: "Cursor Setup",
+                href: "/docs/ai-tools/cursor-setup",
+                difficulty: "beginner",
+              },
+              {
+                label: "Windsurf Setup",
+                href: "/docs/ai-tools/windsurf-setup",
+                difficulty: "beginner",
+              },
+              {
+                label: "Tool Selection",
+                href: "/docs/ai-tools/selection",
                 difficulty: "beginner",
               },
             ],
           },
           {
-            title: "Community",
-            icon: "Layout",
+            title: "Getting Started",
+            icon: "Rocket",
             items: [
               {
-                label: "Join Discord",
-                href: "https://discord.gg/meshjs",
+                label: "First Project",
+                href: "/guides/first-project",
                 difficulty: "beginner",
               },
               {
-                label: "Ask Questions",
-                href: "/docs/help",
+                label: "Safety Guide",
+                href: "/docs/safety-guide",
+                difficulty: "beginner",
+              },
+            ],
+          },
+          {
+            title: "Discover",
+            icon: "Layout",
+            items: [
+              {
+                label: "AI Tools Discovery",
+                href: "/docs/discover",
+                difficulty: "beginner",
+              },
+              {
+                label: "Join Discord",
+                href: "https://discord.gg/meshjs",
                 difficulty: "beginner",
               },
             ],
@@ -125,32 +141,53 @@ export function getSidebarSections(
       case "ai-user":
         return [
           {
-            title: "Home",
-            icon: "Home",
-            items: [],
+            title: "AI Fundamentals",
+            icon: "BookOpen",
+            items: [
+              {
+                label: "AI Basics",
+                href: "/docs/ai-basics",
+                difficulty: "intermediate",
+              },
+              {
+                label: "Blockchain Basics",
+                href: "/docs/blockchain-basics",
+                difficulty: "intermediate",
+              },
+              {
+                label: "Cardano Explained",
+                href: "/docs/cardano-explained",
+                difficulty: "intermediate",
+              },
+            ],
           },
           {
             title: "AI Tools",
-            icon: "BookOpen",
+            icon: "Code",
             items: [
+              {
+                label: "AI Tools Overview",
+                href: "/docs/ai-tools",
+                difficulty: "intermediate",
+              },
+              {
+                label: "ChatGPT Guide",
+                href: "/docs/chatgpt-guide",
+                difficulty: "intermediate",
+              },
               {
                 label: "Cursor Setup",
                 href: "/docs/ai-tools/cursor-setup",
                 difficulty: "intermediate",
               },
               {
-                label: "Windsurf Integration",
+                label: "Windsurf Setup",
                 href: "/docs/ai-tools/windsurf-setup",
                 difficulty: "intermediate",
               },
               {
-                label: "Advanced Prompts",
-                href: "/docs/advanced-prompts",
-                difficulty: "intermediate",
-              },
-              {
-                label: "AI Best Practices",
-                href: "/docs/ai-best-practices",
+                label: "Tool Selection",
+                href: "/docs/ai-tools/selection",
                 difficulty: "intermediate",
               },
             ],
@@ -160,15 +197,21 @@ export function getSidebarSections(
             icon: "Rocket",
             items: [
               {
-                label: "First Transaction",
-                href: "/guides/first_transaction",
+                label: "First Project",
+                href: "/guides/first-project",
                 difficulty: "intermediate",
               },
               {
-                label: "NFT Collection",
-                href: "/guides/nft-collection",
+                label: "Safety Guide",
+                href: "/docs/safety-guide",
                 difficulty: "intermediate",
               },
+            ],
+          },
+          {
+            title: "Advanced Topics",
+            icon: "Layout",
+            items: [
               {
                 label: "Cardano APIs",
                 href: "/docs/apis",
@@ -179,25 +222,9 @@ export function getSidebarSections(
                 href: "/docs/live-coding",
                 difficulty: "intermediate",
               },
-            ],
-          },
-          {
-            title: "Ship & Deploy",
-            icon: "Code",
-            items: [
               {
-                label: "GitHub Workflow",
-                href: "/docs/github-workflow",
-                difficulty: "intermediate",
-              },
-              {
-                label: "Practice Workflow",
+                label: "Practice Exercises",
                 href: "/docs/practice",
-                difficulty: "intermediate",
-              },
-              {
-                label: "Deploy to Production",
-                href: "/docs/deployment",
                 difficulty: "intermediate",
               },
             ],
@@ -228,32 +255,53 @@ export function getSidebarSections(
       case "ai-power-user":
         return [
           {
-            title: "Home",
-            icon: "Home",
-            items: [],
-          },
-          {
-            title: "Advanced AI",
+            title: "AI Fundamentals",
             icon: "BookOpen",
             items: [
               {
-                label: "MCP Integration",
-                href: "/docs/mcp-integration",
+                label: "AI Basics",
+                href: "/docs/ai-basics",
                 difficulty: "advanced",
               },
               {
-                label: "Custom AI Models",
-                href: "/docs/custom-models",
+                label: "Blockchain Basics",
+                href: "/docs/blockchain-basics",
                 difficulty: "advanced",
               },
               {
-                label: "AI Automation",
-                href: "/docs/ai-automation",
+                label: "Cardano Explained",
+                href: "/docs/cardano-explained",
+                difficulty: "advanced",
+              },
+            ],
+          },
+          {
+            title: "AI Tools",
+            icon: "Code",
+            items: [
+              {
+                label: "AI Tools Overview",
+                href: "/docs/ai-tools",
                 difficulty: "advanced",
               },
               {
-                label: "Advanced Prompts",
-                href: "/docs/advanced-prompts",
+                label: "ChatGPT Guide",
+                href: "/docs/chatgpt-guide",
+                difficulty: "advanced",
+              },
+              {
+                label: "Cursor Setup",
+                href: "/docs/ai-tools/cursor-setup",
+                difficulty: "advanced",
+              },
+              {
+                label: "Windsurf Setup",
+                href: "/docs/ai-tools/windsurf-setup",
+                difficulty: "advanced",
+              },
+              {
+                label: "Tool Selection",
+                href: "/docs/ai-tools/selection",
                 difficulty: "advanced",
               },
             ],
@@ -263,23 +311,28 @@ export function getSidebarSections(
             icon: "Rocket",
             items: [
               {
-                label: "Smart Contracts",
-                href: "/guides/smart-contracts",
+                label: "First Project",
+                href: "/guides/first-project",
                 difficulty: "advanced",
               },
               {
-                label: "DeFi Protocols",
-                href: "/guides/defi-protocols",
+                label: "Safety Guide",
+                href: "/docs/safety-guide",
                 difficulty: "advanced",
               },
               {
-                label: "Advanced APIs",
-                href: "/docs/advanced-apis",
+                label: "Cardano APIs",
+                href: "/docs/apis",
                 difficulty: "advanced",
               },
               {
-                label: "Token Swapper",
-                href: "/guides/token-swap",
+                label: "Live Coding",
+                href: "/docs/live-coding",
+                difficulty: "advanced",
+              },
+              {
+                label: "Practice Exercises",
+                href: "/docs/practice",
                 difficulty: "advanced",
               },
             ],
@@ -289,49 +342,39 @@ export function getSidebarSections(
             icon: "Code",
             items: [
               {
-                label: "Deploy to Production",
+                label: "GitHub Workflow",
+                href: "/docs/github-workflow",
+                difficulty: "advanced",
+              },
+              {
+                label: "Deployment",
                 href: "/docs/deployment",
                 difficulty: "advanced",
               },
               {
-                label: "Performance Optimization",
+                label: "Performance",
                 href: "/docs/performance",
-                difficulty: "advanced",
-              },
-              {
-                label: "Security Best Practices",
-                href: "/docs/security",
-                difficulty: "advanced",
-              },
-              {
-                label: "Monitoring & Analytics",
-                href: "/docs/monitoring",
                 difficulty: "advanced",
               },
             ],
           },
           {
-            title: "Advanced Resources",
+            title: "Resources",
             icon: "Layout",
             items: [
               {
-                label: "Cardano Developer Portal",
-                href: "https://developers.cardano.org/",
+                label: "Blockfrost API",
+                href: "https://blockfrost.io/",
                 difficulty: "advanced",
               },
               {
-                label: "Plutus Documentation",
-                href: "https://docs.cardano.org/plutus/",
+                label: "DexHunter",
+                href: "https://dexhunter.io/",
                 difficulty: "advanced",
               },
               {
-                label: "Advanced APIs",
-                href: "/docs/advanced-apis",
-                difficulty: "advanced",
-              },
-              {
-                label: "Community Projects",
-                href: "/docs/community-projects",
+                label: "Taptools",
+                href: "https://taptools.io/",
                 difficulty: "advanced",
               },
             ],
@@ -339,130 +382,77 @@ export function getSidebarSections(
         ];
 
       default:
-        // Default sections for when no persona is selected
+        // Default sections for all personas
         return [
           {
-            title: "Home",
-            icon: "Home",
-            items: [],
-          },
-          {
-            title: "Discover",
+            title: "AI Fundamentals",
             icon: "BookOpen",
             items: [
               {
-                label: "What are AI Tools?",
-                href: "/docs/ai-tools",
-                difficulty: "beginner",
+                label: "AI Basics",
+                href: "/docs/ai-basics",
               },
               {
-                label: "Choose Your AI Tool",
-                href: "/docs/ai-tools/selection",
-                difficulty: "beginner",
-              },
-              {
-                label: "Cardano Basics",
-                href: "/docs/cardano-basics",
-                difficulty: "beginner",
-              },
-              {
-                label: "Blockchain Fundamentals",
+                label: "Blockchain Basics",
                 href: "/docs/blockchain-basics",
-                difficulty: "intermediate",
+              },
+              {
+                label: "Cardano Explained",
+                href: "/docs/cardano-explained",
               },
             ],
           },
           {
-            title: "Try",
-            icon: "Rocket",
+            title: "AI Tools",
+            icon: "Code",
             items: [
               {
-                label: "Cursor Setup Quest",
+                label: "AI Tools Overview",
+                href: "/docs/ai-tools",
+              },
+              {
+                label: "ChatGPT Guide",
+                href: "/docs/chatgpt-guide",
+              },
+              {
+                label: "Cursor Setup",
                 href: "/docs/ai-tools/cursor-setup",
-                difficulty: "beginner",
               },
               {
                 label: "Windsurf Setup",
                 href: "/docs/ai-tools/windsurf-setup",
-                difficulty: "beginner",
               },
               {
-                label: "Your First Transaction",
-                href: "/guides/first_transaction",
-                difficulty: "beginner",
-              },
-              {
-                label: "Live Coding Sessions",
-                href: "/docs/live-coding",
-                difficulty: "intermediate",
+                label: "Tool Selection",
+                href: "/docs/ai-tools/selection",
               },
             ],
           },
           {
-            title: "Build",
-            icon: "Code",
+            title: "Getting Started",
+            icon: "Rocket",
             items: [
               {
-                label: "NFT Collection",
-                href: "/guides/nft-collection",
-                difficulty: "intermediate",
+                label: "First Project",
+                href: "/guides/first-project",
               },
               {
-                label: "Token Swapper",
-                href: "/guides/token-swap",
-                difficulty: "advanced",
-              },
-              {
-                label: "DeFi Dashboard",
-                href: "/guides/defi-dashboard",
-                difficulty: "advanced",
-              },
-              {
-                label: "Practice Workflow",
-                href: "/docs/practice",
-                difficulty: "intermediate",
+                label: "Safety Guide",
+                href: "/docs/safety-guide",
               },
             ],
           },
           {
-            title: "Ship",
+            title: "Discover",
             icon: "Layout",
             items: [
               {
-                label: "GitHub Workflow",
-                href: "/docs/github-workflow",
-                difficulty: "intermediate",
+                label: "AI Tools Discovery",
+                href: "/docs/discover",
               },
               {
-                label: "Deploy to Production",
-                href: "/docs/deployment",
-                difficulty: "advanced",
-              },
-              {
-                label: "Marketing Your Project",
-                href: "/docs/marketing",
-                difficulty: "intermediate",
-              },
-              {
-                label: "Community Building",
-                href: "/docs/community",
-                difficulty: "beginner",
-              },
-            ],
-          },
-          {
-            title: "Resources",
-            icon: "Code",
-            items: [
-              {
-                label: "Cardano APIs",
-                href: "/docs/apis",
-                difficulty: "intermediate",
-              },
-              {
-                label: "Example Projects",
-                href: "/docs/example-content",
-                difficulty: "beginner",
+                label: "Join Discord",
+                href: "https://discord.gg/meshjs",
               },
             ],
           },
@@ -472,13 +462,11 @@ export function getSidebarSections(
 
   const sections = getPersonaSpecificSections(persona);
 
-  // Filter sections and items based on persona
-  return sections
-    .map(section => ({
-      ...section,
-      items: filterItemsByPersona(section.items, persona),
-    }))
-    .filter(section => section.items.length > 0); // Remove empty sections
+  // Filter items by persona for each section
+  return sections.map(section => ({
+    ...section,
+    items: filterItemsByPersona(section.items, persona),
+  }));
 }
 
 // Utility functions for sidebar state management

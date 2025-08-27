@@ -312,7 +312,7 @@ export default function Sidebar() {
           >
             <div className="flex items-center gap-3">
               <MetallicCardanoLogo size={24} className="flex-shrink-0" />
-              <span className="font-display font-semibold text-text-primary text-sm">
+              <span className="font-mono font-bold text-text-primary text-sm tracking-wide">
                 LEARNING SECTIONS
               </span>
             </div>
@@ -343,7 +343,7 @@ export default function Sidebar() {
               onMouseDown={e => e.stopPropagation()}
             >
               <Home className="w-5 h-5 text-primary" />
-              <span className="font-display font-medium text-text-primary text-sm">
+              <span className="font-mono font-bold text-text-primary text-sm">
                 Home
               </span>
             </Link>
@@ -445,7 +445,7 @@ export default function Sidebar() {
                       onMouseDown={e => e.stopPropagation()}
                     >
                       <span className="text-primary mr-3">{section.icon}</span>
-                      <span className="flex-1 font-display font-medium text-text-primary">
+                      <span className="flex-1 font-mono font-bold text-text-primary">
                         {section.title}
                       </span>
                     </Link>
@@ -466,7 +466,7 @@ export default function Sidebar() {
                       tabIndex={0}
                     >
                       <span className="text-primary mr-3">{section.icon}</span>
-                      <span className="flex-1 font-display font-medium text-text-primary">
+                      <span className="flex-1 font-mono font-bold text-text-primary">
                         {section.title}
                       </span>
                       <ChevronDown
@@ -479,7 +479,7 @@ export default function Sidebar() {
 
                   {/* Tooltip for collapsed state */}
                   {collapsed && (
-                    <span className="absolute left-full top-1/2 -translate-y-1/2 ml-2 px-3 py-2 rounded-lg bg-surface-elevated border border-border text-xs text-text-primary opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50 shadow-lg transition-opacity duration-200 font-display">
+                    <span className="absolute left-full top-1/2 -translate-y-1/2 ml-2 px-3 py-2 rounded-lg bg-surface-elevated border border-border text-xs text-text-primary opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50 shadow-lg transition-opacity duration-200 font-mono font-bold">
                       {section.title}
                     </span>
                   )}

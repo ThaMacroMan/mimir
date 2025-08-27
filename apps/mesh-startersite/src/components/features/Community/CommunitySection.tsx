@@ -14,7 +14,7 @@ export default function CommunitySection() {
       <div className="flex flex-col items-center w-full max-w-2xl">
         <div className="flex flex-row gap-8 w-full justify-center border border-primary/20 rounded-xl px-8 py-5 bg-primary/5 shadow-sm">
           <span className=" px-4 py-1 border-primary/30 rounded-full text-primary font-mono text-base font-semibold tracking-wide bg-primary/5">
-            And make new friends:
+            Find other Builders:
           </span>
           <motion.a
             href="https://twitter.com/mesh_js"
@@ -25,7 +25,7 @@ export default function CommunitySection() {
             whileTap={{ scale: 0.95 }}
           >
             <Twitter className="w-5 h-5" />
-            <span className="text-sm font-medium">Twitter</span>
+            <span className="text-sm font-mono font-medium">Twitter</span>
           </motion.a>
           <motion.a
             href="https://discord.gg/meshjs"
@@ -36,7 +36,7 @@ export default function CommunitySection() {
             whileTap={{ scale: 0.95 }}
           >
             <MessageCircle className="w-5 h-5" />
-            <span className="text-sm font-medium">Discord</span>
+            <span className="text-sm font-mono font-medium">Discord</span>
           </motion.a>
           <motion.a
             href="https://github.com/MeshJS/mesh"
@@ -47,7 +47,7 @@ export default function CommunitySection() {
             whileTap={{ scale: 0.95 }}
           >
             <Github className="w-5 h-5" />
-            <span className="text-sm font-medium">GitHub</span>
+            <span className="text-sm font-mono font-medium">GitHub</span>
           </motion.a>
         </div>
       </div>

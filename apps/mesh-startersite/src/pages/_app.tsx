@@ -2,7 +2,7 @@ import "@/styles/globals.css";
 import "@meshsdk/react/styles.css";
 import type { AppProps } from "next/app";
 import { AnimatePresence } from "framer-motion";
-import Layout from "../../Layout";
+import Layout from "../components/layout/Layout";
 import ClickSpark from "../components/features/ClickCounter/ClickSpark";
 import { PersonaProvider } from "../contexts/PersonaContext";
 

@@ -1,10 +1,10 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { ReactNode, useEffect, useState, useRef } from "react";
-import Sidebar from "./src/components/layout/Sidebar/Sidebar";
-import ResourceSidebar from "./src/components/layout/Sidebar/AIChatSidebar";
-import ScrollNavigation from "./src/components/layout/ScrollNavigation";
-import { Terminal } from "./src/components/magicui/terminal";
-import { resetAllSidebarStates } from "./src/utils/sidebarUtils";
+import Sidebar from "./Sidebar/Sidebar";
+import ResourceSidebar from "./Sidebar/AIChatSidebar";
+import ScrollNavigation from "./ScrollNavigation";
+import { Terminal } from "../magicui/terminal";
+import { resetAllSidebarStates } from "../../utils/sidebarUtils";
 
 export default function Layout({ children }: { children: ReactNode }) {
   const [terminalOpen, setTerminalOpen] = useState(false);

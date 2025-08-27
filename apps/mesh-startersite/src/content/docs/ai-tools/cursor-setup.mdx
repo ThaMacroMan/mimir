@@ -1,0 +1,231 @@
+---
+title: "Cursor Setup"
+description: "Get Cursor installed and configured for AI-powered Cardano development"
+difficulty: "intermediate"
+persona: "ai-user"
+---
+
+# Cursor Setup 🚀
+
+Cursor is an AI-powered code editor that will revolutionize how you write Cardano code. It's like having a brilliant coding partner who understands your project and helps you build faster.
+
+## What is Cursor?
+
+Cursor is a code editor built on VS Code that integrates AI directly into your development workflow. It can:
+
+- **Generate code** from natural language descriptions
+- **Explain code** you don't understand
+- **Debug issues** by analyzing your code
+- **Refactor code** to improve quality
+- **Answer questions** about your project
+
+## Why Cursor for Cardano Development?
+
+- **Cardano-aware**: Understands blockchain concepts and patterns
+- **TypeScript support**: Excellent for MeshJS and modern Cardano development
+- **Git integration**: Seamless version control for your projects
+- **Extensible**: All VS Code extensions work with Cursor
+
+## Installation
+
+### Step 1: Download Cursor
+
+1. Go to [cursor.sh](https://cursor.sh)
+2. Click "Download for [Your OS]"
+3. Install the application
+
+### Step 2: First Launch
+
+1. Open Cursor
+2. Sign in with your GitHub account (recommended)
+3. Choose your preferred theme and settings
+
+### Step 3: Install Extensions
+
+Install these essential extensions for Cardano development:
+
+```bash
+# Essential extensions
+- TypeScript and JavaScript Language Features
+- Prettier - Code formatter
+- ESLint
+- GitLens
+- Auto Rename Tag
+- Bracket Pair Colorizer
+```
+
+## Configuration
+
+### AI Settings
+
+1. Open Settings (`Cmd/Ctrl + ,`)
+2. Search for "AI" or "Cursor"
+3. Configure your preferred AI model (Claude 3.5 Sonnet recommended)
+4. Set your API key if using custom models
+
+### Cardano Development Setup
+
+1. **Install Node.js** (if not already installed)
+2. **Install MeshJS**: `npm install @meshsdk/meshjs`
+3. **Configure TypeScript** for strict mode
+
+### Recommended Settings
+
+```json
+{
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "editor.suggestSelection": "first",
+  "editor.tabCompletion": "on"
+}
+```
+
+## Your First AI-Powered Coding Session
+
+### 1. **Open a Project**
+
+- Create a new folder for your Cardano project
+- Open it in Cursor
+- Initialize a new Node.js project: `npm init -y`
+
+### 2. **Ask Cursor to Help**
+
+Open the AI chat (`Cmd/Ctrl + L`) and try:
+
+```
+"I want to create a simple Cardano wallet using MeshJS. Can you help me set up the basic structure?"
+```
+
+### 3. **Generate Code**
+
+Ask Cursor to:
+
+- Create the project structure
+- Set up basic dependencies
+- Generate a simple wallet implementation
+
+### 4. **Iterate and Improve**
+
+- Ask questions about the generated code
+- Request improvements and optimizations
+- Get explanations for complex parts
+
+## Cursor AI Commands
+
+### Chat Commands
+
+- `Cmd/Ctrl + L` - Open AI chat
+- `Cmd/Ctrl + K` - Quick AI command
+- `Cmd/Ctrl + I` - Inline AI edit
+
+### Code Generation
+
+- Select code and ask for explanations
+- Use `/edit` to modify existing code
+- Use `/explain` to understand complex code
+
+### Project Help
+
+- Ask about project structure
+- Get help with dependencies
+- Debug issues step by step
+
+## Best Practices for Cardano Development
+
+### 1. **Start with Clear Prompts**
+
+```
+❌ "Help me build a dApp"
+✅ "Create a simple Cardano NFT minting dApp with React and MeshJS"
+```
+
+### 2. **Use Context**
+
+- Show Cursor your existing code
+- Explain your project goals
+- Reference specific Cardano concepts
+
+### 3. **Verify and Test**
+
+- Always test generated code
+- Verify Cardano-specific logic
+- Check for security best practices
+
+### 4. **Learn as You Go**
+
+- Ask Cursor to explain generated code
+- Request alternative approaches
+- Get help with debugging
+
+## Common Cardano Development Tasks
+
+### Setting Up a Project
+
+```
+"Create a Next.js project structure for a Cardano dApp with TypeScript, Tailwind CSS, and MeshJS integration"
+```
+
+### Wallet Integration
+
+```
+"Show me how to connect a Cardano wallet using MeshJS and handle wallet state in React"
+```
+
+### Transaction Building
+
+```
+"Create a function to build a simple ADA transfer transaction using MeshJS"
+```
+
+### Error Handling
+
+```
+"Help me add proper error handling for Cardano wallet connection failures"
+```
+
+## Troubleshooting
+
+### AI Not Responding
+
+- Check your internet connection
+- Verify API key settings
+- Restart Cursor
+
+### Code Generation Issues
+
+- Be more specific in your prompts
+- Provide more context about your project
+- Break complex requests into smaller parts
+
+### Performance Issues
+
+- Close unnecessary files
+- Disable heavy extensions
+- Restart Cursor periodically
+
+## Next Steps
+
+Now that Cursor is set up, let's build something real:
+
+- [Your First Transaction](/guides/first_transaction) - Build a simple Cardano transaction
+- [NFT Collection](/guides/nft-collection) - Create an NFT minting dApp
+- [Live Coding](/docs/live-coding) - Watch AI-assisted development in action
+
+## Practice Exercise
+
+**Try this in Cursor:**
+
+1. Create a new folder called `cursor-cardano-demo`
+2. Open it in Cursor
+3. Ask Cursor: "Help me create a simple HTML page that explains Cardano to beginners"
+4. Ask follow-up questions about the generated code
+5. Request improvements and modifications
+
+**Challenge**: Use Cursor to help you understand one concept from the generated code that you're curious about.
+
+---
+
+**Pro Tip**: Cursor gets better the more you use it. The AI learns your coding style and project patterns, so don't be afraid to experiment and ask lots of questions!

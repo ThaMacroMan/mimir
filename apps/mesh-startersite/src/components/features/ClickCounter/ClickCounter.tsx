@@ -596,7 +596,7 @@ const ClickCounter: React.FC<ClickCounterProps> = ({
                 className="bg-surface/40 hover:bg-surface/60 border border-border/30 hover:border-primary/30 rounded-lg px-4 py-2 text-xs text-text-secondary hover:text-primary transition-all duration-200 flex items-center gap-2 mx-auto"
               >
                 <RotateCcw className="w-3 h-3" />
-                Reset Counter
+                <span className="font-mono">Reset Counter</span>
               </motion.button>
             </motion.div>
           )}

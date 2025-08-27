@@ -1,4 +1,3 @@
-import Head from "next/head";
 import { motion } from "framer-motion";
 import FluidBackground from "../components/shared/Background/FluidBackground";
 import MimirHero from "../components/features/Persona/MimirHero";
@@ -28,15 +27,7 @@ export default function Home() {
   return (
     <div className="w-full h-screen cardano-gradient-bg fixed inset-0">
       {/* Fluid Cardano logos background */}
-      <FluidBackground />
-
-      <Head>
-        <title>Mimir | Anyone Can Build on Cardano</title>
-        <meta
-          name="description"
-          content="You don't need to be a programmer. Just describe what you want to build and AI will help create it for you. Start building on Cardano today."
-        />
-      </Head>
+      <FluidBackground persona={selectedPersona} />
 
       {/* Scrollable content container */}
       <div className="relative z-10 w-full h-full overflow-y-auto">
@@ -98,13 +89,7 @@ export default function Home() {
         >
           <div className="container mx-auto px-6">
             <motion.div className="flex justify-center" variants={fadeInUp}>
-              <ClickCounter
-                initialCount={0}
-                showMilestones={true}
-                milestoneValues={[10, 25, 50, 100, 250, 500, 1000]}
-                persistData={true}
-                storageKey="mimir-v1-click-counter"
-              />
+              <ClickCounter />
             </motion.div>
           </div>
         </motion.section>

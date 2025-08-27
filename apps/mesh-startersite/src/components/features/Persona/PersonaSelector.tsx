@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { CheckCircle } from "lucide-react";
-import { PERSONAS, LearnerPersona, PersonaConfig } from "../../../types/personas";
+import {
+  PERSONAS,
+  LearnerPersona,
+  PersonaConfig,
+} from "../../../types/personas";
 import { MetallicCardanoLogo } from "../../shared/Logo";
 import Image from "next/image";
 import { useCyclingText } from "../../../hooks/useCyclingText";

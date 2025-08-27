@@ -685,7 +685,7 @@ export default function ResourceSidebar({
               >
                 <div className="flex items-center gap-2">
                   <MetallicCardanoLogo size={24} className="flex-shrink-0" />
-                  <span className="font-display font-semibold text-text-primary text-sm">
+                  <span className="font-mono font-bold text-text-primary text-sm tracking-wide">
                     RESOURCES & AI CHAT
                   </span>
                 </div>
@@ -722,7 +722,7 @@ export default function ResourceSidebar({
                 }`}
               >
                 <BookOpen className="w-4 h-4" />
-                <span>Resources</span>
+                <span className="font-mono font-medium">Resources</span>
               </button>
               <button
                 onClick={() => {
@@ -737,7 +737,7 @@ export default function ResourceSidebar({
                 }`}
               >
                 <MessageSquare className="w-4 h-4" />
-                <span>AI Chat</span>
+                <span className="font-mono font-medium">AI Chat</span>
               </button>
             </div>
 
@@ -758,7 +758,7 @@ export default function ResourceSidebar({
                       <div className="flex items-start gap-3">
                         <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-text-primary text-sm mb-1 group-hover:text-primary transition-colors">
+                          <h4 className="font-mono font-bold text-text-primary text-sm mb-1 group-hover:text-primary transition-colors">
                             {resource.title}
                           </h4>
                           <p className="text-text-secondary text-xs leading-relaxed">

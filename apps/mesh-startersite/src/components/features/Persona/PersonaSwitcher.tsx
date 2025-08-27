@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
-import { PERSONAS, LearnerPersona, PersonaConfig } from "../../../types/personas";
+import {
+  PERSONAS,
+  LearnerPersona,
+  PersonaConfig,
+} from "../../../types/personas";
 import { usePersona } from "../../../contexts/PersonaContext";
 import { MetallicCardanoLogo } from "../../shared/Logo";
 import Image from "next/image";

@@ -1,0 +1,303 @@
+---
+title: "Safe Practices"
+description: "Essential security practices to keep you safe while developing and using Cardano applications"
+difficulty: "beginner"
+persona: "brand-new-to-ai"
+---
+
+# Safe Practices 🛡️
+
+Security is crucial in the blockchain world. This guide will teach you essential practices to protect yourself, your projects, and your users from common threats and scams.
+
+## Why Security Matters
+
+### **The Stakes Are High**
+
+- **Real Money**: You're dealing with actual cryptocurrency
+- **Irreversible Transactions**: Once sent, transactions can't be undone
+- **Public Nature**: All transactions are visible on the blockchain
+- **Target for Attackers**: Scammers target new users
+
+### **Common Threats**
+
+- **Phishing Attacks** - Fake websites and emails
+- **Malware** - Viruses that steal your keys
+- **Social Engineering** - Manipulation tactics
+- **Smart Contract Bugs** - Code vulnerabilities
+- **Private Key Theft** - Losing access to your funds
+
+## Private Key Security
+
+### **What Are Private Keys?**
+
+Private keys are like the password to your bank account. They:
+
+- **Control your funds** - Anyone with your key can spend your ADA
+- **Cannot be recovered** - If lost, your funds are gone forever
+- **Must be kept secret** - Never share them with anyone
+
+### **Best Practices**
+
+1. **Never share your private key** with anyone
+2. **Store keys securely** - Use hardware wallets for large amounts
+3. **Backup your keys** - Multiple secure locations
+4. **Use strong passwords** - For wallet encryption
+5. **Test with small amounts** - Before committing large sums
+
+### **Storage Options (From Most to Least Secure)**
+
+1. **Hardware Wallets** - Ledger, Trezor (most secure)
+2. **Paper Wallets** - Printed and stored safely
+3. **Software Wallets** - Daedalus, Yoroi (good for small amounts)
+4. **Exchange Wallets** - Least secure, not recommended for holding
+
+## Wallet Security
+
+### **Choosing a Wallet**
+
+- **Official Wallets** - Daedalus, Yoroi, Eternl
+- **Open Source** - Code can be audited
+- **Active Development** - Regular security updates
+- **Community Trust** - Widely used and recommended
+
+### **Wallet Setup Security**
+
+1. **Download from official sources** only
+2. **Verify file signatures** when possible
+3. **Use strong passwords** for wallet encryption
+4. **Enable two-factor authentication** if available
+5. **Test with small amounts** first
+
+### **Daily Security Habits**
+
+- **Lock your computer** when away
+- **Use antivirus software** and keep it updated
+- **Don't use public computers** for wallet access
+- **Log out** of wallets when done
+- **Monitor transactions** regularly
+
+## Smart Contract Security
+
+### **Understanding Smart Contract Risks**
+
+Smart contracts are programs that run on the blockchain:
+
+- **Immutable** - Once deployed, they can't be changed
+- **Public** - Anyone can see the code
+- **Automatic** - Execute without human intervention
+- **Vulnerable** - Bugs can lead to fund loss
+
+### **Security Best Practices**
+
+1. **Audit your code** - Use formal verification tools
+2. **Test thoroughly** - On testnets before mainnet
+3. **Start small** - Deploy with minimal funds first
+4. **Use established patterns** - Don't reinvent security
+5. **Plan for upgrades** - Design with upgradeability in mind
+
+### **Common Vulnerabilities**
+
+- **Reentrancy** - Functions calling themselves
+- **Overflow/Underflow** - Number manipulation attacks
+- **Access Control** - Unauthorized function access
+- **Logic Errors** - Incorrect business logic
+- **Gas Optimization** - Unexpected behavior
+
+## Network Security
+
+### **Understanding Cardano Networks**
+
+- **Mainnet** - Real Cardano network (real money)
+- **Testnet** - Testing environment (fake money)
+- **Devnet** - Development environment
+
+### **Network Security Practices**
+
+1. **Always use testnets** for development
+2. **Verify network settings** before transactions
+3. **Use official RPC endpoints** only
+4. **Monitor network status** for issues
+5. **Have fallback options** for critical operations
+
+### **RPC Endpoint Security**
+
+- **Use official endpoints** from Cardano Foundation
+- **Verify SSL certificates** for HTTPS connections
+- **Don't share credentials** or API keys
+- **Monitor usage** for unusual activity
+- **Have backup endpoints** ready
+
+## Social Engineering Protection
+
+### **Common Attack Vectors**
+
+- **Fake Support** - Scammers pretending to be help desk
+- **Phishing Emails** - Fake emails from trusted sources
+- **Social Media Scams** - Fake giveaways and contests
+- **Fake Websites** - Imitations of legitimate sites
+- **Impersonation** - Pretending to be someone you trust
+
+### **Protection Strategies**
+
+1. **Verify identities** - Don't trust usernames alone
+2. **Check URLs carefully** - Look for typos and fake domains
+3. **Don't click suspicious links** - Hover to see real destinations
+4. **Verify information** - Cross-check with official sources
+5. **Trust your instincts** - If something seems off, it probably is
+
+### **Red Flags to Watch For**
+
+- **Urgency** - "Act now or lose your funds!"
+- **Too good to be true** - Promises of huge returns
+- **Requests for private keys** - Legitimate services never ask
+- **Poor grammar** - Professional services use proper English
+- **Unusual requests** - Out-of-character behavior
+
+## Development Security
+
+### **Code Security Practices**
+
+1. **Use version control** - Track all changes
+2. **Code reviews** - Have others review your code
+3. **Automated testing** - Catch bugs before deployment
+4. **Security scanning** - Use tools to find vulnerabilities
+5. **Regular updates** - Keep dependencies current
+
+### **Environment Security**
+
+1. **Separate environments** - Development, staging, production
+2. **Access controls** - Limit who can access what
+3. **Monitoring** - Watch for unusual activity
+4. **Backups** - Regular, secure backups
+5. **Incident response** - Plan for security breaches
+
+### **API Security**
+
+1. **Rate limiting** - Prevent abuse
+2. **Authentication** - Verify user identity
+3. **Authorization** - Control access to resources
+4. **Input validation** - Sanitize all inputs
+5. **HTTPS only** - Encrypt all communications
+
+## Testing Security
+
+### **Security Testing Types**
+
+1. **Unit Testing** - Test individual functions
+2. **Integration Testing** - Test component interactions
+3. **Penetration Testing** - Simulate attacks
+4. **Code Auditing** - Manual code review
+5. **Formal Verification** - Mathematical proof of correctness
+
+### **Testnet Best Practices**
+
+1. **Use dedicated testnet wallets** - Separate from mainnet
+2. **Test all functionality** - Don't skip edge cases
+3. **Simulate attacks** - Try to break your own code
+4. **Document findings** - Keep track of issues found
+5. **Fix before mainnet** - Never deploy known vulnerabilities
+
+## Incident Response
+
+### **What to Do If Compromised**
+
+1. **Stay calm** - Panic leads to poor decisions
+2. **Isolate the threat** - Disconnect compromised systems
+3. **Assess damage** - Determine what was affected
+4. **Contact authorities** - Report to relevant agencies
+5. **Notify users** - If others are affected
+6. **Document everything** - For insurance and legal purposes
+
+### **Recovery Steps**
+
+1. **Secure systems** - Fix vulnerabilities
+2. **Restore from backups** - Clean backups only
+3. **Change credentials** - All passwords and keys
+4. **Monitor activity** - Watch for further attacks
+5. **Learn from incident** - Improve security measures
+
+## Security Tools and Resources
+
+### **Essential Security Tools**
+
+- **Antivirus Software** - Malware protection
+- **Password Managers** - Secure credential storage
+- **Two-Factor Authentication** - Extra login security
+- **VPN Services** - Secure internet connections
+- **Firewall Software** - Network protection
+
+### **Cardano-Specific Tools**
+
+- **Cardano CLI** - Command line security tools
+- **Blockchain Explorers** - Transaction monitoring
+- **Wallet Security Features** - Built-in protections
+- **Smart Contract Auditing** - Formal verification tools
+- **Network Monitoring** - Status and health checks
+
+### **Learning Resources**
+
+- [OWASP Top 10](https://owasp.org/www-project-top-ten/) - Web security
+- [Cardano Security](https://docs.cardano.org/) - Official documentation
+- [Smart Contract Security](https://consensys.net/blog/) - Best practices
+- [Blockchain Security](https://www.blockchain.com/) - Industry standards
+
+## Security Checklist
+
+### **Before Starting Development**
+
+- [ ] Set up secure development environment
+- [ ] Install security tools and software
+- [ ] Create secure backup procedures
+- [ ] Plan security testing strategy
+- [ ] Set up monitoring and alerting
+
+### **During Development**
+
+- [ ] Use secure coding practices
+- [ ] Test security features regularly
+- [ ] Review code for vulnerabilities
+- [ ] Keep dependencies updated
+- [ ] Document security decisions
+
+### **Before Deployment**
+
+- [ ] Complete security audit
+- [ ] Test on testnet thoroughly
+- [ ] Verify all security measures
+- [ ] Plan incident response
+- [ ] Set up monitoring
+
+### **After Deployment**
+
+- [ ] Monitor for security issues
+- [ ] Keep systems updated
+- [ ] Review security logs
+- [ ] Conduct regular audits
+- [ ] Update security measures
+
+## Next Steps
+
+Security is an ongoing process. Continue learning:
+
+- [Your First Project](/guides/first-project) - Apply security practices
+- [Simple Examples](/docs/example-content) - See secure implementations
+- [Community Projects](/docs/community) - Learn from others
+- [Advanced Security](/docs/advanced-security) - Deep dive into security
+
+## Practice Exercise
+
+**Test Your Security Knowledge:**
+
+1. Create a security checklist for your project
+2. Identify potential vulnerabilities in your code
+3. Practice secure wallet setup on testnet
+4. Research recent security incidents in blockchain
+5. Join security-focused communities
+
+**Challenge**: Set up a complete secure development environment with all recommended tools and practices.
+
+---
+
+**Remember**: Security is not a one-time task but an ongoing commitment. The blockchain world moves fast, and new threats emerge constantly. Stay informed, stay vigilant, and always prioritize security in your development work.
+
+**Pro Tip**: Consider security from day one. It's much easier to build security in from the start than to add it later. Every line of code you write should consider security implications.

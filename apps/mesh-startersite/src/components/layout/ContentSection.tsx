@@ -238,12 +238,12 @@ export default function ContentSection({
         {(title || subtitle) && (
           <motion.div variants={fadeInUp} className="text-center mb-12">
             {title && (
-              <h2 className="text-3xl md:text-5xl font-bold text-primary mb-4 tracking-tight">
+              <h2 className="text-3xl md:text-5xl font-mono font-bold text-primary mb-4 tracking-tight">
                 {title}
               </h2>
             )}
             {subtitle && (
-              <p className="text-lg md:text-xl text-text-secondary font-medium max-w-3xl mx-auto leading-relaxed">
+              <p className="text-lg md:text-xl text-text-secondary font-mono font-medium max-w-3xl mx-auto leading-relaxed">
                 {subtitle}
               </p>
             )}

@@ -1,0 +1,392 @@
+---
+title: "Getting Started with Cardano Development"
+description: "Your complete roadmap to becoming a Cardano developer, from zero to your first dApp"
+difficulty: "beginner"
+persona: "brand-new-to-ai"
+---
+
+# Getting Started with Cardano Development 🚀
+
+Welcome to your Cardano development journey! This guide will take you from complete beginner to building your first decentralized application (dApp) on Cardano.
+
+## What You'll Learn
+
+By the end of this guide, you'll be able to:
+
+- Understand blockchain and Cardano fundamentals
+- Set up your development environment
+- Create your first Cardano transaction
+- Build a simple dApp
+- Deploy your project to production
+
+## Prerequisites
+
+### **What You Need:**
+
+- Basic computer skills
+- Internet connection
+- Curiosity and patience
+- No programming experience required!
+
+### **What You Don't Need:**
+
+- Expensive hardware
+- Programming background
+- Large amounts of money
+- Technical expertise
+
+## Your Learning Path
+
+### **Phase 1: Foundation (Week 1-2)** 🏗️
+
+- [What is AI?](/docs/ai-basics) - Understand AI tools
+- [What is Blockchain?](/docs/blockchain-basics) - Learn blockchain basics
+- [Cardano Explained](/docs/cardano-explained) - Dive into Cardano
+- [Try ChatGPT](/docs/chatgpt-guide) - Start using AI
+
+### **Phase 2: First Steps (Week 3-4)** 👣
+
+- [Your First Project](/guides/first-project) - Build something simple
+- [Safe Practices](/docs/safety-guide) - Learn security basics
+- [Simple Examples](/docs/example-content) - See what's possible
+
+### **Phase 3: Building (Week 5-6)** 🏗️
+
+- [First Transaction](/guides/first_transaction) - Make real transactions
+- [NFT Collection](/guides/nft-collection) - Create digital assets
+- [Community Projects](/docs/community) - Join the ecosystem
+
+## Setting Up Your Environment
+
+### **1. Install Essential Tools**
+
+#### **Code Editor**
+
+- **Cursor** (Recommended for AI assistance)
+- **VS Code** (Alternative)
+- **Sublime Text** (Lightweight option)
+
+#### **Development Tools**
+
+- **Node.js** - JavaScript runtime
+- **Git** - Version control
+- **Terminal** - Command line interface
+
+### **2. Create Your Workspace**
+
+```bash
+# Create a folder for your projects
+mkdir cardano-projects
+cd cardano-projects
+
+# Create your first project
+mkdir my-first-dapp
+cd my-first-dapp
+```
+
+### **3. Set Up Version Control**
+
+```bash
+# Initialize Git repository
+git init
+
+# Create your first commit
+git add .
+git commit -m "Initial commit: Starting my Cardano journey"
+```
+
+## Understanding the Cardano Ecosystem
+
+### **Core Components**
+
+- **Cardano Node** - The blockchain itself
+- **Wallets** - Store and manage ADA
+- **Smart Contracts** - Programmable logic
+- **dApps** - Decentralized applications
+
+### **Development Tools**
+
+- **MeshJS** - JavaScript SDK for Cardano
+- **Plutus** - Smart contract language
+- **Cardano CLI** - Command line tools
+- **Blockfrost** - API for blockchain data
+
+### **Networks**
+
+- **Mainnet** - Real Cardano network (real money)
+- **Testnet** - Testing environment (fake money)
+- **Devnet** - Development environment
+
+## Your First Project: Hello Cardano
+
+### **Project Overview**
+
+We'll build a simple web page that:
+
+- Displays Cardano information
+- Shows current ADA price
+- Explains blockchain concepts
+- Demonstrates basic web development
+
+### **Step 1: Create the HTML Structure**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hello Cardano</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>🌿 Welcome to Cardano</h1>
+      <p>Your journey to blockchain development starts here</p>
+    </header>
+
+    <main>
+      <section id="cardano-info">
+        <h2>What is Cardano?</h2>
+        <p>
+          Cardano is a blockchain platform for changemakers, innovators, and
+          visionaries.
+        </p>
+      </section>
+
+      <section id="price-display">
+        <h2>Current ADA Price</h2>
+        <div id="ada-price">Loading...</div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Built with ❤️ for the Cardano community</p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
+```
+
+### **Step 2: Add Styling**
+
+```css
+/* styles.css */
+body {
+  font-family: "Arial", sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+header {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+section {
+  background: rgba(255, 255, 255, 0.1);
+  margin: 2rem 0;
+  padding: 2rem;
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+}
+
+footer {
+  text-align: center;
+  padding: 2rem;
+  background: rgba(0, 0, 0, 0.1);
+}
+```
+
+### **Step 3: Add Interactivity**
+
+```javascript
+// script.js
+document.addEventListener("DOMContentLoaded", function () {
+  // Display current date
+  const dateElement = document.createElement("p");
+  dateElement.textContent = `Today is: ${new Date().toLocaleDateString()}`;
+  document.querySelector("header").appendChild(dateElement);
+
+  // Simulate ADA price (in real app, you'd fetch from API)
+  const adaPrice = document.getElementById("ada-price");
+  adaPrice.innerHTML = `
+        <div style="font-size: 2rem; font-weight: bold;">
+            $0.45 USD
+        </div>
+        <small>Updated: ${new Date().toLocaleTimeString()}</small>
+    `;
+
+  // Add interactive elements
+  const sections = document.querySelectorAll("section");
+  sections.forEach(section => {
+    section.addEventListener("click", function () {
+      this.style.transform = "scale(1.02)";
+      setTimeout(() => {
+        this.style.transform = "scale(1)";
+      }, 200);
+    });
+  });
+});
+```
+
+## Testing Your Project
+
+### **1. Open in Browser**
+
+- Double-click your HTML file
+- Or use a local server: `python -m http.server 8000`
+
+### **2. Test Functionality**
+
+- Click on sections to see animations
+- Check if the date displays correctly
+- Verify the ADA price shows
+
+### **3. Debug Issues**
+
+- Open browser developer tools (F12)
+- Check the Console tab for errors
+- Use the Elements tab to inspect HTML
+
+## Next Steps
+
+### **Immediate Next Steps:**
+
+1. **Customize your project** - Change colors, add content
+2. **Add more features** - Include images, links, forms
+3. **Test on different devices** - Mobile, tablet, desktop
+4. **Share with friends** - Get feedback and suggestions
+
+### **Week 2 Goals:**
+
+- [Safe Practices](/docs/safety-guide) - Learn security
+- [Simple Examples](/docs/example-content) - See more possibilities
+- [Community Projects](/docs/community) - Join the ecosystem
+
+### **Week 3 Goals:**
+
+- [First Transaction](/guides/first_transaction) - Real blockchain interaction
+- [NFT Collection](/guides/nft-collection) - Create digital assets
+- [Advanced Features](/docs/advanced-features) - Add complexity
+
+## Common Challenges & Solutions
+
+### **"I don't understand the code"**
+
+- **Solution**: Use ChatGPT to explain each line
+- **Practice**: Modify small parts and see what happens
+- **Remember**: You don't need to understand everything at once
+
+### **"My project doesn't work"**
+
+- **Solution**: Check browser console for errors
+- **Practice**: Start simple and add features gradually
+- **Remember**: Debugging is a normal part of development
+
+### **"I'm overwhelmed by all the information"**
+
+- **Solution**: Focus on one concept at a time
+- **Practice**: Build small projects to reinforce learning
+- **Remember**: Everyone starts as a beginner
+
+## Getting Help
+
+### **AI Tools**
+
+- **ChatGPT** - Ask questions about concepts
+- **Cursor** - Get help with code
+- **Windsurf** - Generate project ideas
+
+### **Community Resources**
+
+- **Discord** - Join the MeshJS community
+- **Reddit** - r/cardano and r/cardanodevelopers
+- **Stack Overflow** - Technical questions
+- **YouTube** - Video tutorials and explanations
+
+### **Official Resources**
+
+- [Cardano Documentation](https://docs.cardano.org/)
+- [MeshJS Documentation](https://meshjs.dev/)
+- [Cardano Developer Portal](https://developers.cardano.org/)
+
+## Practice Exercises
+
+### **Exercise 1: Customize Your Project**
+
+- Change the color scheme
+- Add your own content
+- Include images or icons
+- Make it responsive for mobile
+
+### **Exercise 2: Add New Features**
+
+- Create a navigation menu
+- Add a contact form
+- Include a blog section
+- Add social media links
+
+### **Exercise 3: Learn by Doing**
+
+- Try different CSS properties
+- Experiment with JavaScript functions
+- Test on different browsers
+- Get feedback from others
+
+## Success Metrics
+
+### **Week 1: Foundation**
+
+- ✅ Understand basic blockchain concepts
+- ✅ Set up development environment
+- ✅ Create first HTML page
+- ✅ Deploy to local server
+
+### **Week 2: Building**
+
+- ✅ Customize project appearance
+- ✅ Add interactive features
+- ✅ Test on multiple devices
+- ✅ Share with community
+
+### **Week 3: Advancing**
+
+- ✅ Understand Cardano fundamentals
+- ✅ Make first blockchain transaction
+- ✅ Build more complex features
+- ✅ Plan next project
+
+## Remember These Key Points
+
+1. **Start Small** - Don't try to build everything at once
+2. **Learn by Doing** - Reading is good, building is better
+3. **Use AI Tools** - They're here to help you learn faster
+4. **Join Communities** - You're not alone in this journey
+5. **Be Patient** - Learning takes time, but it's worth it
+
+## Next Steps
+
+Ready to continue your journey? Choose your path:
+
+- [Safe Practices](/docs/safety-guide) - Learn to stay secure
+- [Simple Examples](/docs/example-content) - See what's possible
+- [First Transaction](/guides/first_transaction) - Interact with the blockchain
+- [Community Projects](/docs/community) - Join the ecosystem
+
+---
+
+**Remember**: Every expert was once a beginner. You're taking the first step on an exciting journey that could change your life and the world. Take it one step at a time, and don't be afraid to ask for help!
+
+**Pro Tip**: Keep a development journal. Document what you learn, the challenges you face, and how you solve them. This will become your personal guide and show you how far you've come.

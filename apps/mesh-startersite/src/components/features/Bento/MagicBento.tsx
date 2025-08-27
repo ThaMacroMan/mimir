@@ -1,8 +1,8 @@
 "use client";
 
-import MimirHero from "./MimirHero";
+import MimirHero from "../Persona/MimirHero";
 import BentoGrid from "./BentoGrid";
-import CommunitySection from "./CommunitySection";
+import CommunitySection from "../Community/CommunitySection";
 
 export default function MagicBento() {
   return (

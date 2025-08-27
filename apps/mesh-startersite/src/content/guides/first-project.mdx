@@ -1,0 +1,1327 @@
+---
+title: "Your First Project"
+description: "Build your first Cardano project - a simple web application that introduces you to blockchain development"
+difficulty: "beginner"
+persona: "brand-new-to-ai"
+---
+
+# Your First Project 🎯
+
+Congratulations! You're ready to build your first Cardano project. This guide will walk you through creating a simple web application that will teach you the fundamentals of blockchain development.
+
+## What We'll Build
+
+We'll create a **Cardano Information Dashboard** that:
+
+- Displays real-time Cardano network information
+- Shows current ADA price and market data
+- Explains blockchain concepts to visitors
+- Demonstrates modern web development practices
+- Prepares you for more complex blockchain projects
+
+## Project Overview
+
+### **Features**
+
+- Responsive web design
+- Real-time data integration
+- Interactive elements
+- Educational content
+- Professional appearance
+
+### **Technologies Used**
+
+- HTML5 for structure
+- CSS3 for styling
+- JavaScript for interactivity
+- Cardano APIs for blockchain data
+- Modern web development practices
+
+### **Learning Outcomes**
+
+- Understand web development basics
+- Learn to integrate external APIs
+- Practice responsive design
+- Gain confidence with coding
+- Prepare for blockchain development
+
+## Prerequisites
+
+### **What You Need**
+
+- Basic computer skills
+- Text editor (Cursor recommended)
+- Web browser
+- Internet connection
+- Curiosity and patience
+
+### **What You Don't Need**
+
+- Programming experience
+- Expensive software
+- Complex development environment
+- Deep technical knowledge
+
+## Setting Up Your Environment
+
+### **Step 1: Install Cursor**
+
+1. Go to [cursor.sh](https://cursor.sh)
+2. Download for your operating system
+3. Install and launch Cursor
+4. Sign in with your GitHub account
+
+### **Step 2: Create Project Folder**
+
+```bash
+# Create your project directory
+mkdir cardano-dashboard
+cd cardano-dashboard
+
+# Open in Cursor
+cursor .
+```
+
+### **Step 3: Set Up Git**
+
+```bash
+# Initialize Git repository
+git init
+
+# Create .gitignore file
+echo "node_modules/" > .gitignore
+echo ".env" >> .gitignore
+echo "*.log" >> .gitignore
+
+# Make first commit
+git add .
+git commit -m "Initial project setup"
+```
+
+## Project Structure
+
+```
+cardano-dashboard/
+├── index.html          # Main HTML file
+├── styles/
+│   ├── main.css        # Main stylesheet
+│   └── responsive.css  # Mobile styles
+├── scripts/
+│   ├── main.js         # Main JavaScript
+│   ├── api.js          # API functions
+│   └── utils.js        # Utility functions
+├── assets/
+│   ├── images/         # Project images
+│   └── icons/          # Icon files
+├── README.md           # Project documentation
+└── .gitignore          # Git ignore file
+```
+
+## Building the HTML Structure
+
+### **Step 1: Create the Main HTML File**
+
+Create `index.html` with this structure:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cardano Dashboard - Your Gateway to Blockchain</title>
+    <meta
+      name="description"
+      content="Learn about Cardano blockchain and track real-time network data"
+    />
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="styles/main.css" />
+    <link rel="stylesheet" href="styles/responsive.css" />
+
+    <!-- Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="assets/icons/favicon.ico" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <nav class="nav">
+        <div class="nav-brand">
+          <img
+            src="assets/icons/cardano-icon.svg"
+            alt="Cardano"
+            class="brand-icon"
+          />
+          <h1 class="brand-text">Cardano Dashboard</h1>
+        </div>
+        <ul class="nav-menu">
+          <li><a href="#overview" class="nav-link">Overview</a></li>
+          <li><a href="#network" class="nav-link">Network</a></li>
+          <li><a href="#learn" class="nav-link">Learn</a></li>
+          <li><a href="#about" class="nav-link">About</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+      <!-- Hero Section -->
+      <section class="hero">
+        <div class="hero-content">
+          <h2 class="hero-title">Welcome to the Future of Blockchain</h2>
+          <p class="hero-subtitle">
+            Discover Cardano's innovative approach to decentralized technology
+          </p>
+          <div class="hero-stats">
+            <div class="stat-item">
+              <span class="stat-value" id="ada-price">Loading...</span>
+              <span class="stat-label">ADA Price</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value" id="network-status">Online</span>
+              <span class="stat-label">Network Status</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Overview Section -->
+      <section id="overview" class="section">
+        <div class="container">
+          <h2 class="section-title">What is Cardano?</h2>
+          <div class="overview-grid">
+            <div class="overview-card">
+              <div class="card-icon">🔬</div>
+              <h3>Research-Driven</h3>
+              <p>Built on peer-reviewed academic research and formal methods</p>
+            </div>
+            <div class="overview-card">
+              <div class="card-icon">🌱</div>
+              <h3>Sustainable</h3>
+              <p>
+                Proof-of-stake consensus uses 99.95% less energy than
+                proof-of-work
+              </p>
+            </div>
+            <div class="overview-card">
+              <div class="card-icon">🔗</div>
+              <h3>Interoperable</h3>
+              <p>
+                Designed to work with other blockchains and traditional systems
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Network Section -->
+      <section id="network" class="section">
+        <div class="container">
+          <h2 class="section-title">Network Statistics</h2>
+          <div class="network-grid">
+            <div class="network-card">
+              <h3>Current Epoch</h3>
+              <div class="network-value" id="current-epoch">Loading...</div>
+            </div>
+            <div class="network-card">
+              <h3>Total Supply</h3>
+              <div class="network-value" id="total-supply">Loading...</div>
+            </div>
+            <div class="network-card">
+              <h3>Circulating Supply</h3>
+              <div class="network-value" id="circulating-supply">
+                Loading...
+              </div>
+            </div>
+            <div class="network-card">
+              <h3>Stake Pools</h3>
+              <div class="network-value" id="stake-pools">Loading...</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Learn Section -->
+      <section id="learn" class="section">
+        <div class="container">
+          <h2 class="section-title">Learn About Blockchain</h2>
+          <div class="learn-content">
+            <div class="learn-text">
+              <h3>Understanding the Basics</h3>
+              <p>
+                Blockchain technology is revolutionizing how we think about
+                trust, security, and digital ownership. Cardano represents the
+                next generation of this technology.
+              </p>
+
+              <h3>Key Concepts</h3>
+              <ul>
+                <li>
+                  <strong>Decentralization:</strong> No single entity controls
+                  the network
+                </li>
+                <li>
+                  <strong>Immutability:</strong> Once recorded, data cannot be
+                  changed
+                </li>
+                <li>
+                  <strong>Transparency:</strong> All transactions are publicly
+                  visible
+                </li>
+                <li>
+                  <strong>Security:</strong> Advanced cryptography protects the
+                  network
+                </li>
+              </ul>
+            </div>
+            <div class="learn-visual">
+              <div class="blockchain-diagram">
+                <div class="block">Block 1</div>
+                <div class="block">Block 2</div>
+                <div class="block">Block 3</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- About Section -->
+      <section id="about" class="section">
+        <div class="container">
+          <h2 class="section-title">About This Project</h2>
+          <div class="about-content">
+            <p>
+              This dashboard was created to help newcomers understand Cardano
+              and blockchain technology. It demonstrates modern web development
+              practices while providing valuable information about the Cardano
+              ecosystem.
+            </p>
+
+            <div class="tech-stack">
+              <h3>Technologies Used</h3>
+              <div class="tech-tags">
+                <span class="tech-tag">HTML5</span>
+                <span class="tech-tag">CSS3</span>
+                <span class="tech-tag">JavaScript</span>
+                <span class="tech-tag">Cardano APIs</span>
+                <span class="tech-tag">Responsive Design</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3>Cardano Dashboard</h3>
+            <p>Your gateway to blockchain technology</p>
+          </div>
+          <div class="footer-section">
+            <h3>Resources</h3>
+            <ul>
+              <li><a href="https://cardano.org">Official Website</a></li>
+              <li><a href="https://docs.cardano.org">Documentation</a></li>
+              <li>
+                <a href="https://github.com/input-output-hk/cardano-node"
+                  >GitHub</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h3>Connect</h3>
+            <ul>
+              <li><a href="https://discord.gg/cardano">Discord</a></li>
+              <li><a href="https://twitter.com/cardano">Twitter</a></li>
+              <li><a href="https://reddit.com/r/cardano">Reddit</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2024 Cardano Dashboard. Built with ❤️ for the community.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- JavaScript Files -->
+    <script src="scripts/utils.js"></script>
+    <script src="scripts/api.js"></script>
+    <script src="scripts/main.js"></script>
+  </body>
+</html>
+```
+
+## Adding CSS Styling
+
+### **Step 2: Create the Main Stylesheet**
+
+Create `styles/main.css`:
+
+```css
+/* Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: #f8fafc;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Header Styles */
+.header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.brand-text {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.nav-menu {
+  display: flex;
+  list-style: none;
+  gap: 2rem;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity 0.3s ease;
+}
+
+.nav-link:hover {
+  opacity: 0.8;
+}
+
+/* Hero Section */
+.hero {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 4rem 0;
+  text-align: center;
+}
+
+.hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}
+
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  margin-top: 2rem;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  opacity: 0.8;
+}
+
+/* Section Styles */
+.section {
+  padding: 4rem 0;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 3rem;
+  color: #1a202c;
+}
+
+/* Overview Section */
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.overview-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.overview-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.card-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.overview-card h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #2d3748;
+}
+
+.overview-card p {
+  color: #718096;
+  line-height: 1.6;
+}
+
+/* Network Section */
+.network-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.network-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  border: 2px solid #e2e8f0;
+  transition: border-color 0.3s ease;
+}
+
+.network-card:hover {
+  border-color: #667eea;
+}
+
+.network-card h3 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  color: #718096;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.network-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+/* Learn Section */
+.learn-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+.learn-text h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #2d3748;
+}
+
+.learn-text p {
+  margin-bottom: 1.5rem;
+  color: #718096;
+  line-height: 1.7;
+}
+
+.learn-text ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.learn-text li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e2e8f0;
+  color: #718096;
+}
+
+.learn-text li:last-child {
+  border-bottom: none;
+}
+
+.blockchain-diagram {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.block {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  min-width: 80px;
+  text-align: center;
+}
+
+/* About Section */
+.about-content {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.about-content p {
+  font-size: 1.125rem;
+  color: #718096;
+  margin-bottom: 2rem;
+  line-height: 1.7;
+}
+
+.tech-stack h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #2d3748;
+}
+
+.tech-tags {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.tech-tag {
+  background: #667eea;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Footer */
+.footer {
+  background: #2d3748;
+  color: white;
+  padding: 3rem 0 1rem;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.footer-section h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #e2e8f0;
+}
+
+.footer-section ul {
+  list-style: none;
+}
+
+.footer-section li {
+  margin-bottom: 0.5rem;
+}
+
+.footer-section a {
+  color: #a0aec0;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-section a:hover {
+  color: white;
+}
+
+.footer-bottom {
+  border-top: 1px solid #4a5568;
+  padding-top: 1rem;
+  text-align: center;
+  color: #a0aec0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  .hero-stats {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .learn-content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .nav-menu {
+    display: none;
+  }
+}
+```
+
+## Adding JavaScript Functionality
+
+### **Step 3: Create the JavaScript Files**
+
+Create `scripts/utils.js`:
+
+```javascript
+// Utility functions for the dashboard
+
+// Format numbers with commas
+export function formatNumber(num) {
+  if (num === null || num === undefined) return "N/A";
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+// Format currency
+export function formatCurrency(amount, currency = "USD") {
+  if (amount === null || amount === undefined) return "N/A";
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: currency,
+  }).format(amount);
+}
+
+// Format percentage
+export function formatPercentage(value) {
+  if (value === null || value === undefined) return "N/A";
+  return `${value.toFixed(2)}%`;
+}
+
+// Debounce function for API calls
+export function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+// Show loading state
+export function showLoading(elementId) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.innerHTML = '<span class="loading">Loading...</span>';
+  }
+}
+
+// Show error state
+export function showError(elementId, message = "Error loading data") {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.innerHTML = `<span class="error">${message}</span>`;
+  }
+}
+
+// Add smooth scrolling for navigation links
+export function initSmoothScrolling() {
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener("click", function (e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute("href"));
+      if (target) {
+        target.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    });
+  });
+}
+
+// Add scroll effects
+export function initScrollEffects() {
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: "0px 0px -50px 0px",
+  };
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("animate-in");
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll(".overview-card, .network-card").forEach(card => {
+    observer.observe(card);
+  });
+}
+```
+
+Create `scripts/api.js`:
+
+```javascript
+// API functions for fetching Cardano data
+
+// Base URL for Cardano APIs
+const CARDANO_API_BASE = "https://api.coingecko.com/api/v3";
+const BLOCKFROST_API_BASE = "https://cardano-mainnet.blockfrost.io/api/v0";
+
+// Fetch ADA price from CoinGecko
+export async function fetchAdaPrice() {
+  try {
+    const response = await fetch(
+      `${CARDANO_API_BASE}/simple/price?ids=cardano&vs_currencies=usd,eur&include_24hr_change=true`
+    );
+    const data = await response.json();
+
+    if (data.cardano) {
+      return {
+        usd: data.cardano.usd,
+        eur: data.cardano.eur,
+        change24h: data.cardano.usd_24h_change,
+      };
+    }
+    throw new Error("Invalid data format");
+  } catch (error) {
+    console.error("Error fetching ADA price:", error);
+    return null;
+  }
+}
+
+// Fetch Cardano network statistics
+export async function fetchNetworkStats() {
+  try {
+    // For demo purposes, we'll use mock data
+    // In a real application, you'd use Blockfrost API with authentication
+    return {
+      currentEpoch: 450,
+      totalSupply: 45000000000,
+      circulatingSupply: 35000000000,
+      stakePools: 3200,
+    };
+  } catch (error) {
+    console.error("Error fetching network stats:", error);
+    return null;
+  }
+}
+
+// Fetch real-time network data (requires Blockfrost API key)
+export async function fetchRealTimeData(apiKey) {
+  if (!apiKey) {
+    console.warn("Blockfrost API key required for real-time data");
+    return null;
+  }
+
+  try {
+    const headers = {
+      project_id: apiKey,
+    };
+
+    const [epochResponse, supplyResponse, poolsResponse] = await Promise.all([
+      fetch(`${BLOCKFROST_API_BASE}/epochs/latest`, { headers }),
+      fetch(`${BLOCKFROST_API_BASE}/blocks/latest`, { headers }),
+      fetch(`${BLOCKFROST_API_BASE}/pools`, { headers }),
+    ]);
+
+    const [epochData, supplyData, poolsData] = await Promise.all([
+      epochResponse.json(),
+      supplyResponse.json(),
+      poolsResponse.json(),
+    ]);
+
+    return {
+      currentEpoch: epochData.epoch,
+      totalSupply: 45000000000, // Fixed supply
+      circulatingSupply: supplyData.total_supply || 35000000000,
+      stakePools: poolsData.length || 3200,
+    };
+  } catch (error) {
+    console.error("Error fetching real-time data:", error);
+    return null;
+  }
+}
+
+// Update dashboard with fetched data
+export function updateDashboard(priceData, networkData) {
+  // Update price display
+  if (priceData) {
+    const priceElement = document.getElementById("ada-price");
+    if (priceElement) {
+      priceElement.innerHTML = `
+                <span class="price-main">$${priceData.usd.toFixed(2)}</span>
+                <span class="price-change ${priceData.change24h >= 0 ? "positive" : "negative"}">
+                    ${priceData.change24h >= 0 ? "+" : ""}${priceData.change24h.toFixed(2)}%
+                </span>
+            `;
+    }
+  }
+
+  // Update network statistics
+  if (networkData) {
+    const elements = {
+      "current-epoch": networkData.currentEpoch,
+      "total-supply": formatNumber(networkData.totalSupply),
+      "circulating-supply": formatNumber(networkData.circulatingSupply),
+      "stake-pools": formatNumber(networkData.stakePools),
+    };
+
+    Object.entries(elements).forEach(([id, value]) => {
+      const element = document.getElementById(id);
+      if (element) {
+        element.textContent = value;
+      }
+    });
+  }
+}
+```
+
+Create `scripts/main.js`:
+
+```javascript
+// Main application logic
+
+import { initSmoothScrolling, initScrollEffects } from "./utils.js";
+import { fetchAdaPrice, fetchNetworkStats, updateDashboard } from "./api.js";
+
+// Main application class
+class CardanoDashboard {
+  constructor() {
+    this.isInitialized = false;
+    this.updateInterval = null;
+    this.init();
+  }
+
+  async init() {
+    try {
+      // Initialize UI components
+      this.initUI();
+
+      // Load initial data
+      await this.loadData();
+
+      // Set up auto-refresh
+      this.startAutoRefresh();
+
+      // Initialize scroll effects
+      initScrollEffects();
+
+      this.isInitialized = true;
+      console.log("Dashboard initialized successfully");
+    } catch (error) {
+      console.error("Failed to initialize dashboard:", error);
+      this.showErrorMessage(
+        "Failed to load dashboard. Please refresh the page."
+      );
+    }
+  }
+
+  initUI() {
+    // Initialize smooth scrolling
+    initSmoothScrolling();
+
+    // Add loading states
+    this.addLoadingStates();
+
+    // Add error handling
+    this.addErrorHandling();
+
+    // Add mobile menu toggle
+    this.addMobileMenu();
+  }
+
+  addLoadingStates() {
+    const loadingElements = [
+      "ada-price",
+      "current-epoch",
+      "total-supply",
+      "circulating-supply",
+      "stake-pools",
+    ];
+
+    loadingElements.forEach(id => {
+      const element = document.getElementById(id);
+      if (element) {
+        element.innerHTML = '<span class="loading">Loading...</span>';
+      }
+    });
+  }
+
+  addErrorHandling() {
+    // Global error handler
+    window.addEventListener("error", event => {
+      console.error("Global error:", event.error);
+      this.showErrorMessage(
+        "An unexpected error occurred. Please refresh the page."
+      );
+    });
+
+    // Unhandled promise rejection handler
+    window.addEventListener("unhandledrejection", event => {
+      console.error("Unhandled promise rejection:", event.reason);
+      this.showErrorMessage(
+        "Failed to load some data. Please check your connection."
+      );
+    });
+  }
+
+  addMobileMenu() {
+    // Add mobile menu toggle button
+    const nav = document.querySelector(".nav");
+    const mobileMenuButton = document.createElement("button");
+    mobileMenuButton.className = "mobile-menu-toggle";
+    mobileMenuButton.innerHTML = "☰";
+    mobileMenuButton.setAttribute("aria-label", "Toggle mobile menu");
+
+    mobileMenuButton.addEventListener("click", () => {
+      const navMenu = document.querySelector(".nav-menu");
+      navMenu.classList.toggle("show");
+    });
+
+    // Only show on mobile
+    if (window.innerWidth <= 768) {
+      nav.appendChild(mobileMenuButton);
+    }
+
+    // Handle window resize
+    window.addEventListener("resize", () => {
+      if (window.innerWidth <= 768 && !nav.contains(mobileMenuButton)) {
+        nav.appendChild(mobileMenuButton);
+      } else if (window.innerWidth > 768 && nav.contains(mobileMenuButton)) {
+        nav.removeChild(mobileMenuButton);
+      }
+    });
+  }
+
+  async loadData() {
+    try {
+      // Fetch data in parallel
+      const [priceData, networkData] = await Promise.all([
+        fetchAdaPrice(),
+        fetchNetworkStats(),
+      ]);
+
+      // Update the dashboard
+      updateDashboard(priceData, networkData);
+
+      // Add success indicators
+      this.addSuccessIndicators();
+    } catch (error) {
+      console.error("Error loading data:", error);
+      this.showErrorMessage(
+        "Failed to load data. Please check your connection."
+      );
+    }
+  }
+
+  addSuccessIndicators() {
+    // Add visual feedback for loaded data
+    const elements = document.querySelectorAll(".network-card, .overview-card");
+    elements.forEach((element, index) => {
+      setTimeout(() => {
+        element.classList.add("loaded");
+      }, index * 100);
+    });
+  }
+
+  startAutoRefresh() {
+    // Refresh data every 5 minutes
+    this.updateInterval = setInterval(
+      async () => {
+        await this.loadData();
+      },
+      5 * 60 * 1000
+    );
+  }
+
+  showErrorMessage(message) {
+    // Create error banner
+    const errorBanner = document.createElement("div");
+    errorBanner.className = "error-banner";
+    errorBanner.innerHTML = `
+            <div class="error-content">
+                <span class="error-icon">⚠️</span>
+                <span class="error-message">${message}</span>
+                <button class="error-close" onclick="this.parentElement.parentElement.remove()">×</button>
+            </div>
+        `;
+
+    // Add to page
+    document.body.insertBefore(errorBanner, document.body.firstChild);
+
+    // Auto-remove after 10 seconds
+    setTimeout(() => {
+      if (errorBanner.parentElement) {
+        errorBanner.remove();
+      }
+    }, 10000);
+  }
+
+  destroy() {
+    if (this.updateInterval) {
+      clearInterval(this.updateInterval);
+    }
+  }
+}
+
+// Initialize dashboard when DOM is loaded
+document.addEventListener("DOMContentLoaded", () => {
+  window.dashboard = new CardanoDashboard();
+});
+
+// Clean up on page unload
+window.addEventListener("beforeunload", () => {
+  if (window.dashboard) {
+    window.dashboard.destroy();
+  }
+});
+```
+
+## Testing Your Project
+
+### **Step 4: Test Locally**
+
+1. **Open in Browser**
+   - Double-click `index.html`
+   - Or use a local server: `python -m http.server 8000`
+
+2. **Test Functionality**
+   - Check if all sections load
+   - Verify navigation works
+   - Test responsive design
+   - Check console for errors
+
+3. **Debug Issues**
+   - Open browser developer tools (F12)
+   - Check Console tab for errors
+   - Use Elements tab to inspect HTML
+   - Test on different devices
+
+## Customizing Your Project
+
+### **Personalization Ideas**
+
+- Change color scheme
+- Add your own content
+- Include personal branding
+- Add more sections
+- Integrate additional APIs
+
+### **Advanced Features**
+
+- Add dark mode toggle
+- Implement search functionality
+- Add data visualization charts
+- Create user accounts
+- Add real-time notifications
+
+## Next Steps
+
+### **Immediate Next Steps:**
+
+1. **Customize the design** - Make it your own
+2. **Add more features** - Expand functionality
+3. **Test thoroughly** - Ensure everything works
+4. **Share with others** - Get feedback
+
+### **Week 2 Goals:**
+
+- [Safe Practices](/docs/safety-guide) - Learn security
+- [Simple Examples](/docs/example-content) - See more possibilities
+- [Community Projects](/docs/community) - Join the ecosystem
+
+### **Week 3 Goals:**
+
+- [First Transaction](/guides/first_transaction) - Real blockchain interaction
+- [NFT Collection](/guides/nft-collection) - Create digital assets
+- [Advanced Features](/docs/advanced-features) - Add complexity
+
+## Common Issues & Solutions
+
+### **"My page doesn't load"**
+
+- Check file paths in HTML
+- Verify all files are in correct folders
+- Check browser console for errors
+- Ensure all files are saved
+
+### **"Styling doesn't work"**
+
+- Verify CSS file paths
+- Check CSS syntax for errors
+- Clear browser cache
+- Test in different browsers
+
+### **"JavaScript doesn't work"**
+
+- Check browser console for errors
+- Verify JavaScript file paths
+- Ensure ES6 modules are supported
+- Test in modern browsers
+
+## Getting Help
+
+### **AI Tools**
+
+- **ChatGPT** - Ask about concepts and code
+- **Cursor** - Get help with development
+- **Windsurf** - Generate project ideas
+
+### **Community Resources**
+
+- **Discord** - Join the MeshJS community
+- **Stack Overflow** - Technical questions
+- **GitHub** - Code examples and issues
+- **YouTube** - Video tutorials
+
+## Practice Exercises
+
+### **Exercise 1: Customize Design**
+
+- Change the color scheme
+- Add your own images
+- Modify the layout
+- Create a unique brand
+
+### **Exercise 2: Add Features**
+
+- Create a contact form
+- Add a blog section
+- Include social media feeds
+- Build a portfolio section
+
+### **Exercise 3: Improve Functionality**
+
+- Add data caching
+- Implement error handling
+- Create loading animations
+- Add user preferences
+
+## Success Metrics
+
+### **Week 1: Foundation**
+
+- ✅ Set up development environment
+- ✅ Create project structure
+- ✅ Build basic HTML layout
+- ✅ Add CSS styling
+
+### **Week 2: Functionality**
+
+- ✅ Implement JavaScript features
+- ✅ Test all functionality
+- ✅ Fix bugs and issues
+- ✅ Optimize performance
+
+### **Week 3: Enhancement**
+
+- ✅ Add advanced features
+- ✅ Improve user experience
+- ✅ Test on multiple devices
+- ✅ Prepare for deployment
+
+## Remember These Key Points
+
+1. **Start Simple** - Don't overcomplicate your first project
+2. **Test Often** - Check your work frequently
+3. **Learn by Doing** - Experiment with code
+4. **Use AI Tools** - They're here to help you learn
+5. **Be Patient** - Learning takes time
+
+## Next Steps
+
+Ready to continue your journey? Choose your path:
+
+- [Safe Practices](/docs/safety-guide) - Learn to stay secure
+- [Simple Examples](/docs/example-content) - See what's possible
+- [First Transaction](/guides/first_transaction) - Interact with the blockchain
+- [Community Projects](/docs/community) - Join the ecosystem
+
+---
+
+**Congratulations!** You've just built your first web project. This is a significant milestone in your development journey. You now have the foundation to build more complex applications and eventually integrate with the Cardano blockchain.
+
+**Pro Tip**: Keep iterating on your project. Add new features, improve the design, and use it as a learning platform. Every improvement you make teaches you something new about web development.

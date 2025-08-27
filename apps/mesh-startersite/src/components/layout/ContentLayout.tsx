@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { motion } from "framer-motion";
-import FluidBackground from "./FluidBackground";
+import FluidBackground from "../shared/Background/FluidBackground";
+import { usePersona } from "../../contexts/PersonaContext";
 
 interface ContentLayoutProps {
   children: ReactNode;
@@ -30,10 +31,12 @@ export default function ContentLayout({
   subtitle,
   className = "",
 }: ContentLayoutProps) {
+  const { selectedPersona } = usePersona();
+
   return (
     <div className="w-full h-screen cardano-gradient-bg fixed inset-0">
       {/* Fluid Cardano logos background */}
-      <FluidBackground />
+      <FluidBackground persona={selectedPersona} />
 
       {/* Scrollable content container */}
       <div className="relative z-10 w-full h-full overflow-y-auto">
@@ -47,12 +50,12 @@ export default function ContentLayout({
           >
             <motion.div variants={fadeInUp} className="max-w-4xl mx-auto">
               {title && (
-                <h1 className="text-4xl md:text-6xl font-extrabold text-primary mb-6 tracking-tight">
+                <h1 className="text-4xl md:text-6xl font-mono font-extrabold text-primary mb-6 tracking-tight">
                   {title}
                 </h1>
               )}
               {subtitle && (
-                <p className="text-lg md:text-xl text-text-secondary font-medium max-w-3xl mx-auto leading-relaxed">
+                <p className="text-lg md:text-xl text-text-secondary font-mono font-medium max-w-3xl mx-auto leading-relaxed">
                   {subtitle}
                 </p>
               )}
