@@ -233,7 +233,7 @@ export default function ResourceSidebar({
       collapsed: true,
       width: externalWidth || COLLAPSED_WIDTH,
       height: externalHeight || 800,
-      top: 16,
+      top: 32, // Align with main content area (pt-8 = 32px)
       activeTab: "resources",
     },
   });
@@ -250,7 +250,7 @@ export default function ResourceSidebar({
     typeof window !== "undefined" ? window.innerWidth / 2 : 600
   );
   const [maxHeight, setMaxHeight] = useState(
-    typeof window !== "undefined" ? window.innerHeight - 32 : 800
+    typeof window !== "undefined" ? window.innerHeight - 32 : 800 // Consistent with left sidebar
   );
   const [isClient, setIsClient] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>(
@@ -392,7 +392,7 @@ export default function ResourceSidebar({
     setIsClient(true);
     const handleResize = () => {
       const newMaxWidth = window.innerWidth / 2;
-      const newMaxHeight = window.innerHeight - 32;
+      const newMaxHeight = window.innerHeight - 32; // Consistent with left sidebar
       setMaxWidth(newMaxWidth);
       setMaxHeight(newMaxHeight);
       setWidth(w => Math.min(w, newMaxWidth));
@@ -493,7 +493,7 @@ export default function ResourceSidebar({
           if (newHeight > maxAllowedHeight) {
             const adjustedHeight = maxAllowedHeight;
             const adjustedTop = Math.max(
-              16,
+              32, // Minimum top position (align with main content area)
               window.innerHeight - adjustedHeight - 16
             );
             setTop(adjustedTop);
@@ -512,7 +512,7 @@ export default function ResourceSidebar({
         ) {
           const deltaY = e.clientY - dragStartY.current;
           const newTop = Math.min(
-            Math.max(dragStartTop.current + deltaY, 16), // Minimum top position
+            Math.max(dragStartTop.current + deltaY, 32), // Minimum top position (align with main content area)
             window.innerHeight - height - 16 // Maximum top position (keep sidebar in view)
           );
           setTop(newTop);
