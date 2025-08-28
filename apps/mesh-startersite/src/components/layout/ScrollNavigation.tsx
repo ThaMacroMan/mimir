@@ -80,8 +80,20 @@ export default function ScrollNavigation({
 
   // Calculate position for navigation buttons
   const calculateButtonPosition = useCallback(() => {
+    // When sidebar is collapsed (48px), buttons should be at 64px from right edge
+    // When sidebar is expanded, buttons should be at sidebar width + 16px from right edge
+    // This ensures buttons are always visible and not covered by the sidebar
     return aiChatWidth + 16; // 16px margin from the sidebar
   }, [aiChatWidth]);
+
+  // Force re-render when aiChatWidth changes to ensure smooth position updates
+  const [buttonPosition, setButtonPosition] = useState(
+    calculateButtonPosition()
+  );
+
+  useEffect(() => {
+    setButtonPosition(calculateButtonPosition());
+  }, [calculateButtonPosition]);
 
   return (
     <>
@@ -91,9 +103,10 @@ export default function ScrollNavigation({
           <motion.div
             className="fixed top-20 w-14 h-14 bg-surface/80 border border-primary/30 rounded-full flex items-center justify-center text-primary z-50 shadow-xl backdrop-blur-md cursor-pointer"
             style={{
-              right: `${calculateButtonPosition()}px`,
+              right: `${buttonPosition}px`,
               opacity: isScrolling ? 0.5 : 1,
               pointerEvents: isScrolling ? "none" : "auto",
+              transition: "right 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
             }}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1, y: [0, -2, 0] }}
@@ -115,9 +128,10 @@ export default function ScrollNavigation({
           <motion.div
             className="fixed bottom-20 w-14 h-14 bg-surface/80 border border-primary/30 rounded-full flex items-center justify-center text-primary z-50 shadow-xl backdrop-blur-md cursor-pointer"
             style={{
-              right: `${calculateButtonPosition()}px`,
+              right: `${buttonPosition}px`,
               opacity: isScrolling ? 0.5 : 1,
               pointerEvents: isScrolling ? "none" : "auto",
+              transition: "right 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
             }}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1, y: [0, 2, 0] }}

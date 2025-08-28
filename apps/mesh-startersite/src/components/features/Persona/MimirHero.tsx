@@ -59,29 +59,29 @@ export default function MimirHero() {
   }, [targetText]);
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4">
+    <div className="w-full px-4">
       {/* Mimir Badge - now much larger, with "powered by MeshJS" inside */}
       <motion.div
-        className="flex justify-center"
+        className="flex justify-center mb-20"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
       >
-        <div className="inline-flex flex-col items-center justify-center gap-1 from-primary/10 to-secondary/10 border border-primary/20 rounded-full backdrop-blur-sm shadow-2xl">
-          <div className="inline-flex items-center justify-center gap-2 mr-2       ">
+        <div className="inline-flex flex-col items-center justify-center gap-1 from-primary/10 to-secondary/10 border border-primary/20 rounded-full backdrop-blur-sm">
+          <div className="inline-flex items-center justify-center gap-3 mr-2">
             <MetallicCardanoLogo size={120} />
-            <span className="font-mono font-extrabold tracking-widest text-5xl md:text-6xl lg:text-7xl text-primary drop-shadow-lg">
+            <span className="font-display font-extrabold tracking-widest text-4xl md:text-5xl text-primary">
               MIMIR
             </span>
           </div>
         </div>
       </motion.div>
 
-      <div className="flex justify-center mt-8">
-        <span className="text-lg md:text-xl text-center text-text-secondary font-mono font-medium max-w-2xl">
+      <div className="flex justify-center">
+        <span className="text-lg md:text-xl text-center text-text-secondary font-display font-medium">
           Learn to build on Cardano as a{" "}
           <span
-            className={`font-bold text-primary font-mono ${
+            className={`font-bold text-primary font-display ${
               isDecrypting ? "text-primary/80" : "text-primary"
             }`}
           >
@@ -95,7 +95,7 @@ export default function MimirHero() {
             height={24}
             className="w-6 h-6 opacity-80 inline-block"
           />{" "}
-          <span className="font-bold text-primary">MeshJS</span>
+          <span className="font-bold text-primary font-display">MeshJS</span>
         </span>
       </div>
     </div>

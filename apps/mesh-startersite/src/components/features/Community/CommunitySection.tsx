@@ -6,14 +6,14 @@ import { Twitter, MessageCircle, Github } from "lucide-react";
 export default function CommunitySection() {
   return (
     <motion.div
-      className="mt-12 flex justify-center"
+      className="mt-16 flex justify-center"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.4 }}
     >
       <div className="flex flex-col items-center w-full max-w-2xl">
-        <div className="flex flex-row gap-8 w-full justify-center border border-primary/20 rounded-xl px-8 py-5 bg-primary/5 shadow-sm">
-          <span className=" px-4 py-1 border-primary/30 rounded-full text-primary font-mono text-base font-semibold tracking-wide bg-primary/5">
+        <div className="flex flex-row gap-6 w-full justify-center border border-primary/10 rounded-xl px-5 py-4 bg-primary/5">
+          <span className=" px-3 py-1 border-primary/20 rounded-full text-primary font-display text-sm font-medium tracking-wide bg-primary/5">
             Find other Builders:
           </span>
           <motion.a
@@ -24,8 +24,8 @@ export default function CommunitySection() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Twitter className="w-5 h-5" />
-            <span className="text-sm font-mono font-medium">Twitter</span>
+            <Twitter className="w-4 h-4" />
+            <span className="text-xs font-display font-medium">Twitter</span>
           </motion.a>
           <motion.a
             href="https://discord.gg/meshjs"
@@ -35,8 +35,8 @@ export default function CommunitySection() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <MessageCircle className="w-5 h-5" />
-            <span className="text-sm font-mono font-medium">Discord</span>
+            <MessageCircle className="w-4 h-4" />
+            <span className="text-xs font-display font-medium">Discord</span>
           </motion.a>
           <motion.a
             href="https://github.com/MeshJS/mesh"
@@ -46,8 +46,8 @@ export default function CommunitySection() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Github className="w-5 h-5" />
-            <span className="text-sm font-mono font-medium">GitHub</span>
+            <Github className="w-4 h-4" />
+            <span className="text-xs font-display font-medium">GitHub</span>
           </motion.a>
         </div>
       </div>

@@ -1,5 +1,17 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap");
+
+/* Custom Inter-ExtraLight font - Primary font face */
+@font-face {
+  font-family: "Inter-ExtraLight";
+  src: url("/Inter-4.1/extras/otf/Inter-ExtraLight.otf") format("opentype");
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Fallback Inter fonts from Google Fonts for other weights */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -16,10 +28,11 @@
   --warning: #f59e0b;
   --error: #ef4444;
 
-  /* Text Colors */
-  --text-primary: #ffffff;
-  --text-secondary: #a1a1aa;
-  --text-muted: #71717a;
+  /* Text Colors - Improved for better readability */
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-accent: #e2e8f0;
 
   /* Border Colors */
   --border: #27272a;
@@ -36,19 +49,43 @@
   html {
     background-color: var(--background);
     font-family:
+      "Inter-ExtraLight",
       "Inter",
       -apple-system,
       BlinkMacSystemFont,
       "Segoe UI",
       Roboto,
       sans-serif;
+    font-weight: 200; /* Apply ExtraLight weight globally */
   }
 
   body {
     background-color: var(--background);
     color: var(--text-primary);
+    font-family: "Inter-ExtraLight", "Inter", sans-serif;
+    font-weight: 200; /* Apply ExtraLight weight globally */
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
-    font-variation-settings: "wght" 400;
+    font-variation-settings: "wght" 200; /* Update to ExtraLight weight */
+  }
+
+  /* Ensure all text elements inherit the Inter-ExtraLight font */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  span,
+  div,
+  a,
+  button,
+  input,
+  textarea,
+  select,
+  label {
+    font-family: inherit;
+    font-weight: inherit;
   }
 
   #__next {
@@ -81,7 +118,212 @@
 }
 
 @layer components {
-  /* Cardano-themed dynamic gradient background */
+  /* MDX Content Typography - Improved readability */
+  .mdx-content {
+    @apply text-text-secondary leading-relaxed;
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+
+  .mdx-content h1 {
+    @apply text-2xl font-bold text-text-primary mb-4 mt-6;
+    font-size: 1.75rem;
+    line-height: 1.3;
+  }
+
+  .mdx-content h2 {
+    @apply text-xl font-semibold text-text-primary mb-3 mt-6;
+    font-size: 1.5rem;
+    line-height: 1.4;
+  }
+
+  .mdx-content h3 {
+    @apply text-lg font-semibold text-text-accent mb-2 mt-5;
+    font-size: 1.25rem;
+    line-height: 1.4;
+  }
+
+  .mdx-content h4 {
+    @apply text-base font-medium text-text-accent mb-2 mt-4;
+    font-size: 1.125rem;
+    line-height: 1.4;
+  }
+
+  .mdx-content h5 {
+    @apply text-sm font-medium text-text-accent mb-2 mt-3;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  .mdx-content h6 {
+    @apply text-xs font-medium text-text-accent mb-2 mt-3;
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  .mdx-content p {
+    @apply text-text-secondary mb-3;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .mdx-content ul,
+  .mdx-content ol {
+    @apply text-text-secondary mb-3 ml-6;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .mdx-content li {
+    @apply text-text-secondary mb-1.5;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .mdx-content blockquote {
+    @apply border-l-4 border-primary/30 pl-4 py-2 my-4 bg-surface-elevated/50 rounded-r-lg;
+  }
+
+  .mdx-content blockquote p {
+    @apply text-text-accent italic;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .mdx-content code {
+    @apply bg-surface-elevated text-primary px-2 py-1 rounded text-sm font-mono;
+    font-size: 0.875rem;
+  }
+
+  .mdx-content pre {
+    @apply bg-surface-elevated p-4 rounded-lg overflow-x-auto my-4;
+  }
+
+  .mdx-content pre code {
+    @apply bg-transparent text-text-accent p-0;
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  .mdx-content a {
+    @apply text-primary hover:text-primary-hover underline decoration-primary/30 hover:decoration-primary transition-colors;
+  }
+
+  .mdx-content strong {
+    @apply text-text-primary font-semibold;
+  }
+
+  .mdx-content em {
+    @apply text-text-accent italic;
+  }
+
+  .mdx-content hr {
+    @apply border-border my-8;
+  }
+
+  .mdx-content table {
+    @apply w-full border-collapse my-6;
+  }
+
+  .mdx-content th,
+  .mdx-content td {
+    @apply border border-border px-4 py-2 text-left;
+    font-size: 0.9rem;
+  }
+
+  .mdx-content th {
+    @apply bg-surface-elevated text-text-primary font-semibold;
+  }
+
+  .mdx-content td {
+    @apply text-text-secondary;
+  }
+
+  /* Interactive Demo Components */
+  .mdx-content .interactive-demo {
+    @apply bg-surface-elevated border border-border rounded-lg p-6 my-6;
+  }
+
+  .mdx-content .interactive-demo h4 {
+    @apply text-text-primary mb-4;
+  }
+
+  .mdx-content .interactive-demo p {
+    @apply text-text-secondary;
+  }
+
+  /* Code Playground */
+  .mdx-content .code-playground {
+    @apply bg-surface-elevated border border-border rounded-lg p-4 my-6;
+  }
+
+  /* Quiz Components */
+  .mdx-content .quiz {
+    @apply bg-surface-elevated border border-border rounded-lg p-6 my-6;
+  }
+
+  .mdx-content .quiz-question {
+    @apply text-text-primary font-semibold mb-4;
+  }
+
+  .mdx-content .quiz-options {
+    @apply space-y-2 mb-4;
+  }
+
+  .mdx-content .quiz-option {
+    @apply text-text-secondary hover:text-text-primary transition-colors cursor-pointer;
+  }
+
+  /* Cardano-themed content improvements */
+  .mdx-content .cardano-gradient-bg {
+    @apply relative overflow-hidden rounded-lg p-6 my-6;
+    background: linear-gradient(
+      135deg,
+      rgba(0, 212, 255, 0.1) 0%,
+      rgba(99, 102, 241, 0.1) 100%
+    );
+    border: 1px solid rgba(0, 212, 255, 0.2);
+  }
+
+  .mdx-content .cardano-gradient-bg h4 {
+    @apply text-text-primary mb-3;
+  }
+
+  .mdx-content .cardano-gradient-bg p {
+    @apply text-text-secondary;
+  }
+
+  /* Pro tip styling */
+  .mdx-content .pro-tip {
+    @apply bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 rounded-lg p-4 my-6;
+  }
+
+  .mdx-content .pro-tip strong {
+    @apply text-primary;
+  }
+
+  /* Learning path styling */
+  .mdx-content .learning-path {
+    @apply space-y-4 my-6;
+  }
+
+  .mdx-content .learning-path-item {
+    @apply flex items-center gap-3 p-3 bg-surface-elevated/50 rounded-lg border border-border;
+  }
+
+  .mdx-content .learning-path-item span {
+    @apply text-2xl;
+  }
+
+  .mdx-content .learning-path-item h4 {
+    @apply text-text-primary mb-1;
+  }
+
+  .mdx-content .learning-path-item p {
+    @apply text-text-secondary mb-0;
+  }
+
+  /* Cardano Gradient Background */
   .cardano-gradient-bg {
     position: relative;
     background: linear-gradient(
@@ -98,6 +340,7 @@
     background-size: 300% 300%;
     animation: gradientShift 40s ease-in-out infinite;
     overflow: hidden;
+    height: 100%;
     min-height: 100vh;
     width: 100%;
   }
@@ -697,12 +940,20 @@
 
   .font-display {
     font-family:
+      "Inter-ExtraLight",
       "Inter",
       -apple-system,
       BlinkMacSystemFont,
       "Segoe UI",
       Roboto,
       sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    font-weight: 200; /* Apply ExtraLight weight */
+  }
+
+  .font-inter-extralight {
+    font-family: "Inter-ExtraLight", "Inter", sans-serif;
+    font-weight: 200;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 

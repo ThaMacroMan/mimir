@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useRouter } from "next/router";
 import { MetallicCardanoLogo } from "./MetallicCardanoLogo";
 
 interface MimirHeaderProps {
@@ -12,6 +13,8 @@ export default function MimirHeader({
   size = "md",
   className = "",
 }: MimirHeaderProps) {
+  const router = useRouter();
+
   const sizeClasses = {
     sm: {
       logo: 24,
@@ -35,16 +38,30 @@ export default function MimirHeader({
 
   const { logo, text, gap, padding } = sizeClasses[size];
 
+  const handleClick = () => {
+    router.push("/");
+  };
+
   return (
     <motion.div
-      className={`inline-flex items-center justify-center ${gap} ${padding} from-primary/10 to-secondary/10 border border-primary/20 rounded-full backdrop-blur-sm shadow-2xl ${className}`}
+      className={`inline-flex items-center justify-center ${gap} ${padding} from-primary/10 to-secondary/10 border border-primary/20 rounded-full backdrop-blur-sm shadow-2xl cursor-pointer hover:from-primary/20 hover:to-secondary/20 hover:border-primary/30 transition-all duration-200 ${className}`}
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.4 }}
+      onClick={handleClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={e => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
+      aria-label="Go to home page"
     >
       <MetallicCardanoLogo size={logo} />
       <span
-        className={`font-mono font-extrabold tracking-widest text-primary drop-shadow-lg ${text}`}
+        className={`font-display font-extrabold tracking-widest text-primary drop-shadow-lg ${text}`}
       >
         MIMIR
       </span>

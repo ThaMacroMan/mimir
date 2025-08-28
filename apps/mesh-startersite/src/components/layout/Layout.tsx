@@ -3,23 +3,33 @@ import { ReactNode, useEffect, useState, useRef } from "react";
 import Sidebar from "./Sidebar/Sidebar";
 import ResourceSidebar from "./Sidebar/AIChatSidebar";
 import ScrollNavigation from "./ScrollNavigation";
+import PageTransition from "./PageTransition";
 import { Terminal } from "../magicui/terminal";
 import { resetAllSidebarStates } from "../../utils/sidebarUtils";
+import FluidBackground from "../shared/Background/FluidBackground";
+import { usePersona } from "../../contexts/PersonaContext";
+import { useRouter } from "next/router";
 
 export default function Layout({ children }: { children: ReactNode }) {
+  const { selectedPersona } = usePersona();
   const [terminalOpen, setTerminalOpen] = useState(false);
   const [terminalHeight, setTerminalHeight] = useState(420);
   const [terminalDragging, setTerminalDragging] = useState(false);
   const [footerDragging, setFooterDragging] = useState(false);
   const [aiChatWidth, setAiChatWidth] = useState(48);
   const [sidebarWidth, setSidebarWidth] = useState(48);
-  const [mainContentWidth, setMainContentWidth] = useState(0);
+
+  // Handle AI chat sidebar width changes smoothly
+  const handleAiChatWidthChange = (newWidth: number) => {
+    setAiChatWidth(newWidth);
+  };
   const [mainContentLeft, setMainContentLeft] = useState(48);
   const dragStartY = useRef<number | null>(null);
   const dragStartHeight = useRef<number | null>(null);
   const mainContentRef = useRef<HTMLElement>(null);
   const minTerminalHeight = 120;
   const maxTerminalHeight = 600;
+  const router = useRouter();
 
   // Update sidebar positions and main content dimensions dynamically
   useEffect(() => {
@@ -38,19 +48,13 @@ export default function Layout({ children }: { children: ReactNode }) {
 
       // Update state variables
       setSidebarWidth(currentSidebarWidth);
-      setAiChatWidth(currentAiChatWidth);
+      // Note: aiChatWidth is now managed by the callback from AIChatSidebar
 
       // Calculate main content dimensions
       // Account for AI chat sidebar width + 16px right margin
       const aiChatTotalSpace = currentAiChatWidth + 16; // 16px margin from right edge
-      const viewportWidth = window.innerWidth;
-      const newMainContentWidth = Math.max(
-        300,
-        viewportWidth - currentSidebarWidth - aiChatTotalSpace
-      ); // Minimum 300px width
       const newMainContentLeft = currentSidebarWidth;
 
-      setMainContentWidth(newMainContentWidth);
       setMainContentLeft(newMainContentLeft);
 
       // Set CSS custom properties for terminal
@@ -113,7 +117,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       observer.disconnect();
       resizeObserver.disconnect();
     };
-  }, []);
+  }, [aiChatWidth]);
 
   // Add effect to set --terminal-height CSS variable on body for scrollable main
   useEffect(() => {
@@ -247,7 +251,10 @@ export default function Layout({ children }: { children: ReactNode }) {
   }, [terminalDragging, footerDragging, terminalHeight, terminalOpen]);
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
+    <div className="flex flex-col h-screen overflow-hidden cardano-gradient-bg">
+      {/* Fluid Cardano logos background - covers entire viewport */}
+      <FluidBackground persona={selectedPersona} />
+
       {/* <ReadingProgress /> */}
       {/* <div className="fixed top-0 left-0 right-0 z-50">
         <Header />
@@ -256,27 +263,36 @@ export default function Layout({ children }: { children: ReactNode }) {
         <Sidebar />
         <main
           ref={mainContentRef}
-          className="flex-1 overflow-auto px-8 max-w-none mx-0 transition-all duration-300"
+          className={`flex-1 px-8 transition-all duration-300 ${
+            router.pathname === "/" ? "" : "overflow-auto"
+          }`}
           style={{
-            height: `calc(100vh - var(--terminal-height, 0px))`,
-            marginTop: "0px", // Removed header spacing
+            height: "100vh",
+            marginTop: "0px",
             marginLeft: `${mainContentLeft}px`,
-            marginRight: "0px", // Remove right margin since sidebar is absolutely positioned
-            width: `${mainContentWidth}px`, // Dynamic width based on sidebar states
-            minWidth: "300px", // Ensure minimum readable width
+            marginRight: "16px",
+            width: `calc(100vw - ${mainContentLeft}px - ${aiChatWidth + 16}px)`,
+            minWidth: "300px",
           }}
         >
-          <div className="max-w-6xl mx-auto">{children}</div>
+          <div className="w-full h-full">
+            <PageTransition>{children}</PageTransition>
+          </div>
         </main>
-        <ResourceSidebar width={aiChatWidth} onWidthChange={setAiChatWidth} />
+        <ResourceSidebar
+          width={aiChatWidth}
+          onWidthChange={handleAiChatWidthChange}
+        />
       </div>
 
       {/* Custom Scroll Navigation - moved outside flex container */}
-      <ScrollNavigation
-        containerRef={mainContentRef}
-        className="hidden md:flex" // Only show on medium screens and up to avoid conflicts with mobile
-        aiChatWidth={aiChatWidth + 16} // Account for AI chat sidebar + 16px margin
-      />
+      {router.pathname !== "/" && (
+        <ScrollNavigation
+          containerRef={mainContentRef}
+          className="hidden md:flex" // Only show on medium screens and up to avoid conflicts with mobile
+          aiChatWidth={aiChatWidth + 16} // Account for AI chat sidebar + 16px margin
+        />
+      )}
       {/* <div className="fixed bottom-0 left-0 right-0 z-50">
         <Footer
           onTerminalClick={() => setTerminalOpen(v => !v)}

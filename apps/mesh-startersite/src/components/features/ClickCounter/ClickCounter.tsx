@@ -525,7 +525,7 @@ const ClickCounter: React.FC<ClickCounterProps> = ({
                       initial={{ scale: 1.2, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       transition={{ duration: 0.3 }}
-                      className={`text-4xl md:text-6xl font-bold ${getCountColor(currentUser.clicks)} transition-colors duration-300`}
+                      className={`text-2xl md:text-4xl font-bold ${getCountColor(currentUser.clicks)} transition-colors duration-300`}
                     >
                       {getCountDisplay(currentUser.clicks)}
                     </motion.div>

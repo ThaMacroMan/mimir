@@ -18,9 +18,10 @@ export default {
         accent: "#10b981",
         warning: "#f59e0b",
         error: "#ef4444",
-        "text-primary": "#ffffff",
-        "text-secondary": "#a1a1aa",
-        "text-muted": "#71717a",
+        "text-primary": "#f8fafc",
+        "text-secondary": "#cbd5e1",
+        "text-muted": "#94a3b8",
+        "text-accent": "#e2e8f0",
         border: "#27272a",
         "border-light": "#3f3f46",
         "border-accent": "#00d4ff20",
@@ -29,8 +30,11 @@ export default {
         "center-bg": "#0f0f16",
       },
       fontFamily: {
-        display: ["Inter", "sans-serif"],
+        sans: ["Inter-ExtraLight", "Inter", "sans-serif"], // Default sans-serif font with ExtraLight priority
+        display: ["Inter-ExtraLight", "Inter", "sans-serif"], // Display font with ExtraLight priority
         mono: ["JetBrains Mono", "monospace"],
+        inter: ["Inter-ExtraLight", "Inter", "sans-serif"], // Inter-specific font family with ExtraLight priority
+        "inter-extralight": ["Inter-ExtraLight", "Inter", "sans-serif"], // Dedicated ExtraLight font family
       },
       animation: {
         "glow-pulse": "glow-pulse 2s ease-in-out infinite alternate",

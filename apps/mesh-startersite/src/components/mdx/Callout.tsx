@@ -39,14 +39,20 @@ export default function Callout({
   const Icon = style.icon;
 
   return (
-    <div className={`rounded-lg border p-4 my-6 ${style.className}`}>
+    <div
+      className={`rounded-lg border p-4 my-6 ${style.className} bg-surface-elevated/50`}
+    >
       <div className="flex items-start gap-3">
         <Icon
           className={`w-5 h-5 mt-0.5 flex-shrink-0 ${style.iconClassName}`}
         />
         <div className="flex-1">
-          {title && <h4 className="font-semibold mb-2 text-white">{title}</h4>}
-          <div className="prose prose-invert max-w-none">{children}</div>
+          {title && (
+            <h4 className="font-semibold mb-2 text-text-primary">{title}</h4>
+          )}
+          <div className="text-text-secondary text-sm leading-relaxed">
+            {children}
+          </div>
         </div>
       </div>
     </div>

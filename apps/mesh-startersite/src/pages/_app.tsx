@@ -2,11 +2,14 @@ import "@/styles/globals.css";
 import "@meshsdk/react/styles.css";
 import type { AppProps } from "next/app";
 import { AnimatePresence } from "framer-motion";
+import { useRouter } from "next/router";
 import Layout from "../components/layout/Layout";
 import ClickSpark from "../components/features/ClickCounter/ClickSpark";
 import { PersonaProvider } from "../contexts/PersonaContext";
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const router = useRouter();
+
   return (
     <PersonaProvider>
       <ClickSpark
@@ -24,7 +27,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             initial={false}
             onExitComplete={() => window.scrollTo(0, 0)}
           >
-            <Component {...pageProps} />
+            <Component {...pageProps} key={router.asPath} />
           </AnimatePresence>
         </Layout>
       </ClickSpark>

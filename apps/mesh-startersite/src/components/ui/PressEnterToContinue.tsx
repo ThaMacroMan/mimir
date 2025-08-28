@@ -9,7 +9,7 @@ export default function PressEnterToContinue({
 }: PressEnterToContinueProps) {
   return (
     <motion.div
-      className={`flex items-center gap-3 sm:gap-4 text-text-muted text-xs sm:text-sm font-mono bg-surface/50 px-4 py-2 rounded-full border border-border/50 ${className}`}
+      className={`flex items-center gap-3 sm:gap-4 text-text-muted text-xs sm:text-sm font-display bg-surface/50 px-4 py-2 rounded-full border border-border/50 ${className}`}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}

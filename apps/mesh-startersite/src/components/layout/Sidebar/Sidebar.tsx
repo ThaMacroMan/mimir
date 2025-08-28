@@ -19,6 +19,8 @@ import PersonaSwitcher from "../../features/Persona/PersonaSwitcher";
 
 // Collapsed width constant
 const COLLAPSED_WIDTH = 48;
+// Collapsed height constant - just enough for icons + padding
+const COLLAPSED_HEIGHT = 200;
 
 interface SidebarSection {
   title: string;
@@ -28,11 +30,11 @@ interface SidebarSection {
 
 // Icon mapping for dynamic sections
 const iconMap = {
-  Home: <Home className="w-5 h-5" />,
-  BookOpen: <BookOpen className="w-5 h-5" />,
-  Rocket: <Rocket className="w-5 h-5" />,
-  Layout: <Layout className="w-5 h-5" />,
-  Code: <Code className="w-5 h-5" />,
+  Home: <Home className="w-4 h-4" />,
+  BookOpen: <BookOpen className="w-4 h-4" />,
+  Rocket: <Rocket className="w-4 h-4" />,
+  Layout: <Layout className="w-4 h-4" />,
+  Code: <Code className="w-4 h-4" />,
 };
 
 // Get sections with proper icons
@@ -62,7 +64,7 @@ export default function Sidebar() {
     defaultState: {
       collapsed: true,
       width: COLLAPSED_WIDTH,
-      height: 800,
+      height: COLLAPSED_HEIGHT, // Use collapsed height when collapsed
       top: 16,
       openSections: sections.map(() => true),
     },
@@ -117,7 +119,20 @@ export default function Sidebar() {
   useEffect(() => {
     const newSections = getSectionsWithIcons(selectedPersona);
     setOpenSections(newSections.map(() => true));
-  }, [selectedPersona]);
+
+    // Auto-select the current section based on route
+    const currentPath = router.asPath;
+    const currentSectionIndex = newSections.findIndex(section =>
+      section.items.some(
+        item =>
+          currentPath === item.href ||
+          (item.href !== "/" && currentPath.startsWith(item.href))
+      )
+    );
+    if (currentSectionIndex !== -1) {
+      setSelectedSection(currentSectionIndex);
+    }
+  }, [selectedPersona, router.asPath]);
 
   // Set client-side flag and update maxWidth/maxHeight on window resize
   useEffect(() => {
@@ -128,13 +143,17 @@ export default function Sidebar() {
       setMaxWidth(newMaxWidth);
       setMaxHeight(newMaxHeight);
       setWidth(w => Math.min(w, newMaxWidth));
-      // Always set to full height on initial load and resize
-      setHeight(newMaxHeight);
+      // When collapsed, use minimal height; when expanded, use full height
+      if (collapsed) {
+        setHeight(COLLAPSED_HEIGHT);
+      } else {
+        setHeight(newMaxHeight);
+      }
     };
     handleResize(); // Call immediately
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [collapsed, updatePersistedState]);
 
   useEffect(() => {
     if (!dragging && !draggingVertical && !draggingPosition) return;
@@ -241,9 +260,15 @@ export default function Sidebar() {
     if (collapsed) {
       setIsAnimating(true);
       setCollapsed(false);
-      setWidth(260); // Expand to default width
-      setAnimatingWidth(260);
-      updatePersistedState({ collapsed: false, width: 260 });
+      setWidth(220); // Expand to a more compact default width
+      setAnimatingWidth(220);
+      // Expand to full height when opening
+      setHeight(maxHeight);
+      updatePersistedState({
+        collapsed: false,
+        width: 220,
+        height: maxHeight,
+      });
       // Reset animation state after transition
       setTimeout(() => setIsAnimating(false), 600);
     }
@@ -296,7 +321,7 @@ export default function Sidebar() {
       >
         {/* Sidebar Title */}
         <div
-          className={`border-b border-border px-4 py-3 bg-surface-elevated rounded-t-3xl transition-all duration-300 ease-out ${collapsed ? "opacity-0 pointer-events-none h-0 overflow-hidden" : "opacity-100"}`}
+          className={`border-b border-border px-3 py-2 bg-surface-elevated rounded-t-3xl transition-all duration-300 ease-out ${collapsed ? "opacity-0 pointer-events-none h-0 overflow-hidden" : "opacity-100"}`}
         >
           <div
             className="flex items-center justify-between cursor-move"
@@ -311,8 +336,8 @@ export default function Sidebar() {
             }}
           >
             <div className="flex items-center gap-3">
-              <MetallicCardanoLogo size={24} className="flex-shrink-0" />
-              <span className="font-mono font-bold text-text-primary text-sm tracking-wide">
+              <MetallicCardanoLogo size={20} className="flex-shrink-0" />
+              <span className="font-display font-bold text-text-primary text-xs tracking-wide">
                 LEARNING SECTIONS
               </span>
             </div>
@@ -320,13 +345,15 @@ export default function Sidebar() {
               onClick={() => {
                 setCollapsed(true);
                 setWidth(COLLAPSED_WIDTH);
+                setHeight(COLLAPSED_HEIGHT); // Set to minimal height when collapsing
                 updatePersistedState({
                   collapsed: true,
                   width: COLLAPSED_WIDTH,
+                  height: COLLAPSED_HEIGHT,
                 });
               }}
               onMouseDown={e => e.stopPropagation()}
-              className="p-1 rounded-full hover:bg-surface/50 text-text-secondary hover:text-primary transition-colors duration-200"
+              className="p-2 rounded-full hover:bg-surface/50 text-text-secondary hover:text-primary transition-colors duration-200"
               title="Collapse sidebar"
             >
               <X className="w-4 h-4" />
@@ -339,11 +366,15 @@ export default function Sidebar() {
           <div className="border-b border-border/30">
             <Link
               href="/"
-              className="flex items-center gap-3 px-4 py-3 hover:bg-surface-elevated/50 transition-colors duration-200"
+              className={`flex items-center gap-3 px-4 py-3 hover:bg-surface-elevated/50 transition-colors duration-200 ${
+                router.asPath === "/"
+                  ? "bg-primary/10 border-r-2 border-primary/30"
+                  : ""
+              }`}
               onMouseDown={e => e.stopPropagation()}
             >
-              <Home className="w-5 h-5 text-primary" />
-              <span className="font-mono font-bold text-text-primary text-sm">
+              <Home className="w-4 h-4 text-primary" />
+              <span className="font-display font-bold text-text-primary text-xs">
                 Home
               </span>
             </Link>
@@ -380,14 +411,20 @@ export default function Sidebar() {
 
         {collapsed ? (
           <div className="flex flex-col items-center justify-center gap-8 h-full">
-            {sections.map((section, idx) =>
-              section.title === "Home" ? (
+            {sections.map((section, idx) => {
+              const isActiveSection = section.items.some(
+                item =>
+                  router.asPath === item.href ||
+                  (item.href !== "/" && router.asPath.startsWith(item.href))
+              );
+
+              return section.title === "Home" ? (
                 <Link
                   key={section.title}
                   href="/"
                   onMouseDown={e => e.stopPropagation()}
                   className={`transition-all duration-300 ease-out cursor-pointer ${
-                    router.pathname === "/"
+                    router.asPath === "/"
                       ? "text-primary-hover scale-110"
                       : "text-primary hover:text-primary-hover hover:scale-105"
                   }`}
@@ -400,9 +437,15 @@ export default function Sidebar() {
                   onClick={() => {
                     setIsAnimating(true);
                     setCollapsed(false);
-                    setWidth(260);
-                    setAnimatingWidth(260);
-                    updatePersistedState({ collapsed: false, width: 260 });
+                    setWidth(220);
+                    setAnimatingWidth(220);
+                    // Expand to full height when opening
+                    setHeight(maxHeight);
+                    updatePersistedState({
+                      collapsed: false,
+                      width: 220,
+                      height: maxHeight,
+                    });
                     setSelectedSection(idx);
                     setOpenSections(prev => {
                       const newSections = prev.map((open, i) =>
@@ -416,44 +459,51 @@ export default function Sidebar() {
                   }}
                   onMouseDown={e => e.stopPropagation()}
                   className={`transition-all duration-300 ease-out cursor-pointer ${
-                    selectedSection === idx
-                      ? "text-primary-hover scale-110"
-                      : "text-primary hover:text-primary-hover hover:scale-105"
+                    isActiveSection
+                      ? "text-primary-hover scale-110 drop-shadow-lg drop-shadow-primary/50"
+                      : selectedSection === idx
+                        ? "text-primary scale-105"
+                        : "text-primary hover:text-primary-hover hover:scale-105"
                   }`}
                 >
                   {section.icon}
                 </button>
-              )
-            )}
+              );
+            })}
           </div>
         ) : (
-          <ul className="space-y-4 flex-1 overflow-y-auto py-4 px-2 scrollbar-none">
+          <ul className="space-y-4 flex-1 overflow-y-auto py-4 px-3 scrollbar-none">
             {sections.map((section, idx) => {
-              const isActiveSection = section.items.some(item =>
-                router.pathname.startsWith(item.href)
+              const isActiveSection = section.items.some(
+                item =>
+                  router.asPath === item.href ||
+                  (item.href !== "/" && router.asPath.startsWith(item.href))
               );
               return (
-                <li key={section.title} className="relative group">
+                <li
+                  key={section.title}
+                  className={`relative group transition-all duration-300 ${isActiveSection ? "border-l-2 border-primary/50 pl-2" : "border-l-2 border-transparent pl-2"}`}
+                >
                   {section.title === "Home" ? (
                     <Link
                       href="/"
                       className={`flex items-center w-full text-left py-4 px-3 rounded-lg hover:bg-surface-elevated focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 ${
-                        router.pathname === "/"
+                        router.asPath === "/"
                           ? "bg-primary/10 border border-primary/30"
                           : ""
                       }`}
                       onMouseDown={e => e.stopPropagation()}
                     >
                       <span className="text-primary mr-3">{section.icon}</span>
-                      <span className="flex-1 font-mono font-bold text-text-primary">
+                      <span className="flex-1 font-display font-bold text-text-primary">
                         {section.title}
                       </span>
                     </Link>
                   ) : (
                     <button
-                      className={`flex items-center w-full text-left py-4 px-3 rounded-lg hover:bg-surface-elevated focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 ${
+                      className={`flex items-center w-full text-left py-3 px-3 rounded-lg hover:bg-surface-elevated focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 ${
                         isActiveSection || selectedSection === idx
-                          ? "bg-primary/10 border border-primary/30"
+                          ? "bg-primary/20 border-2 border-primary/50 shadow-lg shadow-primary/20"
                           : ""
                       }`}
                       aria-expanded={openSections[idx]}
@@ -466,11 +516,11 @@ export default function Sidebar() {
                       tabIndex={0}
                     >
                       <span className="text-primary mr-3">{section.icon}</span>
-                      <span className="flex-1 font-mono font-bold text-text-primary">
+                      <span className="flex-1 font-display font-bold text-text-primary text-xs">
                         {section.title}
                       </span>
                       <ChevronDown
-                        className={`w-4 h-4 text-text-secondary transition-transform duration-200 ${
+                        className={`w-3 h-3 text-text-secondary transition-transform duration-200 ${
                           openSections[idx] ? "rotate-180" : ""
                         }`}
                       />
@@ -479,7 +529,7 @@ export default function Sidebar() {
 
                   {/* Tooltip for collapsed state */}
                   {collapsed && (
-                    <span className="absolute left-full top-1/2 -translate-y-1/2 ml-2 px-3 py-2 rounded-lg bg-surface-elevated border border-border text-xs text-text-primary opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50 shadow-lg transition-opacity duration-200 font-mono font-bold">
+                    <span className="absolute left-full top-1/2 -translate-y-1/2 ml-2 px-3 py-2 rounded-lg bg-surface-elevated border border-border text-xs text-text-primary opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50 shadow-lg transition-opacity duration-200 font-display font-bold">
                       {section.title}
                     </span>
                   )}
@@ -494,14 +544,14 @@ export default function Sidebar() {
                   >
                     {!collapsed &&
                       section.items.map(item => {
-                        const isActiveItem = router.pathname === item.href;
+                        const isActiveItem = router.asPath === item.href;
                         return (
                           <li key={item.href}>
                             <Link
                               href={item.href}
-                              className={`block py-2 px-3 rounded-lg text-sm font-mono transition-all duration-200 ${
+                              className={`block py-2 px-3 rounded-lg text-xs font-display transition-all duration-200 ${
                                 isActiveItem
-                                  ? "bg-primary/20 text-primary border border-primary/30"
+                                  ? "bg-primary/30 text-primary border-2 border-primary/50 shadow-md shadow-primary/20 font-semibold ring-2 ring-primary/20"
                                   : "text-text-secondary hover:text-primary hover:bg-surface-elevated"
                               }`}
                               onMouseDown={e => e.stopPropagation()}
@@ -520,7 +570,7 @@ export default function Sidebar() {
 
         {/* Persona Switcher */}
         {!collapsed && (
-          <div className="border-t border-border px-4 py-3 bg-surface-elevated rounded-b-3xl">
+          <div className="border-t border-border px-4 py-4 bg-surface-elevated rounded-b-3xl">
             <PersonaSwitcher variant="compact" />
           </div>
         )}

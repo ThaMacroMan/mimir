@@ -50,12 +50,12 @@ export default function ContentLayout({
           >
             <motion.div variants={fadeInUp} className="max-w-4xl mx-auto">
               {title && (
-                <h1 className="text-4xl md:text-6xl font-mono font-extrabold text-primary mb-6 tracking-tight">
+                <h1 className="text-2xl md:text-4xl font-display font-extrabold text-primary mb-4 tracking-tight">
                   {title}
                 </h1>
               )}
               {subtitle && (
-                <p className="text-lg md:text-xl text-text-secondary font-mono font-medium max-w-3xl mx-auto leading-relaxed">
+                <p className="text-lg md:text-xl text-text-secondary font-display font-medium max-w-3xl mx-auto leading-relaxed">
                   {subtitle}
                 </p>
               )}

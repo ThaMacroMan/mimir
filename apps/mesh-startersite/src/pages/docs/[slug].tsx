@@ -24,7 +24,7 @@ interface DocPageProps {
 export default function DocPage({ mdxSource, frontmatter }: DocPageProps) {
   return (
     <DocTemplate title={frontmatter.title}>
-      <div className="prose prose-lg max-w-none text-text-primary font-mono">
+      <div className="prose prose-lg max-w-none text-text-primary font-display">
         <MDXRemote {...mdxSource} components={mdxComponents} />
       </div>
     </DocTemplate>

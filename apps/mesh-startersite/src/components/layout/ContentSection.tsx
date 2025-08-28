@@ -188,12 +188,12 @@ export default function ContentSection({
         <div className="bg-gradient-to-br from-surface/60 to-background/60 border border-primary/20 rounded-3xl p-8 md:p-12 backdrop-blur-sm">
           <div className="flex flex-col md:flex-row items-start gap-6">
             {heroCard.icon && (
-              <div className="text-primary text-4xl md:text-5xl">
+              <div className="text-primary text-2xl md:text-3xl">
                 {heroCard.icon}
               </div>
             )}
             <div className="flex-1">
-              <h2 className="text-2xl md:text-4xl font-bold text-primary mb-4">
+              <h2 className="text-xl md:text-2xl font-bold text-primary mb-3">
                 {heroCard.title}
               </h2>
               <p className="text-lg md:text-xl text-text-secondary leading-relaxed">
@@ -238,12 +238,12 @@ export default function ContentSection({
         {(title || subtitle) && (
           <motion.div variants={fadeInUp} className="text-center mb-12">
             {title && (
-              <h2 className="text-3xl md:text-5xl font-mono font-bold text-primary mb-4 tracking-tight">
+              <h2 className="text-xl md:text-3xl font-display font-bold text-primary mb-3 tracking-tight">
                 {title}
               </h2>
             )}
             {subtitle && (
-              <p className="text-lg md:text-xl text-text-secondary font-mono font-medium max-w-3xl mx-auto leading-relaxed">
+              <p className="text-lg md:text-xl text-text-secondary font-display font-medium max-w-3xl mx-auto leading-relaxed">
                 {subtitle}
               </p>
             )}

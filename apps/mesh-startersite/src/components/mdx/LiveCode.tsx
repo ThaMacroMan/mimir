@@ -50,16 +50,18 @@ export default function LiveCode({
   };
 
   return (
-    <div className="bg-surface/30 backdrop-blur-md rounded-xl border border-border my-8 overflow-hidden">
+    <div className="bg-surface-elevated/50 backdrop-blur-md rounded-xl border border-border my-8 overflow-hidden">
       {/* Header */}
       {(title || description) && (
         <div className="p-6 border-b border-border">
           {title && (
-            <h3 className="text-lg font-display font-semibold text-white mb-2">
+            <h3 className="text-lg font-display font-semibold text-text-primary mb-2">
               {title}
             </h3>
           )}
-          {description && <p className="text-gray-300">{description}</p>}
+          {description && (
+            <p className="text-text-secondary text-sm">{description}</p>
+          )}
         </div>
       )}
 
@@ -67,8 +69,10 @@ export default function LiveCode({
       <div className="relative">
         <div className="flex items-center justify-between p-4 bg-surface/50 border-b border-border">
           <div className="flex items-center gap-2">
-            <Code className="w-4 h-4 text-gray-400" />
-            <span className="text-sm text-gray-400 font-mono">{language}</span>
+            <Code className="w-4 h-4 text-text-muted" />
+            <span className="text-sm text-text-muted font-mono">
+              {language}
+            </span>
           </div>
           <div className="flex items-center gap-2">
             {runnable && (
@@ -82,14 +86,14 @@ export default function LiveCode({
             )}
             <button
               onClick={handleDownload}
-              className="flex items-center gap-2 px-3 py-1.5 bg-surface/50 hover:bg-surface/70 border border-border rounded-lg text-gray-300 text-sm transition-colors duration-200"
+              className="flex items-center gap-2 px-3 py-1.5 bg-surface/50 hover:bg-surface/70 border border-border rounded-lg text-text-secondary text-sm transition-colors duration-200"
             >
               <Download className="w-4 h-4" />
               Download
             </button>
             <button
               onClick={handleCopy}
-              className="flex items-center gap-2 px-3 py-1.5 bg-surface/50 hover:bg-surface/70 border border-border rounded-lg text-gray-300 text-sm transition-colors duration-200"
+              className="flex items-center gap-2 px-3 py-1.5 bg-surface/50 hover:bg-surface/70 border border-border rounded-lg text-text-secondary text-sm transition-colors duration-200"
             >
               {copied ? (
                 <>
@@ -108,7 +112,7 @@ export default function LiveCode({
 
         {/* Code Content */}
         <div className="p-6">
-          <pre className="text-sm text-gray-200 overflow-x-auto">
+          <pre className="text-sm text-text-accent overflow-x-auto">
             <code className={`language-${language}`}>{code}</code>
           </pre>
         </div>
@@ -117,7 +121,9 @@ export default function LiveCode({
       {/* Output */}
       {showOutput && output && (
         <div className="border-t border-border p-6 bg-surface/20">
-          <h4 className="text-sm font-semibold text-white mb-3">Output:</h4>
+          <h4 className="text-sm font-semibold text-text-primary mb-3">
+            Output:
+          </h4>
           <div className="bg-black/50 rounded-lg p-4">
             <pre className="text-sm text-green-400 font-mono">{output}</pre>
           </div>
@@ -130,7 +136,9 @@ export default function LiveCode({
           <h4 className="text-sm font-semibold text-blue-400 mb-3">
             Explanation:
           </h4>
-          <p className="text-gray-300 text-sm leading-relaxed">{explanation}</p>
+          <p className="text-text-secondary text-sm leading-relaxed">
+            {explanation}
+          </p>
         </div>
       )}
     </div>

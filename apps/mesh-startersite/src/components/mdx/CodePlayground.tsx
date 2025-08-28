@@ -36,7 +36,7 @@ export default function CodePlayground({
   };
 
   return (
-    <div className="my-8 border border-border rounded-lg overflow-hidden">
+    <div className="my-8 border border-border rounded-lg overflow-hidden bg-surface-elevated/50">
       <div className="bg-surface-elevated p-4 border-b border-border">
         <h3 className="text-lg font-semibold text-text-primary mb-2">
           {title}

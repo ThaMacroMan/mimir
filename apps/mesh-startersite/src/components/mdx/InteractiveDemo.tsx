@@ -12,9 +12,9 @@ export default function InteractiveDemo({
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="my-8 border border-border rounded-lg overflow-hidden">
+    <div className="my-8 border border-border rounded-lg overflow-hidden bg-surface-elevated/50">
       <div
-        className="bg-surface-elevated p-4 cursor-pointer hover:bg-surface-hover transition-colors"
+        className="bg-surface-elevated p-4 cursor-pointer hover:bg-surface/80 transition-colors"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center justify-between">
@@ -25,7 +25,7 @@ export default function InteractiveDemo({
         </div>
       </div>
 
-      {isExpanded && <div className="p-6 bg-surface">{children}</div>}
+      {isExpanded && <div className="p-6 bg-surface/50">{children}</div>}
     </div>
   );
 }

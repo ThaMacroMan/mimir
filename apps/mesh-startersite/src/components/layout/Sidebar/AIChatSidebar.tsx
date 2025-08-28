@@ -16,6 +16,8 @@ type TabType = "resources" | "ai-chat";
 
 // Collapsed width constant
 const COLLAPSED_WIDTH = 48;
+// Collapsed height constant - just enough for icons + padding
+const COLLAPSED_HEIGHT = 200;
 
 // Define different resources based on persona
 const getPersonaResources = (persona: LearnerPersona | null) => {
@@ -232,7 +234,7 @@ export default function ResourceSidebar({
     defaultState: {
       collapsed: true,
       width: externalWidth || COLLAPSED_WIDTH,
-      height: externalHeight || 800,
+      height: externalHeight || COLLAPSED_HEIGHT, // Use collapsed height when collapsed
       top: 32, // Align with main content area (pt-8 = 32px)
       activeTab: "resources",
     },
@@ -396,15 +398,18 @@ export default function ResourceSidebar({
       setMaxWidth(newMaxWidth);
       setMaxHeight(newMaxHeight);
       setWidth(w => Math.min(w, newMaxWidth));
-      // Always set to full height on initial load and resize (unless external height is provided)
-      if (!externalHeight) {
+
+      // When collapsed, use minimal height; when expanded, use full height (unless external height is provided)
+      if (collapsed) {
+        setHeight(COLLAPSED_HEIGHT);
+      } else if (!externalHeight) {
         setHeight(newMaxHeight);
       }
     };
     handleResize(); // Call immediately
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [externalHeight]);
+  }, [collapsed, externalHeight]);
 
   // Only scroll to bottom when a new message is added
   useEffect(() => {
@@ -421,9 +426,16 @@ export default function ResourceSidebar({
     if (collapsed) {
       setIsAnimating(true);
       setCollapsed(false);
-      setWidth(260); // Expand to default width
-      setAnimatingWidth(260);
-      updatePersistedState({ collapsed: false, width: 260 });
+      const newWidth = 220; // Expand to a more compact default width
+      updateWidth(newWidth);
+      setAnimatingWidth(newWidth);
+      // Expand to full height when opening
+      setHeight(maxHeight);
+      updatePersistedState({
+        collapsed: false,
+        width: newWidth,
+        height: maxHeight,
+      });
       // Reset animation state after transition
       setTimeout(() => setIsAnimating(false), 600);
     }
@@ -625,11 +637,15 @@ export default function ResourceSidebar({
               onClick={() => {
                 setIsAnimating(true);
                 setCollapsed(false);
-                setWidth(260);
-                setAnimatingWidth(260);
+                const newWidth = 220;
+                updateWidth(newWidth);
+                setAnimatingWidth(newWidth);
+                // Expand to full height when opening
+                setHeight(maxHeight);
                 updatePersistedState({
                   collapsed: false,
-                  width: 260,
+                  width: newWidth,
+                  height: maxHeight,
                   activeTab: "resources",
                 });
                 setActiveTab("resources");
@@ -638,17 +654,21 @@ export default function ResourceSidebar({
               onMouseDown={e => e.stopPropagation()}
               className="text-primary hover:text-primary-hover transition-all duration-300 ease-out cursor-pointer hover:scale-105"
             >
-              <Link className="w-5 h-5" />
+              <Link className="w-4 h-4" />
             </button>
             <button
               onClick={() => {
                 setIsAnimating(true);
                 setCollapsed(false);
-                setWidth(260);
-                setAnimatingWidth(260);
+                const newWidth = 220;
+                updateWidth(newWidth);
+                setAnimatingWidth(newWidth);
+                // Expand to full height when opening
+                setHeight(maxHeight);
                 updatePersistedState({
                   collapsed: false,
-                  width: 260,
+                  width: newWidth,
+                  height: maxHeight,
                   activeTab: "ai-chat",
                 });
                 setActiveTab("ai-chat");
@@ -657,7 +677,7 @@ export default function ResourceSidebar({
               onMouseDown={e => e.stopPropagation()}
               className="text-primary hover:text-primary-hover transition-all duration-300 ease-out cursor-pointer hover:scale-105"
             >
-              <MessageSquare className="w-5 h-5" />
+              <MessageSquare className="w-4 h-4" />
             </button>
           </div>
         ) : !isClient ? (
@@ -669,7 +689,7 @@ export default function ResourceSidebar({
           <>
             {/* Sidebar Title */}
             <div
-              className={`border-b border-border px-4 py-3 bg-surface-elevated rounded-t-3xl transition-all duration-300 ease-out ${collapsed ? "opacity-0 pointer-events-none h-0 overflow-hidden" : "opacity-100"}`}
+              className={`border-b border-border px-3 py-2 bg-surface-elevated rounded-t-3xl transition-all duration-300 ease-out ${collapsed ? "opacity-0 pointer-events-none h-0 overflow-hidden" : "opacity-100"}`}
             >
               <div
                 className="flex items-center justify-between cursor-move"
@@ -683,23 +703,26 @@ export default function ResourceSidebar({
                   }
                 }}
               >
-                <div className="flex items-center gap-2">
-                  <MetallicCardanoLogo size={24} className="flex-shrink-0" />
-                  <span className="font-mono font-bold text-text-primary text-sm tracking-wide">
+                <div className="flex items-center gap-3">
+                  <MetallicCardanoLogo size={20} className="flex-shrink-0" />
+                  <span className="font-display font-bold text-text-primary text-xs tracking-wide">
                     RESOURCES & AI CHAT
                   </span>
                 </div>
                 <button
                   onClick={() => {
                     setCollapsed(true);
-                    setWidth(COLLAPSED_WIDTH);
+                    const newWidth = COLLAPSED_WIDTH;
+                    updateWidth(newWidth);
+                    setHeight(COLLAPSED_HEIGHT);
                     updatePersistedState({
                       collapsed: true,
-                      width: COLLAPSED_WIDTH,
+                      width: newWidth,
+                      height: COLLAPSED_HEIGHT,
                     });
                   }}
                   onMouseDown={e => e.stopPropagation()}
-                  className="p-1 rounded-full hover:bg-surface/50 text-text-secondary hover:text-primary transition-colors duration-200"
+                  className="p-2 rounded-full hover:bg-surface/50 text-text-secondary hover:text-primary transition-colors duration-200"
                   title="Collapse sidebar"
                 >
                   <X className="w-4 h-4" />
@@ -715,14 +738,14 @@ export default function ResourceSidebar({
                   updatePersistedState({ activeTab: "resources" });
                 }}
                 onMouseDown={e => e.stopPropagation()}
-                className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium transition-all duration-200 ${
+                className={`flex-1 flex items-center justify-center gap-3 py-3 px-4 text-xs font-medium transition-all duration-200 ${
                   activeTab === "resources"
                     ? "text-primary bg-primary/10 border-b-2 border-primary"
                     : "text-text-secondary hover:text-primary hover:bg-surface-elevated/50"
                 }`}
               >
-                <BookOpen className="w-4 h-4" />
-                <span className="font-mono font-medium">Resources</span>
+                <BookOpen className="w-3 h-3" />
+                <span className="font-display font-medium">Resources</span>
               </button>
               <button
                 onClick={() => {
@@ -730,14 +753,14 @@ export default function ResourceSidebar({
                   updatePersistedState({ activeTab: "ai-chat" });
                 }}
                 onMouseDown={e => e.stopPropagation()}
-                className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium transition-all duration-200 ${
+                className={`flex-1 flex items-center justify-center gap-3 py-3 px-4 text-xs font-medium transition-all duration-200 ${
                   activeTab === "ai-chat"
                     ? "text-primary bg-primary/10 border-b-2 border-primary"
                     : "text-text-secondary hover:text-primary hover:bg-surface-elevated/50"
                 }`}
               >
-                <MessageSquare className="w-4 h-4" />
-                <span className="font-mono font-medium">AI Chat</span>
+                <MessageSquare className="w-3 h-3" />
+                <span className="font-display font-medium">AI Chat</span>
               </button>
             </div>
 
@@ -755,16 +778,11 @@ export default function ResourceSidebar({
                       className="block p-3 rounded-lg bg-surface-elevated/50 hover:bg-surface-elevated border border-border/30 hover:border-primary/30 transition-all duration-200 group"
                       onMouseDown={e => e.stopPropagation()}
                     >
-                      <div className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-mono font-bold text-text-primary text-sm mb-1 group-hover:text-primary transition-colors">
-                            {resource.title}
-                          </h4>
-                          <p className="text-text-secondary text-xs leading-relaxed">
-                            {resource.description}
-                          </p>
-                        </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-1.5 h-1.5 bg-primary rounded-full flex-shrink-0"></div>
+                        <h4 className="font-display font-bold text-text-primary text-xs group-hover:text-primary transition-colors">
+                          {resource.title}
+                        </h4>
                       </div>
                     </a>
                   ))}
@@ -773,10 +791,10 @@ export default function ResourceSidebar({
                 /* AI Chat Tab */
                 <div className="h-full flex flex-col bg-surface/20 backdrop-blur-sm min-w-0 overflow-hidden">
                   <div
-                    className="w-full h-full overflow-y-auto flex flex-col gap-1 py-1 min-w-0 chat-scroll"
+                    className="w-full h-full overflow-y-auto flex flex-col gap-3 py-3 min-w-0 chat-scroll"
                     style={{
-                      paddingTop: "8px",
-                      paddingBottom: "24px",
+                      paddingTop: "12px",
+                      paddingBottom: "32px",
                       marginTop: "0px",
                       width: "100%",
                       maxWidth: "100%",
@@ -816,15 +834,15 @@ export default function ResourceSidebar({
                             padding: `${padding}px`,
                             fontSize: fontSize,
                             opacity: 1,
-                            marginLeft: msg.from === "user" ? "auto" : "8px",
-                            marginRight: msg.from === "ai" ? "auto" : "8px",
+                            marginLeft: msg.from === "user" ? "auto" : "12px",
+                            marginRight: msg.from === "ai" ? "auto" : "12px",
                             minWidth: "60px",
                             width: "fit-content",
                             maxWidth: `${Math.min(availableWidth - 16, 400)}px`,
                           }}
                         >
                           <div
-                            className="font-mono text-text-muted mb-1 truncate"
+                            className="font-display text-text-muted mb-1 truncate"
                             style={{
                               fontSize: `${parseInt(fontSize) - 2}px`,
                             }}
@@ -848,7 +866,7 @@ export default function ResourceSidebar({
             {/* Input Box - Only show for AI Chat tab */}
             {activeTab === "ai-chat" && (
               <form
-                className="w-full flex items-center gap-2 p-1 bg-surface-elevated rounded-lg mt-1 min-w-0 flex-shrink-0 sticky bottom-0 z-10 rounded-b-lg"
+                className="w-full flex items-center gap-3 p-2 bg-surface-elevated rounded-lg mt-2 min-w-0 flex-shrink-0 sticky bottom-0 z-10 rounded-b-lg"
                 onSubmit={e => {
                   e.preventDefault();
                   if (input.trim()) {
@@ -859,14 +877,14 @@ export default function ResourceSidebar({
                 style={{
                   fontSize:
                     width < 150 ? "10px" : width < 200 ? "11px" : "12px",
-                  padding: width < 150 ? "2px" : width < 200 ? "3px" : "4px",
-                  height: width < 150 ? "24px" : width < 200 ? "28px" : "32px",
+                  padding: width < 150 ? "4px" : width < 200 ? "6px" : "8px",
+                  height: width < 150 ? "28px" : width < 200 ? "32px" : "36px",
                   width: "100%",
                   maxWidth: "100%",
                   position: "absolute",
-                  bottom: "8px",
-                  left: "8px",
-                  right: "8px",
+                  bottom: "12px",
+                  left: "12px",
+                  right: "12px",
                   zIndex: 20,
                 }}
               >
@@ -886,28 +904,28 @@ export default function ResourceSidebar({
                   disabled={collapsed}
                   style={{
                     minWidth:
-                      width < 150 ? "15px" : width < 200 ? "20px" : "30px",
+                      width < 150 ? "20px" : width < 200 ? "25px" : "35px",
                     fontSize: "inherit",
                     flex: 1,
-                    maxWidth: "calc(100% - 50px)", // Reserve space for send button
+                    maxWidth: "calc(100% - 55px)", // Reserve space for send button
                   }}
                 />
                 <button
                   type="submit"
-                  className="rounded bg-primary text-background font-semibold hover:bg-primary-hover transition-all duration-200 font-mono disabled:opacity-50 flex items-center gap-1 flex-shrink-0"
+                  className="rounded bg-primary text-background font-semibold hover:bg-primary-hover transition-all duration-200 font-display disabled:opacity-50 flex items-center gap-2 flex-shrink-0"
                   disabled={!input.trim()}
                   onMouseDown={e => e.stopPropagation()}
                   style={{
                     padding:
                       width < 150
-                        ? "2px 3px"
+                        ? "4px 6px"
                         : width < 200
-                          ? "3px 4px"
-                          : "4px 6px",
+                          ? "6px 8px"
+                          : "8px 10px",
                     fontSize: "inherit",
-                    minWidth: "40px", // Guarantee minimum send button width
+                    minWidth: "45px", // Guarantee minimum send button width
                     flexShrink: 0,
-                    width: "40px", // Fixed width for send button
+                    width: "45px", // Fixed width for send button
                   }}
                 >
                   <Send

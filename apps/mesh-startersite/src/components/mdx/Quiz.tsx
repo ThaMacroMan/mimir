@@ -28,7 +28,7 @@ export default function Quiz({
   const isCorrect = selectedAnswer === correct;
 
   return (
-    <div className="my-8 p-6 border border-border rounded-lg bg-surface-elevated">
+    <div className="my-8 p-6 border border-border rounded-lg bg-surface-elevated/50">
       <h3 className="text-xl font-semibold text-text-primary mb-4">
         Quiz Question
       </h3>
