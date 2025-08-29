@@ -7,16 +7,16 @@ export default function Home() {
   const { selectedPersona, setSelectedPersona } = usePersona();
 
   return (
-    <div className="w-full h-screen relative flex flex-col justify-center">
-      {/* Content container - no scrolling, centered vertically */}
-      <div className="relative z-10 w-full flex flex-col justify-center">
+    <div className="w-full h-auto min-h-screen relative flex flex-col justify-start pb-8">
+      {/* Content container - positioned at top */}
+      <div className="relative z-10 w-full flex flex-col justify-start">
         {/* Hero Section - reduced margins to fit in viewport */}
-        <section className="text-center mb-16 mt-16 px-6 w-full relative z-10">
+        <section className="text-center mb-12 mt-16 px-6 w-full relative z-10">
           <MimirHero />
         </section>
 
         {/* Persona Selector - reduced margins */}
-        <section className="mb-6 w-full relative z-10">
+        <section className="w-full relative z-10">
           <PersonaSelector
             onPersonaSelect={setSelectedPersona}
             selectedPersona={selectedPersona}
@@ -24,7 +24,7 @@ export default function Home() {
         </section>
 
         {/* Community Section - reduced margins */}
-        <section className="mb-16 w-full relative z-10">
+        <section className="w-full relative z-10">
           <CommunitySection />
         </section>
       </div>

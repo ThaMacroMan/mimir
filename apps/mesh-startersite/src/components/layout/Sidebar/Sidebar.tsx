@@ -155,6 +155,36 @@ export default function Sidebar() {
     return () => window.removeEventListener("resize", handleResize);
   }, [collapsed, updatePersistedState]);
 
+  // Listen for external sidebar state updates (e.g., from "Start Here" button)
+  useEffect(() => {
+    const handleSidebarStateUpdate = (event: CustomEvent) => {
+      const { sidebarId, state } = event.detail;
+      if (sidebarId === "main-sidebar" && state) {
+        // Update the sidebar state immediately
+        setCollapsed(state.collapsed);
+        setWidth(state.width);
+        setAnimatingWidth(state.width);
+        setHeight(state.height);
+        setTop(state.top);
+        if (state.openSections) {
+          setOpenSections(state.openSections);
+        }
+        // Also update persisted state
+        updatePersistedState(state);
+      }
+    };
+
+    window.addEventListener(
+      "sidebarStateUpdate",
+      handleSidebarStateUpdate as EventListener
+    );
+    return () =>
+      window.removeEventListener(
+        "sidebarStateUpdate",
+        handleSidebarStateUpdate as EventListener
+      );
+  }, [updatePersistedState]);
+
   useEffect(() => {
     if (!dragging && !draggingVertical && !draggingPosition) return;
     let animationFrameId: number;

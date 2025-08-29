@@ -263,9 +263,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         <Sidebar />
         <main
           ref={mainContentRef}
-          className={`flex-1 px-8 transition-all duration-300 ${
-            router.pathname === "/" ? "" : "overflow-auto"
-          }`}
+          className="flex-1 px-8 transition-all duration-300 overflow-auto"
           style={{
             height: "100vh",
             marginTop: "0px",
@@ -275,7 +273,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             minWidth: "300px",
           }}
         >
-          <div className="w-full h-full">
+          <div className="w-full min-h-full">
             <PageTransition>{children}</PageTransition>
           </div>
         </main>

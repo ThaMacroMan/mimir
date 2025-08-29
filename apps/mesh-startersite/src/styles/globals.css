@@ -9,6 +9,15 @@
   font-display: swap;
 }
 
+/* Custom Inter-ExtraBoldItalic font for selected personas */
+@font-face {
+  font-family: "Inter-ExtraBoldItalic";
+  src: url("/Inter-4.1/extras/otf/Inter-ExtraBoldItalic.otf") format("opentype");
+  font-weight: 800;
+  font-style: italic;
+  font-display: swap;
+}
+
 /* Fallback Inter fonts from Google Fonts for other weights */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
 
@@ -102,6 +111,24 @@
   /* Hide scrollbar for Firefox */
   * {
     scrollbar-width: none;
+  }
+
+  /* Mobile scrolling improvements */
+  @media (max-width: 768px) {
+    /* Enable smooth scrolling on mobile */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Improve touch scrolling */
+    * {
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Ensure main content area allows scrolling */
+    main {
+      overscroll-behavior: contain;
+    }
   }
 
   /* Selection */

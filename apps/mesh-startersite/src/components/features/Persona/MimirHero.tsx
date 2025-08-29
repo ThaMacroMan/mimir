@@ -10,7 +10,7 @@ const characters =
 
 export default function MimirHero() {
   const [currentBuilderIndex, setCurrentBuilderIndex] = useState(0);
-  const [displayText, setDisplayText] = useState("");
+  const [displayText, setDisplayText] = useState("New Builder");
   const [isDecrypting, setIsDecrypting] = useState(false);
   const builderNames = [
     "New Builder",
@@ -62,12 +62,12 @@ export default function MimirHero() {
     <div className="w-full px-4">
       {/* Mimir Badge - now much larger, with "powered by MeshJS" inside */}
       <motion.div
-        className="flex justify-center mb-20"
+        className="flex justify-center mb-12"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
       >
-        <div className="inline-flex flex-col items-center justify-center gap-1 from-primary/10 to-secondary/10 border border-primary/20 rounded-full backdrop-blur-sm">
+        <div className="inline-flex flex-col items-center justify-center gap-1 from-primary/10 to-secondary/10 border-2 border-primary/40 rounded-full backdrop-blur-sm">
           <div className="inline-flex items-center justify-center gap-3 mr-2">
             <MetallicCardanoLogo size={120} />
             <span className="font-display font-extrabold tracking-widest text-4xl md:text-5xl text-primary">
@@ -81,7 +81,7 @@ export default function MimirHero() {
         <span className="text-lg md:text-xl text-center text-text-secondary font-display font-medium">
           Learn to build on Cardano as a{" "}
           <span
-            className={`font-bold text-primary font-display ${
+            className={`font-bold text-primary font-display inline-block min-w-[140px] text-center transition-colors duration-200 font-mono ${
               isDecrypting ? "text-primary/80" : "text-primary"
             }`}
           >

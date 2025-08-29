@@ -6,7 +6,7 @@ import { Twitter, MessageCircle, Github } from "lucide-react";
 export default function CommunitySection() {
   return (
     <motion.div
-      className="mt-16 flex justify-center"
+      className="flex justify-center mt-8"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.4 }}
@@ -17,7 +17,7 @@ export default function CommunitySection() {
             Find other Builders:
           </span>
           <motion.a
-            href="https://twitter.com/mesh_js"
+            href="https://x.com/meshsdk"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-3 text-text-secondary hover:text-primary transition-colors duration-200"
