@@ -7,13 +7,19 @@ import {
   getAllMDXSlugs,
   FrontMatter,
 } from "../../utils/mdxUtils";
-import { InteractiveDemo, CodePlayground, Quiz } from "../../components/mdx";
+import {
+  InteractiveDemo,
+  CodePlayground,
+  Quiz,
+  TabbedTutorial,
+} from "../../components/mdx";
 
 // Components that can be used in MDX files
 const mdxComponents = {
   InteractiveDemo,
   CodePlayground,
   Quiz,
+  TabbedTutorial,
 };
 
 interface DocPageProps {

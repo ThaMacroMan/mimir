@@ -122,9 +122,6 @@ export default function PersonaSwitcher({
                       <div className="font-mono font-semibold text-primary text-sm truncate">
                         {persona.name}
                       </div>
-                      <div className="text-xs text-text-secondary font-mono leading-relaxed line-clamp-2">
-                        {persona.description}
-                      </div>
                     </div>
                   </button>
                 );
@@ -157,12 +154,9 @@ export default function PersonaSwitcher({
               <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3">
                 {renderPersonaLogo(persona)}
               </div>
-              <h3 className="font-mono font-semibold text-primary text-sm mb-1">
+              <h3 className="font-mono font-semibold text-primary text-sm">
                 {persona.name}
               </h3>
-              <p className="text-xs text-text-secondary font-mono leading-relaxed">
-                {persona.description}
-              </p>
             </div>
           </button>
         );

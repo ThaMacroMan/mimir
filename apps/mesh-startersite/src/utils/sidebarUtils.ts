@@ -53,7 +53,7 @@ export function getSidebarSections(
       case "brand-new-to-ai":
         return [
           {
-            title: "AI Fundamentals",
+            title: "What is AI?",
             icon: "BookOpen",
             items: [
               {
@@ -141,7 +141,7 @@ export function getSidebarSections(
       case "ai-user":
         return [
           {
-            title: "AI Fundamentals",
+            title: "What is AI?",
             icon: "BookOpen",
             items: [
               {
@@ -255,7 +255,7 @@ export function getSidebarSections(
       case "ai-power-user":
         return [
           {
-            title: "AI Fundamentals",
+            title: "What is AI?",
             icon: "BookOpen",
             items: [
               {
@@ -385,7 +385,7 @@ export function getSidebarSections(
         // Default sections for all personas
         return [
           {
-            title: "AI Fundamentals",
+            title: "What is AI?",
             icon: "BookOpen",
             items: [
               {

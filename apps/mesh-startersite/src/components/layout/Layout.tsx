@@ -17,13 +17,11 @@ export default function Layout({ children }: { children: ReactNode }) {
   const [terminalDragging, setTerminalDragging] = useState(false);
   const [footerDragging, setFooterDragging] = useState(false);
   const [aiChatWidth, setAiChatWidth] = useState(48);
-  const [sidebarWidth, setSidebarWidth] = useState(48);
 
   // Handle AI chat sidebar width changes smoothly
   const handleAiChatWidthChange = (newWidth: number) => {
     setAiChatWidth(newWidth);
   };
-  const [mainContentLeft, setMainContentLeft] = useState(48);
   const dragStartY = useRef<number | null>(null);
   const dragStartHeight = useRef<number | null>(null);
   const mainContentRef = useRef<HTMLElement>(null);
@@ -31,92 +29,19 @@ export default function Layout({ children }: { children: ReactNode }) {
   const maxTerminalHeight = 600;
   const router = useRouter();
 
-  // Update sidebar positions and main content dimensions dynamically
+  // Update AI chat sidebar CSS variables
   useEffect(() => {
-    const updateSidebarPositions = () => {
-      const sidebarElement = document.querySelector(
-        'nav[aria-label="Sidebar navigation"]'
-      );
-      const aiChatElement = document.querySelector(
-        'aside[aria-label="Resource sidebar"]'
-      );
+    const aiChatTotalSpace = aiChatWidth + 16; // 16px margin from right edge
 
-      const currentSidebarWidth =
-        sidebarElement?.getBoundingClientRect().width || 260;
-      const currentAiChatWidth =
-        aiChatElement?.getBoundingClientRect().width || 260;
-
-      // Update state variables
-      setSidebarWidth(currentSidebarWidth);
-      // Note: aiChatWidth is now managed by the callback from AIChatSidebar
-
-      // Calculate main content dimensions
-      // Account for AI chat sidebar width + 16px right margin
-      const aiChatTotalSpace = currentAiChatWidth + 16; // 16px margin from right edge
-      const newMainContentLeft = currentSidebarWidth;
-
-      setMainContentLeft(newMainContentLeft);
-
-      // Set CSS custom properties for terminal
-      document.body.style.setProperty(
-        "--terminal-left",
-        `${currentSidebarWidth}px`
-      );
-      document.body.style.setProperty(
-        "--terminal-right",
-        `${aiChatTotalSpace}px`
-      );
-
-      // Set CSS custom properties for main content area
-      document.body.style.setProperty(
-        "--sidebar-width",
-        `${currentSidebarWidth}px`
-      );
-      document.body.style.setProperty(
-        "--ai-chat-width",
-        `${currentAiChatWidth}px`
-      );
-    };
-
-    updateSidebarPositions();
-
-    // Update on resize
-    window.addEventListener("resize", updateSidebarPositions);
-
-    // Use MutationObserver to watch for sidebar width changes
-    const observer = new MutationObserver(updateSidebarPositions);
-    const sidebar = document.querySelector(
-      'nav[aria-label="Sidebar navigation"]'
-    );
-    const aiChat = document.querySelector(
-      'aside[aria-label="AI Chat sidebar"]'
+    // Set CSS custom properties for terminal
+    document.body.style.setProperty("--terminal-left", "0px");
+    document.body.style.setProperty(
+      "--terminal-right",
+      `${aiChatTotalSpace}px`
     );
 
-    if (sidebar)
-      observer.observe(sidebar, {
-        attributes: true,
-        attributeFilter: ["style"],
-        childList: true,
-        subtree: true,
-      });
-    if (aiChat)
-      observer.observe(aiChat, {
-        attributes: true,
-        attributeFilter: ["style"],
-        childList: true,
-        subtree: true,
-      });
-
-    // Use ResizeObserver for more reliable width detection
-    const resizeObserver = new ResizeObserver(updateSidebarPositions);
-    if (sidebar) resizeObserver.observe(sidebar);
-    if (aiChat) resizeObserver.observe(aiChat);
-
-    return () => {
-      window.removeEventListener("resize", updateSidebarPositions);
-      observer.disconnect();
-      resizeObserver.disconnect();
-    };
+    // Set CSS custom properties for main content area
+    document.body.style.setProperty("--ai-chat-width", `${aiChatWidth}px`);
   }, [aiChatWidth]);
 
   // Add effect to set --terminal-height CSS variable on body for scrollable main
@@ -253,24 +178,20 @@ export default function Layout({ children }: { children: ReactNode }) {
   return (
     <div className="flex flex-col h-screen overflow-hidden cardano-gradient-bg">
       {/* Fluid Cardano logos background - covers entire viewport */}
-      <FluidBackground persona={selectedPersona} />
+      {/* <FluidBackground persona={selectedPersona} /> */}
 
       {/* <ReadingProgress /> */}
       {/* <div className="fixed top-0 left-0 right-0 z-50">
         <Header />
       </div> */}
-      <div className="flex flex-1 flex-row h-full">
+      <div className="flex flex-1 flex-row h-screen">
         <Sidebar />
         <main
           ref={mainContentRef}
-          className="flex-1 px-8 transition-all duration-300 overflow-auto"
+          className="flex-1 transition-all duration-300 overflow-auto px-4"
           style={{
             height: "100vh",
-            marginTop: "0px",
-            marginLeft: `${mainContentLeft}px`,
-            marginRight: "16px",
-            width: `calc(100vw - ${mainContentLeft}px - ${aiChatWidth + 16}px)`,
-            minWidth: "300px",
+            minWidth: "400px",
           }}
         >
           <div className="w-full min-h-full">
@@ -288,7 +209,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         <ScrollNavigation
           containerRef={mainContentRef}
           className="hidden md:flex" // Only show on medium screens and up to avoid conflicts with mobile
-          aiChatWidth={aiChatWidth + 16} // Account for AI chat sidebar + 16px margin
+          aiChatWidth={aiChatWidth + 32} // Account for both sidebars + padding (16px + 16px)
         />
       )}
       {/* <div className="fixed bottom-0 left-0 right-0 z-50">
@@ -310,8 +231,8 @@ export default function Layout({ children }: { children: ReactNode }) {
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className="fixed z-[100] pointer-events-none"
             style={{
-              left: `${sidebarWidth}px`,
-              right: `${aiChatWidth + 16}px`, // Account for AI chat sidebar + 16px margin
+              left: "0px",
+              right: "0px",
               height: terminalHeight,
               bottom: "0px", // No footer anymore
             }}

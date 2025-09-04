@@ -566,12 +566,10 @@ export default function ResourceSidebar({
 
   return (
     <div
+      className="flex-shrink-0"
       style={{
-        position: "fixed",
-        right: "16px",
-        top: `${top}px`,
         width: collapsed ? COLLAPSED_WIDTH : width,
-        height: height,
+        height: "100vh",
         zIndex: 40,
       }}
     >
@@ -586,7 +584,7 @@ export default function ResourceSidebar({
               dragging || draggingVertical
                 ? "none"
                 : "width 0.6s cubic-bezier(0.4, 0, 0.2, 1), height 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-            height: height,
+            height: "100vh",
             top: 0,
             bottom: 0,
             position: "absolute",
@@ -595,7 +593,7 @@ export default function ResourceSidebar({
             "--resource-sidebar-width": `${animatingWidth}px`,
           } as React.CSSProperties & { "--resource-sidebar-width": string }
         }
-        className={`bg-surface/30 backdrop-blur-md flex flex-col shadow-2xl rounded-3xl overflow-hidden isolate transition-all duration-500 ease-out ${
+        className={`bg-surface/30 backdrop-blur-md flex flex-col shadow-2xl rounded-l-3xl overflow-hidden isolate transition-all duration-500 ease-out ${
           collapsed ? "cursor-pointer" : ""
         } ${isAnimating ? "animate-pulse" : ""}`}
         aria-label="Resource sidebar"
@@ -689,7 +687,7 @@ export default function ResourceSidebar({
           <>
             {/* Sidebar Title */}
             <div
-              className={`border-b border-border px-3 py-2 bg-surface-elevated rounded-t-3xl transition-all duration-300 ease-out ${collapsed ? "opacity-0 pointer-events-none h-0 overflow-hidden" : "opacity-100"}`}
+              className={`border-b border-border px-3 py-2 bg-surface-elevated rounded-tl-3xl transition-all duration-300 ease-out ${collapsed ? "opacity-0 pointer-events-none h-0 overflow-hidden" : "opacity-100"}`}
             >
               <div
                 className="flex items-center justify-between cursor-move"
@@ -706,7 +704,7 @@ export default function ResourceSidebar({
                 <div className="flex items-center gap-3">
                   <MetallicCardanoLogo size={20} className="flex-shrink-0" />
                   <span className="font-display font-bold text-text-primary text-xs tracking-wide">
-                    RESOURCES & AI CHAT
+                    Help & Chat
                   </span>
                 </div>
                 <button

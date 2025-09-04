@@ -65,7 +65,7 @@ export default function Sidebar() {
       collapsed: true,
       width: COLLAPSED_WIDTH,
       height: COLLAPSED_HEIGHT, // Use collapsed height when collapsed
-      top: 16,
+      top: 32,
       openSections: sections.map(() => true),
     },
   });
@@ -247,7 +247,7 @@ export default function Sidebar() {
         ) {
           const deltaY = e.clientY - dragStartY.current;
           const newTop = Math.min(
-            Math.max(dragStartTop.current + deltaY, 16), // Minimum top position
+            Math.max(dragStartTop.current + deltaY, 32), // Minimum top position
             window.innerHeight - height - 16 // Maximum top position (keep sidebar in view)
           );
           setTop(newTop);
@@ -314,19 +314,16 @@ export default function Sidebar() {
 
   return (
     <div
-      className="rounded-3xl overflow-hidden"
+      className="overflow-hidden flex-shrink-0"
       style={{
-        position: "fixed",
-        left: "16px",
-        top: `${top}px`,
         width: collapsed ? COLLAPSED_WIDTH : width,
-        height: height,
+        height: "100vh",
         zIndex: 30,
       }}
     >
       <nav
         ref={sidebarRef}
-        className={`bg-surface/30 backdrop-blur-md transition-all duration-500 ease-out flex flex-col overflow-hidden isolate ${collapsed ? "min-w-0 rounded-3xl cursor-pointer" : "rounded-3xl"} ${isAnimating ? "animate-pulse" : ""}`}
+        className={`bg-surface/30 backdrop-blur-md transition-all duration-500 ease-out flex flex-col overflow-hidden isolate ${collapsed ? "min-w-0 rounded-3xl cursor-pointer" : "rounded-r-3xl"} ${isAnimating ? "animate-pulse" : ""}`}
         aria-label="Sidebar navigation"
         onClick={collapsed ? handleCollapsedClick : undefined}
         title={collapsed ? "Click to expand" : ""}
@@ -339,7 +336,7 @@ export default function Sidebar() {
               dragging || draggingVertical
                 ? "none"
                 : "width 0.6s cubic-bezier(0.4, 0, 0.2, 1), height 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-            height: height,
+            height: "100vh",
             top: 0,
             bottom: 0,
             position: "absolute",
@@ -351,7 +348,7 @@ export default function Sidebar() {
       >
         {/* Sidebar Title */}
         <div
-          className={`border-b border-border px-3 py-2 bg-surface-elevated rounded-t-3xl transition-all duration-300 ease-out ${collapsed ? "opacity-0 pointer-events-none h-0 overflow-hidden" : "opacity-100"}`}
+          className={`border-b border-border px-3 py-2 bg-surface-elevated rounded-tr-3xl transition-all duration-300 ease-out ${collapsed ? "opacity-0 pointer-events-none h-0 overflow-hidden" : "opacity-100"}`}
         >
           <div
             className="flex items-center justify-between cursor-move"
@@ -368,7 +365,7 @@ export default function Sidebar() {
             <div className="flex items-center gap-3">
               <MetallicCardanoLogo size={20} className="flex-shrink-0" />
               <span className="font-display font-bold text-text-primary text-xs tracking-wide">
-                LEARNING SECTIONS
+                Learning Sections
               </span>
             </div>
             <button
@@ -600,7 +597,7 @@ export default function Sidebar() {
 
         {/* Persona Switcher */}
         {!collapsed && (
-          <div className="border-t border-border px-4 py-4 bg-surface-elevated rounded-b-3xl">
+          <div className="border-t border-border px-4 py-4 bg-surface-elevated rounded-br-3xl">
             <PersonaSwitcher variant="compact" />
           </div>
         )}

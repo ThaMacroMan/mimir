@@ -170,20 +170,14 @@ export default function PersonaSelector({
               y: 0,
               transition: { duration: 0.1 },
             }}
-            className={`
+            className="
               relative group px-12 py-6 rounded-3xl font-display font-bold text-xl
               transition-all duration-500 ease-out
               shadow-2xl hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.4)]
               backdrop-blur-sm border border-white/20
               overflow-hidden
-              ${
-                selectedPersona === "brand-new-to-ai"
-                  ? "bg-gradient-to-br from-[#0033AD] via-[#1E40AF] to-[#3B82F6] hover:from-[#002B8F] hover:via-[#1E3A8A] hover:to-[#2563EB] text-white"
-                  : selectedPersona === "ai-user"
-                    ? "bg-gradient-to-br from-[#7C3AED] via-[#8B5CF6] to-[#A855F7] hover:from-[#6D28D9] hover:via-[#7C3AED] hover:to-[#9333EA] text-white"
-                    : "bg-gradient-to-br from-[#DC2626] via-[#EF4444] to-[#F87171] hover:from-[#B91C1C] hover:via-[#DC2626] hover:to-[#EF4444] text-white"
-              }
-            `}
+              bg-gradient-to-br from-primary to-primary-hover hover:from-primary-hover hover:to-primary text-white
+            "
           >
             {/* Animated background glow */}
             <motion.div

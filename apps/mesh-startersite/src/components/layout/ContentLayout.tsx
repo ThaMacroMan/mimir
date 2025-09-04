@@ -36,7 +36,7 @@ export default function ContentLayout({
   return (
     <div className="w-full h-screen cardano-gradient-bg fixed inset-0">
       {/* Fluid Cardano logos background */}
-      <FluidBackground persona={selectedPersona} />
+      {/* <FluidBackground persona={selectedPersona} /> */}
 
       {/* Scrollable content container */}
       <div className="relative z-10 w-full h-full overflow-y-auto">
