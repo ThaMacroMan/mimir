@@ -28,21 +28,21 @@ export default function TabbedTutorial({ tabs, title }: TabbedTutorialProps) {
     const { logo } = persona;
 
     if (logo.type === "metallic") {
-      return <MetallicCardanoLogo size={16} className="flex-shrink-0" />;
+      return <MetallicCardanoLogo size={32} className="flex-shrink-0" />;
     } else if (logo.type === "image" && logo.src) {
       return (
         <Image
           src={logo.src}
           alt={`${persona.name} logo`}
-          width={16}
-          height={16}
+          width={32}
+          height={32}
           className="flex-shrink-0"
         />
       );
     }
 
     // Fallback to MetallicCardanoLogo
-    return <MetallicCardanoLogo size={16} className="flex-shrink-0" />;
+    return <MetallicCardanoLogo size={32} className="flex-shrink-0" />;
   };
 
   const goToNext = () => {
@@ -62,7 +62,7 @@ export default function TabbedTutorial({ tabs, title }: TabbedTutorialProps) {
   };
 
   return (
-    <div className="my-2 mx-auto w-full border border-border rounded-3xl overflow-hidden bg-surface/30 backdrop-blur-md flex flex-col min-h-[80vh] max-h-[90vh]">
+    <div className="my-2 mx-auto w-full border border-border rounded-3xl overflow-hidden bg-surface flex flex-col min-h-[80vh] max-h-[90vh]">
       {/* Header with Mimir, title, and progress */}
       <div className="bg-surface-elevated px-4 py-2 border-b border-border rounded-tr-3xl">
         {/* All elements inline */}
@@ -97,9 +97,11 @@ export default function TabbedTutorial({ tabs, title }: TabbedTutorialProps) {
           </div>
 
           {selectedPersona && (
-            <div className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 border border-primary/20 rounded-full backdrop-blur-sm">
-              {renderPersonaLogo()}
-              <span className="text-sm font-display font-bold text-primary">
+            <div className="inline-flex items-center gap-1 p-1 bg-primary/10 border border-primary/20 rounded-full backdrop-blur-sm shadow-2xl">
+              <div className="w-8 h-8 flex items-center justify-center">
+                {renderPersonaLogo()}
+              </div>
+              <span className="text-2xl font-display font-extrabold tracking-widest text-primary drop-shadow-lg">
                 {PERSONAS[selectedPersona].name}
               </span>
             </div>
@@ -121,12 +123,12 @@ export default function TabbedTutorial({ tabs, title }: TabbedTutorialProps) {
       </div>
 
       {/* Previous/Next Page Cards */}
-      <div className="p-4 bg-surface-elevated rounded-br-3xl border-t border-border">
+      <div className="p-4 bg-surface-elevated rounded-br-3xl border-t border-border relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Previous Page Card */}
           <div
             onClick={currentTab > 0 ? goToPrevious : undefined}
-            className={`px-3 py-2 rounded-lg border transition-all duration-200 ${
+            className={`px-3 py-2 rounded-lg border transition-all duration-200 relative z-20 ${
               currentTab > 0
                 ? "bg-surface border-border hover:bg-surface-elevated hover:border-primary cursor-pointer"
                 : "bg-surface border-border opacity-50 cursor-not-allowed"
@@ -147,7 +149,7 @@ export default function TabbedTutorial({ tabs, title }: TabbedTutorialProps) {
           {/* Next Page Card */}
           <div
             onClick={currentTab < tabs.length - 1 ? goToNext : undefined}
-            className={`px-3 py-2 rounded-lg border transition-all duration-200 ${
+            className={`px-3 py-2 rounded-lg border transition-all duration-200 relative z-20 ${
               currentTab < tabs.length - 1
                 ? "bg-surface border-border hover:bg-surface-elevated hover:border-primary cursor-pointer"
                 : "bg-surface border-border opacity-50 cursor-not-allowed"
