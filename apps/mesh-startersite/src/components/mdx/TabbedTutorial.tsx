@@ -62,38 +62,23 @@ export default function TabbedTutorial({ tabs, title }: TabbedTutorialProps) {
   };
 
   return (
-    <div className="my-2 mx-auto w-full border border-border rounded-3xl overflow-hidden bg-surface flex flex-col min-h-[80vh] max-h-[90vh]">
+    <div className="my-2 mx-auto w-full border border-border rounded-3xl overflow-hidden bg-surface flex flex-col h-[85vh]">
       {/* Header with Mimir, title, and progress */}
       <div className="bg-surface-elevated px-4 py-2 border-b border-border rounded-tr-3xl">
         {/* All elements inline */}
         <div className="flex items-center justify-between">
           <MimirHeader size="md" />
 
-          {/* Title and navigation dots */}
-          <div className="flex items-center gap-4">
+          {/* Title with counter */}
+          <div className="flex items-center gap-2">
             {title && (
               <h2 className="text-lg font-display font-bold text-text-primary tracking-wide">
                 {title}
               </h2>
             )}
-
-            {/* Tab navigation dots */}
-            <div className="flex gap-2">
-              {tabs.map((tab, index) => (
-                <button
-                  key={tab.id}
-                  onClick={() => goToTab(index)}
-                  className={`w-2 h-2 rounded-full transition-all duration-200 ${
-                    index === currentTab
-                      ? "bg-primary"
-                      : index < currentTab
-                        ? "bg-primary/50"
-                        : "bg-border hover:bg-primary/30"
-                  }`}
-                  aria-label={`Go to ${tab.title}`}
-                />
-              ))}
-            </div>
+            <span className="text-sm font-medium text-text-secondary">
+              {currentTab + 1} of {tabs.length}
+            </span>
           </div>
 
           {selectedPersona && (
@@ -118,7 +103,7 @@ export default function TabbedTutorial({ tabs, title }: TabbedTutorialProps) {
       </div>
 
       {/* Content area */}
-      <div className="p-6 flex-1 overflow-y-auto scrollbar-none">
+      <div className="p-6 h-[calc(85vh-120px)] overflow-y-auto scrollbar-none">
         {tabs[currentTab].content}
       </div>
 
