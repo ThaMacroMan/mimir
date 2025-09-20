@@ -595,7 +595,7 @@ export default function ResourceSidebar({
         }
         className={`bg-surface/30 backdrop-blur-md flex flex-col shadow-2xl rounded-l-3xl overflow-hidden isolate transition-all duration-500 ease-out ${
           collapsed ? "cursor-pointer" : ""
-        } ${isAnimating ? "animate-pulse" : ""}`}
+        } ${isAnimating ? "animate-pulse" : ""} hidden md:flex`}
         aria-label="Resource sidebar"
         onClick={collapsed ? handleCollapsedClick : undefined}
         title={collapsed ? "Click to expand" : ""}
@@ -941,6 +941,162 @@ export default function ResourceSidebar({
             )}
           </>
         )}
+      </aside>
+
+      {/* Mobile Bottom Navigation */}
+      <aside className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface/95 backdrop-blur-md border-t border-border rounded-t-3xl">
+        {/* Mobile Tab Navigation */}
+        <div className="flex bg-surface-elevated/20">
+          <button
+            onClick={() => {
+              if (activeTab === "resources" && !collapsed) {
+                // If already on resources tab and open, close it
+                setCollapsed(true);
+              } else {
+                // Switch to resources tab and open
+                setActiveTab("resources");
+                setCollapsed(false);
+                updatePersistedState({
+                  activeTab: "resources",
+                  collapsed: false,
+                });
+              }
+            }}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-xs font-medium transition-all duration-200 ${
+              activeTab === "resources" && !collapsed
+                ? "text-primary bg-primary/10 border-b-2 border-primary"
+                : "text-text-secondary hover:text-primary hover:bg-surface-elevated/50"
+            }`}
+          >
+            <BookOpen className="w-3 h-3" />
+            <span className="font-display font-medium">Resources</span>
+          </button>
+          <button
+            onClick={() => {
+              if (activeTab === "ai-chat" && !collapsed) {
+                // If already on ai-chat tab and open, close it
+                setCollapsed(true);
+              } else {
+                // Switch to ai-chat tab and open
+                setActiveTab("ai-chat");
+                setCollapsed(false);
+                updatePersistedState({
+                  activeTab: "ai-chat",
+                  collapsed: false,
+                });
+              }
+            }}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-xs font-medium transition-all duration-200 ${
+              activeTab === "ai-chat" && !collapsed
+                ? "text-primary bg-primary/10 border-b-2 border-primary"
+                : "text-text-secondary hover:text-primary hover:bg-surface-elevated/50"
+            }`}
+          >
+            <MessageSquare className="w-3 h-3" />
+            <span className="font-display font-medium">AI Chat</span>
+          </button>
+        </div>
+
+        {/* Mobile Content Area */}
+        <div
+          className={`overflow-hidden transition-all duration-300 ${collapsed ? "max-h-0" : "max-h-80"}`}
+        >
+          {activeTab === "resources" ? (
+            /* Resources Tab */
+            <div className="max-h-80 overflow-y-auto p-4 space-y-2">
+              {resources.map((resource, idx) => (
+                <a
+                  key={idx}
+                  href={resource.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block p-3 rounded-lg bg-surface-elevated/50 hover:bg-surface-elevated border border-border/30 hover:border-primary/30 transition-all duration-200 group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-1.5 h-1.5 bg-primary rounded-full flex-shrink-0"></div>
+                    <h4 className="font-display font-bold text-text-primary text-xs group-hover:text-primary transition-colors">
+                      {resource.title}
+                    </h4>
+                  </div>
+                </a>
+              ))}
+            </div>
+          ) : (
+            /* AI Chat Tab */
+            <div className="max-h-80 flex flex-col bg-surface/20 backdrop-blur-sm min-w-0 overflow-hidden">
+              <div className="flex-1 overflow-y-auto flex flex-col gap-2 py-3 px-4 min-w-0">
+                {messages.map((msg, idx) => (
+                  <div
+                    key={idx}
+                    className={`w-fit rounded-lg shadow-sm transition-all duration-300 ${
+                      msg.from === "ai"
+                        ? "bg-surface-elevated text-text-primary self-start"
+                        : "bg-primary/20 text-primary self-end ml-auto"
+                    }`}
+                    style={{
+                      wordBreak: "break-word",
+                      padding: "8px",
+                      fontSize: "12px",
+                      opacity: 1,
+                      marginLeft: msg.from === "user" ? "auto" : "12px",
+                      marginRight: msg.from === "ai" ? "auto" : "12px",
+                      minWidth: "60px",
+                      width: "fit-content",
+                      maxWidth: "280px",
+                    }}
+                  >
+                    <div className="font-display text-text-muted mb-1 truncate text-xs">
+                      {msg.from === "ai" ? "AI" : "You"}
+                    </div>
+                    <div className="break-words whitespace-pre-wrap">
+                      {msg.text}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Mobile Input Box */}
+              <form
+                className="w-full flex items-center gap-2 p-2 bg-surface-elevated rounded-lg mt-2 min-w-0 flex-shrink-0"
+                onSubmit={e => {
+                  e.preventDefault();
+                  if (input.trim()) {
+                    setMessages([...messages, { from: "user", text: input }]);
+                    setInput("");
+                  }
+                }}
+              >
+                <input
+                  type="text"
+                  className="flex-1 bg-transparent text-text-primary border-none focus:outline-none focus:ring-0 font-mono placeholder:text-text-muted min-w-0 text-xs"
+                  placeholder="Ask me anything..."
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  style={{
+                    minWidth: "20px",
+                    fontSize: "12px",
+                    flex: 1,
+                    maxWidth: "calc(100% - 40px)",
+                  }}
+                />
+                <button
+                  type="submit"
+                  className="rounded bg-primary text-background font-semibold hover:bg-primary-hover transition-all duration-200 font-display disabled:opacity-50 flex items-center gap-1 flex-shrink-0"
+                  disabled={!input.trim()}
+                  style={{
+                    padding: "6px 8px",
+                    fontSize: "12px",
+                    minWidth: "35px",
+                    flexShrink: 0,
+                    width: "35px",
+                  }}
+                >
+                  <Send className="w-3 h-3" />
+                </button>
+              </form>
+            </div>
+          )}
+        </div>
       </aside>
     </div>
   );

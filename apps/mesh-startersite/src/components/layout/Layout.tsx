@@ -6,12 +6,9 @@ import ScrollNavigation from "./ScrollNavigation";
 import PageTransition from "./PageTransition";
 import { Terminal } from "../magicui/terminal";
 import { resetAllSidebarStates } from "../../utils/sidebarUtils";
-import FluidBackground from "../shared/Background/FluidBackground";
-import { usePersona } from "../../contexts/PersonaContext";
 import { useRouter } from "next/router";
 
 export default function Layout({ children }: { children: ReactNode }) {
-  const { selectedPersona } = usePersona();
   const [terminalOpen, setTerminalOpen] = useState(false);
   const [terminalHeight, setTerminalHeight] = useState(420);
   const [terminalDragging, setTerminalDragging] = useState(false);
@@ -185,19 +182,36 @@ export default function Layout({ children }: { children: ReactNode }) {
         <Header />
       </div> */}
       <div className="flex flex-1 flex-row h-screen">
-        <Sidebar />
+        {/* Desktop Sidebar - Hidden on mobile */}
+        <div className="hidden md:block">
+          <Sidebar />
+        </div>
+
         <main
           ref={mainContentRef}
-          className="flex-1 transition-all duration-300 overflow-auto px-4"
+          className="flex-1 transition-all duration-300 overflow-auto md:px-4 pt-12 md:pt-0 pb-12 md:pb-0"
           style={{
             height: "100vh",
-            minWidth: "400px",
+            minWidth: "320px",
           }}
         >
           <div className="w-full min-h-full">
-            <PageTransition>{children}</PageTransition>
+            <PageTransition className="h-full">{children}</PageTransition>
           </div>
         </main>
+
+        {/* Desktop Resource Sidebar - Hidden on mobile */}
+        <div className="hidden md:block">
+          <ResourceSidebar
+            width={aiChatWidth}
+            onWidthChange={handleAiChatWidthChange}
+          />
+        </div>
+      </div>
+
+      {/* Mobile Sidebars - Only render on mobile */}
+      <div className="md:hidden">
+        <Sidebar />
         <ResourceSidebar
           width={aiChatWidth}
           onWidthChange={handleAiChatWidthChange}

@@ -8,7 +8,6 @@ import {
   Layout,
   Code,
   Home,
-  X,
 } from "lucide-react";
 import { MetallicCardanoLogo } from "../../shared/Logo";
 import { useSidebarPersistence } from "../../../hooks/useSidebarPersistence";
@@ -323,7 +322,7 @@ export default function Sidebar() {
     >
       <nav
         ref={sidebarRef}
-        className={`bg-surface/30 backdrop-blur-md transition-all duration-500 ease-out flex flex-col overflow-hidden isolate ${collapsed ? "min-w-0 rounded-3xl cursor-pointer" : "rounded-r-3xl"} ${isAnimating ? "animate-pulse" : ""}`}
+        className={`bg-surface/30 backdrop-blur-md transition-all duration-500 ease-out flex flex-col overflow-hidden isolate ${collapsed ? "min-w-0 rounded-3xl cursor-pointer" : "rounded-r-3xl"} ${isAnimating ? "animate-pulse" : ""} hidden md:flex`}
         aria-label="Sidebar navigation"
         onClick={collapsed ? handleCollapsedClick : undefined}
         title={collapsed ? "Click to expand" : ""}
@@ -382,9 +381,7 @@ export default function Sidebar() {
               onMouseDown={e => e.stopPropagation()}
               className="p-2 rounded-full hover:bg-surface/50 text-text-secondary hover:text-primary transition-colors duration-200"
               title="Collapse sidebar"
-            >
-              <X className="w-4 h-4" />
-            </button>
+            ></button>
           </div>
         </div>
 
@@ -601,6 +598,139 @@ export default function Sidebar() {
             <PersonaSwitcher variant="compact" />
           </div>
         )}
+      </nav>
+
+      {/* Mobile Navigation - Horizontal at top */}
+      <nav className="md:hidden fixed top-0 left-0 right-0 z-50 bg-surface/95 backdrop-blur-md border-b border-border rounded-b-3xl">
+        <div
+          className="flex items-center justify-between px-4 py-3 cursor-pointer"
+          onClick={() => setCollapsed(!collapsed)}
+        >
+          {/* Logo and Current Section */}
+          <div className="flex items-center gap-3">
+            <MetallicCardanoLogo size={20} className="flex-shrink-0" />
+            <div className="flex items-center gap-2">
+              <span className="font-display font-bold text-text-primary text-xs tracking-wide">
+                Learning Sections
+              </span>
+              <span className="text-xs text-text-secondary">•</span>
+              <span className="text-xs text-text-secondary truncate max-w-48">
+                {(() => {
+                  const currentPath = router.asPath;
+                  const currentSection = sections.find(section =>
+                    section.items.some(
+                      item =>
+                        currentPath === item.href ||
+                        (item.href !== "/" && currentPath.startsWith(item.href))
+                    )
+                  );
+                  if (!currentSection) return "Select Section";
+
+                  // Find the current sub-item within the section
+                  const currentItem = currentSection.items.find(
+                    item =>
+                      currentPath === item.href ||
+                      (item.href !== "/" && currentPath.startsWith(item.href))
+                  );
+
+                  if (currentItem) {
+                    return `${currentSection.title} • ${currentItem.label}`;
+                  }
+
+                  return currentSection.title;
+                })()}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Menu Items */}
+        <div
+          className={`overflow-hidden transition-all duration-300 ${collapsed ? "max-h-0" : "max-h-96"}`}
+        >
+          <div className="px-4 py-2 space-y-2">
+            {/* Home Section */}
+            <Link
+              href="/"
+              onClick={() => setCollapsed(true)}
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                router.asPath === "/"
+                  ? "bg-primary/10 text-primary border border-primary/30"
+                  : "text-text-secondary hover:text-primary hover:bg-surface-elevated/50"
+              }`}
+            >
+              <Home className="w-4 h-4" />
+              <span>Home</span>
+            </Link>
+
+            {/* Other Sections */}
+            {sections.map((section, idx) => {
+              if (section.title === "Home") return null;
+
+              const isActiveSection = section.items.some(
+                item =>
+                  router.asPath === item.href ||
+                  (item.href !== "/" && router.asPath.startsWith(item.href))
+              );
+
+              return (
+                <div key={section.title} className="space-y-1">
+                  <button
+                    className={`flex items-center w-full text-left py-2 px-3 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                      isActiveSection || selectedSection === idx
+                        ? "bg-primary/20 text-primary border border-primary/50"
+                        : "text-text-secondary hover:text-primary hover:bg-surface-elevated/50"
+                    }`}
+                    onClick={() => {
+                      toggleSection(idx);
+                      setSelectedSection(idx);
+                    }}
+                  >
+                    <span className="text-primary mr-3">{section.icon}</span>
+                    <span className="flex-1">{section.title}</span>
+                    <ChevronDown
+                      className={`w-3 h-3 transition-transform duration-200 ${
+                        openSections[idx] ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {/* Sub-items */}
+                  <div
+                    className={`pl-6 space-y-1 transition-all duration-200 ${
+                      openSections[idx]
+                        ? "max-h-96 opacity-100"
+                        : "max-h-0 opacity-0 overflow-hidden"
+                    }`}
+                  >
+                    {section.items.map(item => {
+                      const isActiveItem = router.asPath === item.href;
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={() => setCollapsed(true)}
+                          className={`block py-1 px-3 rounded text-xs transition-colors duration-200 ${
+                            isActiveItem
+                              ? "text-primary bg-primary/30 border border-primary/50"
+                              : "text-text-secondary hover:text-primary hover:bg-surface-elevated/50"
+                          }`}
+                        >
+                          {item.label}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* Persona Switcher for Mobile */}
+            <div className="pt-2 border-t border-border/30">
+              <PersonaSwitcher variant="compact" />
+            </div>
+          </div>
+        </div>
       </nav>
     </div>
   );

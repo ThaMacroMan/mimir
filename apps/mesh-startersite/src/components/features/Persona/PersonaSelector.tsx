@@ -64,7 +64,11 @@ export default function PersonaSelector({
     if (persona.logo.type === "metallic") {
       return (
         <div className="w-full h-full flex items-center justify-center">
-          <MetallicCardanoLogo size={200} className="w-auto h-auto" />
+          <MetallicCardanoLogo size={60} className="w-auto h-auto md:hidden" />
+          <MetallicCardanoLogo
+            size={200}
+            className="w-auto h-auto hidden md:block"
+          />
         </div>
       );
     } else if (persona.logo.type === "image" && persona.logo.src) {
@@ -73,9 +77,9 @@ export default function PersonaSelector({
           <Image
             src={persona.logo.src}
             alt={`${persona.name} logo`}
-            width={200}
-            height={200}
-            className={`object-contain ${
+            width={60}
+            height={60}
+            className={`object-contain w-12 h-12 md:w-48 md:h-48 ${
               persona.id === "ai-user" ? "brightness-0" : ""
             }`}
           />
@@ -86,8 +90,8 @@ export default function PersonaSelector({
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
+    <div className="w-full max-w-4xl mx-auto px-4">
+      <div className="grid grid-cols-3 gap-2 md:gap-6 max-w-3xl mx-auto">
         {(Object.keys(PERSONAS) as LearnerPersona[]).map((personaId, index) => {
           const persona = PERSONAS[personaId];
           const isSelected = selectedPersona === personaId;
@@ -105,7 +109,7 @@ export default function PersonaSelector({
                 onClick={() => onPersonaSelect(personaId)}
                 onMouseEnter={() => setHoveredPersona(personaId)}
                 onMouseLeave={() => setHoveredPersona(null)}
-                className={`w-full h-56 transition-all duration-300 relative cursor-pointer ${isHovered ? "scale-[1.02]" : "scale-100"}`}
+                className={`w-full h-32 md:h-56 transition-all duration-300 relative cursor-pointer ${isHovered ? "scale-[1.02]" : "scale-100"}`}
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -115,7 +119,7 @@ export default function PersonaSelector({
                   <div className="flex-none flex items-end justify-center pb-2">
                     <div className="text-center">
                       <h3
-                        className="text-2xl text-primary leading-tight drop-shadow-lg"
+                        className="text-sm md:text-2xl text-primary leading-tight drop-shadow-lg"
                         style={{
                           fontFamily: isSelected
                             ? "'Inter-ExtraBoldItalic', 'Inter', sans-serif"
@@ -136,7 +140,7 @@ export default function PersonaSelector({
                         <motion.div
                           initial={{ opacity: 0, scale: 0.8 }}
                           animate={{ opacity: 1, scale: 1 }}
-                          className="absolute w-52 h-52 rounded-full border-2 border-primary"
+                          className="absolute w-20 h-20 md:w-52 md:h-52 rounded-full border-2 border-primary"
                         />
                       )}
                       <div className="relative z-10">
@@ -156,7 +160,7 @@ export default function PersonaSelector({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mt-16"
+          className="text-center mt-4 md:mt-8 px-4"
         >
           <motion.button
             onClick={handleStartHere}
@@ -171,12 +175,13 @@ export default function PersonaSelector({
               transition: { duration: 0.1 },
             }}
             className="
-              relative group px-12 py-6 rounded-3xl font-display font-bold text-xl
+              relative group px-6 md:px-10 py-3 md:py-5 rounded-2xl md:rounded-3xl font-display font-bold text-base md:text-lg
               transition-all duration-500 ease-out
               shadow-2xl hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.4)]
               backdrop-blur-sm border border-white/20
               overflow-hidden
               bg-gradient-to-br from-primary to-primary-hover hover:from-primary-hover hover:to-primary text-white
+              w-full max-w-xs mx-auto
             "
           >
             {/* Animated background glow */}
@@ -201,12 +206,12 @@ export default function PersonaSelector({
             />
 
             {/* Button content with enhanced typography */}
-            <div className="relative z-10 flex items-center justify-center space-x-3">
-              <span className="text-2xl font-bold tracking-wide drop-shadow-lg">
+            <div className="relative z-10 flex items-center justify-center space-x-2 md:space-x-3">
+              <span className="text-base md:text-xl font-bold tracking-wide drop-shadow-lg">
                 Start Here
               </span>
               <motion.svg
-                className="w-6 h-6"
+                className="w-4 h-4 md:w-5 md:h-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

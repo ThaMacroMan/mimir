@@ -1,7 +1,5 @@
 import { ReactNode } from "react";
 import { motion } from "framer-motion";
-import FluidBackground from "../shared/Background/FluidBackground";
-import { usePersona } from "../../contexts/PersonaContext";
 
 interface ContentLayoutProps {
   children: ReactNode;
@@ -31,8 +29,6 @@ export default function ContentLayout({
   subtitle,
   className = "",
 }: ContentLayoutProps) {
-  const { selectedPersona } = usePersona();
-
   return (
     <div className="w-full h-screen cardano-gradient-bg fixed inset-0">
       {/* Fluid Cardano logos background */}

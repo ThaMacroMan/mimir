@@ -60,43 +60,46 @@ export default function MimirHero() {
 
   return (
     <div className="w-full px-4">
-      {/* Mimir Badge - now much larger, with "powered by MeshJS" inside */}
+      {/* Mimir Badge - responsive sizing */}
       <motion.div
-        className="flex justify-center mb-12"
+        className="flex justify-center mb-4 md:mb-8"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
       >
-        <div className="inline-flex flex-col items-center justify-center gap-1 from-primary/10 to-secondary/10 border-2 border-primary/40 rounded-full backdrop-blur-sm">
-          <div className="inline-flex items-center justify-center gap-3 mr-2">
-            <MetallicCardanoLogo size={120} />
-            <span className="font-display font-extrabold tracking-widest text-4xl md:text-5xl text-primary">
+        <div className="inline-flex flex-col items-center justify-center gap-1 border-2 border-primary/40 rounded-full backdrop-blur-sm p-1 md:p-3 bg-transparent md:bg-gradient-to-br md:from-primary/10 md:to-secondary/10">
+          <div className="inline-flex items-center justify-center gap-1 md:gap-2">
+            <MetallicCardanoLogo size={60} className="md:hidden" />
+            <MetallicCardanoLogo size={100} className="hidden md:block" />
+            <span className="font-display font-extrabold tracking-widest text-xl md:text-3xl lg:text-4xl text-primary">
               MIMIR
             </span>
           </div>
         </div>
       </motion.div>
 
-      <div className="flex justify-center">
-        <span className="text-lg md:text-xl text-center text-text-secondary font-display font-medium">
-          Learn to build on Cardano as a{" "}
+      <div className="flex justify-center px-2">
+        <div className="text-sm md:text-lg lg:text-xl text-center text-text-secondary font-display font-medium leading-relaxed">
+          <span>Learn to build on Cardano as a </span>
           <span
-            className={`font-bold text-primary font-display inline-block min-w-[140px] text-center transition-colors duration-200 font-mono ${
+            className={`font-bold text-primary font-display inline-block min-w-[120px] md:min-w-[140px] text-center transition-colors duration-200 font-mono ${
               isDecrypting ? "text-primary/80" : "text-primary"
             }`}
           >
             {displayText}
-          </span>{" "}
-          with simple guides, AI-powered tools, and{" "}
-          <Image
-            src="/logo-mesh-white-32x32.webp"
-            alt="MeshJS Logo"
-            width={24}
-            height={24}
-            className="w-6 h-6 opacity-80 inline-block"
-          />{" "}
-          <span className="font-bold text-primary font-display">MeshJS</span>
-        </span>
+          </span>
+          <span> with simple guides, AI-powered tools, and </span>
+          <span className="inline-flex items-center gap-1">
+            <Image
+              src="/logo-mesh-white-32x32.webp"
+              alt="MeshJS Logo"
+              width={20}
+              height={20}
+              className="w-5 h-5 md:w-6 md:h-6 opacity-80 inline-block"
+            />
+            <span className="font-bold text-primary font-display">MeshJS</span>
+          </span>
+        </div>
       </div>
     </div>
   );

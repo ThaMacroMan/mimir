@@ -7,16 +7,16 @@ export default function Home() {
   const { selectedPersona, setSelectedPersona } = usePersona();
 
   return (
-    <div className="w-full min-h-screen relative flex flex-col justify-center items-center pb-8">
-      {/* Content container - centered vertically */}
-      <div className="relative z-10 w-full flex flex-col justify-center items-center">
+    <div className="w-full relative md:min-h-screen md:flex md:flex-col md:justify-center md:items-center">
+      {/* Content container - centered vertically on desktop, natural flow on mobile */}
+      <div className="relative z-10 w-full flex flex-col md:justify-center items-center">
         {/* Hero Section */}
-        <section className="text-center mb-12 px-6 w-full relative z-10">
+        <section className="text-center mt-2 md:mt-0 mb-4 md:mb-8 w-full relative z-10">
           <MimirHero />
         </section>
 
         {/* Persona Selector */}
-        <section className="w-full relative z-10">
+        <section className="w-full relative z-10 mb-2 md:mb-0">
           <PersonaSelector
             onPersonaSelect={setSelectedPersona}
             selectedPersona={selectedPersona}
