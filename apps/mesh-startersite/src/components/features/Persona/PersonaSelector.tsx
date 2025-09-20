@@ -5,7 +5,6 @@ import {
   LearnerPersona,
   PersonaConfig,
 } from "../../../types/personas";
-import { MetallicCardanoLogo } from "../../shared/Logo";
 import Image from "next/image";
 
 import { useRouter } from "next/navigation";
@@ -60,33 +59,20 @@ export default function PersonaSelector({
     }
   };
 
-  const renderPersonaLogo = (persona: PersonaConfig) => {
-    if (persona.logo.type === "metallic") {
-      return (
-        <div className="w-full h-full flex items-center justify-center">
-          <MetallicCardanoLogo size={60} className="w-auto h-auto md:hidden" />
-          <MetallicCardanoLogo
-            size={200}
-            className="w-auto h-auto hidden md:block"
-          />
-        </div>
-      );
-    } else if (persona.logo.type === "image" && persona.logo.src) {
-      return (
-        <div className="w-full h-full flex items-center justify-center">
-          <Image
-            src={persona.logo.src}
-            alt={`${persona.name} logo`}
-            width={60}
-            height={60}
-            className={`object-contain w-12 h-12 md:w-48 md:h-48 ${
-              persona.id === "ai-user" ? "brightness-0" : ""
-            }`}
-          />
-        </div>
-      );
-    }
-    return null;
+  const renderPersonaLogo = (persona: PersonaConfig, isSelected: boolean) => {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <Image
+          src={persona.logo.src!}
+          alt={`${persona.name} logo`}
+          width={200}
+          height={200}
+          className={`object-contain w-16 h-16 md:w-52 md:h-52 ${
+            isSelected ? "" : "brightness-0 invert"
+          }`}
+        />
+      </div>
+    );
   };
 
   return (
@@ -135,16 +121,8 @@ export default function PersonaSelector({
                   {/* Logo in center */}
                   <div className="flex-1 flex items-center justify-center">
                     <div className="relative flex items-center justify-center">
-                      {/* Glass background when selected */}
-                      {isSelected && (
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          className="absolute w-20 h-20 md:w-52 md:h-52 rounded-full border-2 border-primary"
-                        />
-                      )}
                       <div className="relative z-10">
-                        {renderPersonaLogo(persona)}
+                        {renderPersonaLogo(persona, isSelected)}
                       </div>
                     </div>
                   </div>

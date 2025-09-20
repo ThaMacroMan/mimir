@@ -8,8 +8,9 @@ import {
   Layout,
   Code,
   Home,
+  X,
 } from "lucide-react";
-import { MetallicCardanoLogo } from "../../shared/Logo";
+import Image from "next/image";
 import { useSidebarPersistence } from "../../../hooks/useSidebarPersistence";
 import { getSidebarSections } from "../../../utils/sidebarUtils";
 import { usePersona } from "../../../contexts/PersonaContext";
@@ -362,7 +363,13 @@ export default function Sidebar() {
             }}
           >
             <div className="flex items-center gap-3">
-              <MetallicCardanoLogo size={20} className="flex-shrink-0" />
+              <Image
+                src="/cardano_we_logos/PNG/Cardano-RGB_Logo-Icon-White.png"
+                alt="Cardano Logo"
+                width={20}
+                height={20}
+                className="flex-shrink-0"
+              />
               <span className="font-display font-bold text-text-primary text-xs tracking-wide">
                 Learning Sections
               </span>
@@ -381,7 +388,9 @@ export default function Sidebar() {
               onMouseDown={e => e.stopPropagation()}
               className="p-2 rounded-full hover:bg-surface/50 text-text-secondary hover:text-primary transition-colors duration-200"
               title="Collapse sidebar"
-            ></button>
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
         </div>
 
@@ -608,7 +617,13 @@ export default function Sidebar() {
         >
           {/* Logo and Current Section */}
           <div className="flex items-center gap-3">
-            <MetallicCardanoLogo size={20} className="flex-shrink-0" />
+            <Image
+              src="/cardano_we_logos/PNG/Cardano-RGB_Logo-Icon-White.png"
+              alt="Cardano Logo"
+              width={20}
+              height={20}
+              className="flex-shrink-0"
+            />
             <div className="flex items-center gap-2">
               <span className="font-display font-bold text-text-primary text-xs tracking-wide">
                 Learning Sections

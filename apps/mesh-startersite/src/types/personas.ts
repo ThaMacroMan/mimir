@@ -153,7 +153,8 @@ export const PERSONAS: Record<LearnerPersona, PersonaConfig> = {
     abstractionLevel: "low",
     technicalDepth: "advanced",
     logo: {
-      type: "metallic",
+      type: "image",
+      src: "/cardano_we_logos/cardanologo_border_blue.002.png",
     },
   },
 };

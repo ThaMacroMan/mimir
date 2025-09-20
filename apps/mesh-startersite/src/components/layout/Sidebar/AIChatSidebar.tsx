@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Send, BookOpen, MessageSquare, Link, X } from "lucide-react";
-import { MetallicCardanoLogo } from "../../shared/Logo";
+import Image from "next/image";
 import { useSidebarPersistence } from "../../../hooks/useSidebarPersistence";
 import { usePersona } from "../../../contexts/PersonaContext";
 import { LearnerPersona } from "../../../types/personas";
@@ -701,12 +701,6 @@ export default function ResourceSidebar({
                   }
                 }}
               >
-                <div className="flex items-center gap-3">
-                  <MetallicCardanoLogo size={20} className="flex-shrink-0" />
-                  <span className="font-display font-bold text-text-primary text-xs tracking-wide">
-                    Help & Chat
-                  </span>
-                </div>
                 <button
                   onClick={() => {
                     setCollapsed(true);
@@ -725,6 +719,18 @@ export default function ResourceSidebar({
                 >
                   <X className="w-4 h-4" />
                 </button>
+                <div className="flex items-center gap-3">
+                  <span className="font-display font-bold text-text-primary text-xs tracking-wide">
+                    Help & Chat
+                  </span>
+                  <Image
+                    src="/cardano_we_logos/PNG/Cardano-RGB_Logo-Icon-White.png"
+                    alt="Cardano Logo"
+                    width={20}
+                    height={20}
+                    className="flex-shrink-0"
+                  />
+                </div>
               </div>
             </div>
 
