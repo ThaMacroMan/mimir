@@ -26,8 +26,8 @@ export default function DocTemplate({
         }}
       ></motion.div>
 
-      {/* Scrollable content container that uses remaining space */}
-      <div className="flex-1 overflow-y-auto">
+      {/* Content container that uses remaining space */}
+      <div className="flex-1 flex">
         <div
           className={`w-full max-w-none px-2 py-2 md:px-4 lg:px-8 ${className}`}
         >

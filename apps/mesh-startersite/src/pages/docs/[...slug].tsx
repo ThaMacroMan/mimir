@@ -30,7 +30,7 @@ interface DocPageProps {
 export default function DocPage({ mdxSource, frontmatter }: DocPageProps) {
   return (
     <DocTemplate title={frontmatter.title}>
-      <div className="prose prose-lg max-w-none text-text-primary font-display">
+      <div className="prose prose-lg not-prose:max-w-none max-w-none text-text-primary font-display h-full m-0 p-0">
         <MDXRemote {...mdxSource} components={mdxComponents} />
       </div>
     </DocTemplate>
@@ -61,7 +61,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   const slugs = getAllMDXSlugs();
 
   const paths = slugs.map(slug => ({
-    params: { slug },
+    params: { slug: slug.split("/") },
   }));
 
   return {

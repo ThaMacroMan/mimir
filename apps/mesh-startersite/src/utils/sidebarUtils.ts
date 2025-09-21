@@ -58,17 +58,17 @@ export function getSidebarSections(
             items: [
               {
                 label: "AI Basics",
-                href: "/docs/ai-basics",
+                href: "/docs/what-is-ai/ai-basics",
                 difficulty: "beginner",
               },
               {
                 label: "Blockchain Basics",
-                href: "/docs/blockchain-basics",
+                href: "/docs/what-is-ai/blockchain-basics",
                 difficulty: "beginner",
               },
               {
                 label: "Cardano Explained",
-                href: "/docs/cardano-explained",
+                href: "/docs/what-is-ai/cardano-explained",
                 difficulty: "beginner",
               },
             ],
@@ -84,7 +84,7 @@ export function getSidebarSections(
               },
               {
                 label: "ChatGPT Guide",
-                href: "/docs/chatgpt-guide",
+                href: "/docs/what-is-ai/chatgpt-guide",
                 difficulty: "beginner",
               },
               {
@@ -115,7 +115,7 @@ export function getSidebarSections(
               },
               {
                 label: "Safety Guide",
-                href: "/docs/safety-guide",
+                href: "/docs/what-is-ai/safety-guide",
                 difficulty: "beginner",
               },
             ],
@@ -146,17 +146,17 @@ export function getSidebarSections(
             items: [
               {
                 label: "AI Basics",
-                href: "/docs/ai-basics",
+                href: "/docs/what-is-ai/ai-basics",
                 difficulty: "intermediate",
               },
               {
                 label: "Blockchain Basics",
-                href: "/docs/blockchain-basics",
+                href: "/docs/what-is-ai/blockchain-basics",
                 difficulty: "intermediate",
               },
               {
                 label: "Cardano Explained",
-                href: "/docs/cardano-explained",
+                href: "/docs/what-is-ai/cardano-explained",
                 difficulty: "intermediate",
               },
             ],
@@ -172,7 +172,7 @@ export function getSidebarSections(
               },
               {
                 label: "ChatGPT Guide",
-                href: "/docs/chatgpt-guide",
+                href: "/docs/what-is-ai/chatgpt-guide",
                 difficulty: "intermediate",
               },
               {
@@ -203,7 +203,7 @@ export function getSidebarSections(
               },
               {
                 label: "Safety Guide",
-                href: "/docs/safety-guide",
+                href: "/docs/what-is-ai/safety-guide",
                 difficulty: "intermediate",
               },
             ],
@@ -260,17 +260,17 @@ export function getSidebarSections(
             items: [
               {
                 label: "AI Basics",
-                href: "/docs/ai-basics",
+                href: "/docs/what-is-ai/ai-basics",
                 difficulty: "advanced",
               },
               {
                 label: "Blockchain Basics",
-                href: "/docs/blockchain-basics",
+                href: "/docs/what-is-ai/blockchain-basics",
                 difficulty: "advanced",
               },
               {
                 label: "Cardano Explained",
-                href: "/docs/cardano-explained",
+                href: "/docs/what-is-ai/cardano-explained",
                 difficulty: "advanced",
               },
             ],
@@ -286,7 +286,7 @@ export function getSidebarSections(
               },
               {
                 label: "ChatGPT Guide",
-                href: "/docs/chatgpt-guide",
+                href: "/docs/what-is-ai/chatgpt-guide",
                 difficulty: "advanced",
               },
               {
@@ -317,7 +317,7 @@ export function getSidebarSections(
               },
               {
                 label: "Safety Guide",
-                href: "/docs/safety-guide",
+                href: "/docs/what-is-ai/safety-guide",
                 difficulty: "advanced",
               },
               {
@@ -390,15 +390,15 @@ export function getSidebarSections(
             items: [
               {
                 label: "AI Basics",
-                href: "/docs/ai-basics",
+                href: "/docs/what-is-ai/ai-basics",
               },
               {
                 label: "Blockchain Basics",
-                href: "/docs/blockchain-basics",
+                href: "/docs/what-is-ai/blockchain-basics",
               },
               {
                 label: "Cardano Explained",
-                href: "/docs/cardano-explained",
+                href: "/docs/what-is-ai/cardano-explained",
               },
             ],
           },
@@ -412,7 +412,7 @@ export function getSidebarSections(
               },
               {
                 label: "ChatGPT Guide",
-                href: "/docs/chatgpt-guide",
+                href: "/docs/what-is-ai/chatgpt-guide",
               },
               {
                 label: "Cursor Setup",
@@ -438,7 +438,7 @@ export function getSidebarSections(
               },
               {
                 label: "Safety Guide",
-                href: "/docs/safety-guide",
+                href: "/docs/what-is-ai/safety-guide",
               },
             ],
           },

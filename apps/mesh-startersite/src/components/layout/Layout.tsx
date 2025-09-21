@@ -189,7 +189,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 
         <main
           ref={mainContentRef}
-          className="flex-1 transition-all duration-300 overflow-auto md:px-4 pt-12 md:pt-0 pb-12 md:pb-0"
+          className="flex-1 transition-all duration-300 overflow-hidden md:overflow-auto md:px-4 pt-12 md:pt-0 pb-12 md:pb-0"
           style={{
             height: "100vh",
             minWidth: "320px",
@@ -220,11 +220,12 @@ export default function Layout({ children }: { children: ReactNode }) {
 
       {/* Custom Scroll Navigation - moved outside flex container */}
       {router.pathname !== "/" && (
-        <ScrollNavigation
-          containerRef={mainContentRef}
-          className="hidden md:flex" // Only show on medium screens and up to avoid conflicts with mobile
-          aiChatWidth={aiChatWidth + 32} // Account for both sidebars + padding (16px + 16px)
-        />
+        <div className="hidden md:block">
+          <ScrollNavigation
+            containerRef={mainContentRef}
+            aiChatWidth={aiChatWidth + 32} // Account for both sidebars + padding (16px + 16px)
+          />
+        </div>
       )}
       {/* <div className="fixed bottom-0 left-0 right-0 z-50">
         <Footer

@@ -16,7 +16,7 @@ export default function Home() {
         </section>
 
         {/* Persona Selector */}
-        <section className="w-full relative z-10 mb-2 md:mb-0">
+        <section className="w-full relative z-10 mt-6 md:mt-16 mb-8 md:mb-16">
           <PersonaSelector
             onPersonaSelect={setSelectedPersona}
             selectedPersona={selectedPersona}

@@ -58,7 +58,7 @@ export default function TabbedTutorial({ tabs, title }: TabbedTutorialProps) {
   };
 
   return (
-    <div className="mt-0 mb-2 md:my-2 mx-auto w-full border border-border rounded-3xl overflow-hidden bg-surface flex flex-col h-[calc(100vh-104px)] md:h-[85vh] mx-0">
+    <div className="mt-0 mb-0 md:my-2 mx-auto w-full border border-border rounded-3xl overflow-hidden bg-surface/30 backdrop-blur-md flex flex-col h-[calc(100vh-110px)] mx-0">
       {/* Header with Mimir, title, and progress */}
       <div
         className="bg-surface-elevated px-1 md:px-4 py-0 md:py-2 border-b border-border rounded-tr-3xl"
@@ -119,7 +119,7 @@ export default function TabbedTutorial({ tabs, title }: TabbedTutorialProps) {
       </div>
 
       {/* Content area */}
-      <div className="p-3 md:p-6 h-[calc(100vh-80px)] md:h-[calc(85vh-120px)] overflow-y-auto scrollbar-none">
+      <div className="p-3 md:p-6 flex-1 overflow-y-auto scrollbar-none">
         {tabs[currentTab].content}
       </div>
 

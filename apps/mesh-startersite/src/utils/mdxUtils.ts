@@ -26,30 +26,51 @@ export function getMDXFiles(directory: string = "docs"): MDXFile[] {
     return [];
   }
 
-  const files = fs.readdirSync(fullPath);
-  const mdxFiles = files.filter(file => file.endsWith(".mdx"));
+  const mdxFiles: MDXFile[] = [];
 
-  return mdxFiles.map(file => {
-    const filePath = path.join(fullPath, file);
-    const fileContents = fs.readFileSync(filePath, "utf8");
-    const { data, content } = matter(fileContents);
-    const slug = file.replace(/\.mdx$/, "");
+  function scanDirectory(currentPath: string, relativePath: string = ""): void {
+    const items = fs.readdirSync(currentPath);
 
-    return {
-      slug,
-      frontmatter: data as FrontMatter,
-      content,
-      filePath,
-    };
-  });
+    for (const item of items) {
+      const itemPath = path.join(currentPath, item);
+      const itemRelativePath = relativePath
+        ? path.join(relativePath, item)
+        : item;
+      const stat = fs.statSync(itemPath);
+
+      if (stat.isDirectory()) {
+        // Recursively scan subdirectories
+        scanDirectory(itemPath, itemRelativePath);
+      } else if (item.endsWith(".mdx")) {
+        // Process MDX files
+        const fileContents = fs.readFileSync(itemPath, "utf8");
+        const { data, content } = matter(fileContents);
+        const slug = itemRelativePath.replace(/\.mdx$/, "").replace(/\\/g, "/");
+
+        mdxFiles.push({
+          slug,
+          frontmatter: data as FrontMatter,
+          content,
+          filePath: itemPath,
+        });
+      }
+    }
+  }
+
+  scanDirectory(fullPath);
+  return mdxFiles;
 }
 
 export function getMDXFileBySlug(
-  slug: string,
+  slug: string | string[],
   directory: string = "docs"
 ): MDXFile | null {
   const files = getMDXFiles(directory);
-  return files.find(file => file.slug === slug) || null;
+
+  // Handle both string and array slugs (for [...slug] routes)
+  const slugString = Array.isArray(slug) ? slug.join("/") : slug;
+
+  return files.find(file => file.slug === slugString) || null;
 }
 
 export function getAllMDXSlugs(directory: string = "docs"): string[] {

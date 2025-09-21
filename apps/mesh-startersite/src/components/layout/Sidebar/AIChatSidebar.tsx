@@ -950,9 +950,9 @@ export default function ResourceSidebar({
       </aside>
 
       {/* Mobile Bottom Navigation */}
-      <aside className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface/95 backdrop-blur-md border-t border-border rounded-t-3xl">
+      <aside className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface/30 backdrop-blur-md border-t border-border rounded-t-3xl overflow-hidden">
         {/* Mobile Tab Navigation */}
-        <div className="flex bg-surface-elevated/20">
+        <div className="flex bg-surface-elevated rounded-t-3xl">
           <button
             onClick={() => {
               if (activeTab === "resources" && !collapsed) {
@@ -1005,11 +1005,11 @@ export default function ResourceSidebar({
 
         {/* Mobile Content Area */}
         <div
-          className={`overflow-hidden transition-all duration-300 ${collapsed ? "max-h-0" : "max-h-80"}`}
+          className={`overflow-hidden transition-all duration-300 ${collapsed ? "max-h-0" : "max-h-[28rem]"}`}
         >
           {activeTab === "resources" ? (
             /* Resources Tab */
-            <div className="max-h-80 overflow-y-auto p-4 space-y-2">
+            <div className="max-h-[28rem] overflow-y-auto p-4 space-y-2">
               {resources.map((resource, idx) => (
                 <a
                   key={idx}
@@ -1029,7 +1029,7 @@ export default function ResourceSidebar({
             </div>
           ) : (
             /* AI Chat Tab */
-            <div className="max-h-80 flex flex-col bg-surface/20 backdrop-blur-sm min-w-0 overflow-hidden">
+            <div className="max-h-[28rem] flex flex-col bg-surface/20 backdrop-blur-sm min-w-0 overflow-hidden">
               <div className="flex-1 overflow-y-auto flex flex-col gap-2 py-3 px-4 min-w-0">
                 {messages.map((msg, idx) => (
                   <div
